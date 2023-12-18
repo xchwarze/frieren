@@ -1,0 +1,22 @@
+{
+    "name": "exocet/frieren-api",
+    "description": "PHP micro framework for use in routers and SBCs",
+    "type": "project",
+    "license": "LGPL-3.0-only",
+    "authors": [
+        {
+            "name": "DSR!",
+            "email": "xchwarze@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2 || ^8.3"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "classmap-authoritative": true
+    }
+}
