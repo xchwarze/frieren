@@ -1,5 +1,9 @@
 # Frieren
 
+<p align="center">
+  ![Mascot](assets/mascot.png)
+</p>
+
 ## Description
 
 Frieren is a PHP micro-framework designed for use in routers and Single Board Computers (SBCs). This framework is built to be lightweight, efficient, and easy to integrate into various PHP projects.<br>
