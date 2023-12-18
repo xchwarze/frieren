@@ -1,8 +1,6 @@
 # Frieren
 
-<p align="center">
-  ![Mascot](assets/mascot.png)
-</p>
+![Mascot](assets/mascot.png)
 
 ## Description
 
