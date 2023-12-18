@@ -1,8 +1,9 @@
-# Frieren API
+# Frieren
 
 ## Description
 
-Frieren is a PHP micro-framework designed for use in routers and Single Board Computers (SBCs). This framework is built to be lightweight, efficient, and easy to integrate into various PHP projects.
+Frieren is a PHP micro-framework designed for use in routers and Single Board Computers (SBCs). This framework is built to be lightweight, efficient, and easy to integrate into various PHP projects.<br>
+Also the project will have a sample web implementation in React or Preact. It is still under development so for the moment I only upload the api to this repo.
 
 ## Features
 
@@ -21,10 +22,12 @@ cd frieren
 
 ## Usage
 
-After installation, include Frieren API in your PHP project to enhance routing capabilities and leverage its robust features in a minimalist setup.
-The general idea is that based on the current orm and helper you create the ones you need for other platforms.
+After installation, include Frieren API in your PHP project to enhance routing capabilities and leverage its robust features in a minimalist setup.<br>
+The general idea is that based on the current orm and helper you create the ones you need for other platforms.<br>
+As an example you can find in [this repo](https://github.com/xchwarze/frieren-wpmk6) an implementation of the api part to be used as a replacement of the original one in the WifiPineapple MK6.
 
 ### Directory Structure
+- **webapp/**: TBD
 - **config/**: Contains configuration files.
 - **core/**: The core framework files.
   - `ApiCore.php`: Core API functionalities.
@@ -44,7 +47,7 @@ The general idea is that based on the current orm and helper you create the ones
 
 ## Contributing
 
-Contributions to the Frieren API are welcome. Please read the contributing guidelines before submitting your pull request.
+Contributions to the Frieren are welcome. Please read the contributing guidelines before submitting your pull request.
 License
 
 This project is licensed under the LGPL-3.0-only License - see the LICENSE file for details.
