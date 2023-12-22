@@ -61,10 +61,11 @@ class ApiCore
 
         if (!isset($_SESSION['XSRF-TOKEN'])) {
             $_SESSION['XSRF-TOKEN'] = bin2hex(random_bytes(32));
+            session_write_close();
         }
 
         if (!isset($_COOKIE['XSRF-TOKEN']) || $_COOKIE['XSRF-TOKEN'] !== $_SESSION['XSRF-TOKEN']) {
-            setcookie('XSRF-TOKEN', $_SESSION['XSRF-TOKEN'], time() + 3600, '/', '', false, true);
+            setcookie('XSRF-TOKEN', $_SESSION['XSRF-TOKEN'], 0, '/', '', false, false);
         }
     }
 

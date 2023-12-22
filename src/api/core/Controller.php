@@ -47,7 +47,7 @@ abstract class Controller
      */
     protected function handleActions()
     {
-        if (!isset(($this->request['action']))) {
+        if (!isset($this->request['action'])) {
             return $this->responseHandler->setError('No action was specified');
         }
 

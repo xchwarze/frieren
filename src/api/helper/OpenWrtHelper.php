@@ -17,10 +17,9 @@ class OpenWrtHelper
      */
     public function execBackground($command)
     {
-        $command = escapeshellarg($command);
-        exec("echo \"{$command}\" | /usr/bin/at now", $result);
-
-        return $result;
+        // the use of escapeshellarg() can break the command in this context
+        exec("echo \"{$command}\" | /usr/bin/at now");
+        //exec("{$command} > /dev/null 2>&1 &");
     }
 
     /**
@@ -50,7 +49,7 @@ class OpenWrtHelper
         $dependencyName = escapeshellarg($dependencyName);
         exec("/usr/bin/which {$dependencyName}", $output);
 
-        return !(trim($output[0]) === "");
+        return !empty($output);
     }
 
     /**
