@@ -1,3 +1,9 @@
+/*
+ * Project: Frieren Framework
+ * Copyright (C) 2023 DSR! <xchwarze@gmail.com>
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ * More info at: https://github.com/xchwarze/frieren
+ */
 import PropTypes from 'prop-types';
 
 /**
@@ -14,7 +20,7 @@ const ErrorFallback = ({ error }) => (
             </h5>
         </div>
         <div className={'card-body'}>
-            <p>An unexpected error has occurred. Here's more detail for debugging:</p>
+            <p>An unexpected error has occurred. Here&amp;apos;s more detail for debugging:</p>
             <p>Error Message: <strong>{error.message}</strong></p>
             <pre className={'border rounded bg-light text-danger p-2'}>{error.stack}</pre>
         </div>
