@@ -44,6 +44,29 @@ const schema = yup.object().shape({
     dependencies: yup.array().of(yup.string()),
 });
 
+const mainAction = async (options) => {
+    const manifestPath = path.join(process.cwd(), 'public', 'manifest.json');
+
+    try {
+        const manifest = await fs.readJson(manifestPath);
+        await schema.validate(manifest, { strict: true });
+
+        console.log(chalk.green('Validation successful: manifest.json is valid.'));
+    } catch (error) {
+        if (error instanceof yup.ValidationError) {
+            console.error(chalk.red('Validation failed:'), error.errors);
+        } else {
+            console.error(chalk.red('Unexpected error:'), error);
+        }
+
+        process.exit(1);
+    }
+};
+
+
+/**
+ * Implementation...
+ */
 console.log(chalk.yellow(`
     ,---,.                                                                  
   ,'  .' |             ,--,                                                 
@@ -67,23 +90,6 @@ program
     .name("manifest-validator")
     .description("CLI to validate a module's manifest.json file")
     .version("1.0.0")
-    .action(async () => {
-        const manifestPath = path.join(process.cwd(), 'public', 'manifest.json');
-
-        try {
-            const manifest = await fs.readJson(manifestPath);
-            await schema.validate(manifest, { strict: true });
-
-            console.log(chalk.green('Validation successful: manifest.json is valid.'));
-        } catch (error) {
-            if (error instanceof yup.ValidationError) {
-                console.error(chalk.red('Validation failed:'), error.errors);
-            } else {
-                console.error(chalk.red('Unexpected error:'), error);
-            }
-
-            process.exit(1);
-        }
-    });
+    .action(mainAction);
 
 program.parse(process.argv);

@@ -115,6 +115,36 @@ const generateManifestFile = async (data) => {
     console.log(chalk.green(`[+] Manifest file generated at ${filePath}`));
 }
 
+const mainAction = async (options) => {
+    try {
+        const userInput = await promptUser();
+
+        const manifestData = {
+            ...userInput,
+            system: false,
+            forceSidebar: false,
+            version: "1.0.0",
+        };
+        await updatePackageFile(manifestData);
+        await generateManifestFile(manifestData);
+        await prepareProjectConfig();
+
+        console.log(chalk.green('Module created successfully!'));
+    } catch (error) {
+        if (error instanceof ExitPromptError || error instanceof CancelPromptError) {
+            console.log(chalk.yellow('Prompt cancelled by user.'));
+        } else {
+            console.error(chalk.red('Unexpected error:'), error);
+        }
+
+        process.exit(1)
+    }
+};
+
+
+/**
+ * Implementation...
+ */
 console.log(chalk.yellow(`
       ___         ___                       ___           ___           ___           ___     
      /  /\\       /  /\\        ___          /  /\\         /  /\\         /  /\\         /__/\\    
@@ -137,30 +167,6 @@ program
     .name("create-frieren-module")
     .description("CLI to create a module configuration object and update project files")
     .version("1.0.0")
-    .action(async () => {
-        try {
-            const userInput = await promptUser();
-
-            const manifestData = {
-                ...userInput,
-                system: false,
-                forceSidebar: false,
-                version: "1.0.0",
-            };
-            await updatePackageFile(manifestData);
-            await generateManifestFile(manifestData);
-            await prepareProjectConfig();
-
-            console.log(chalk.green('Module created successfully!'));
-        } catch (error) {
-            if (error instanceof ExitPromptError || error instanceof CancelPromptError) {
-                console.log(chalk.yellow('Prompt cancelled by user.'));
-            } else {
-                console.error(chalk.red('Unexpected error:'), error);
-            }
-
-            process.exit(1)
-        }
-    });
+    .action(mainAction);
 
 program.parse(process.argv);
