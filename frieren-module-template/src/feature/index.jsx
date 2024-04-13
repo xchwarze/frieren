@@ -1,4 +1,10 @@
 /*
+ * Project: Frieren Framework
+ * Copyright (C) 2023 DSR! <xchwarze@gmail.com>
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ * More info at: https://github.com/xchwarze/frieren
+ */
+/*
 If you are reading this is because you want to develop a module!
 
 Basically what you have to do is:
