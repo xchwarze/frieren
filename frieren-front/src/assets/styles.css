@@ -1,0 +1,143 @@
+/* minor changes */
+
+/* first try
+.main-container {
+    background-color: #f0f0f0;
+}
+
+[data-bs-theme='dark'] .main-container {
+    background-color: #2a2e32;
+}
+*/
+
+.main-container {
+    background-color: var(--bs-gray-200);
+}
+
+[data-bs-theme='dark'] .main-container {
+    background-color: var(--bs-secondary-bg);
+}
+
+.card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-icon {
+    border: unset;
+}
+
+.user-select-none {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#header .navbar-brand,
+#header .nav-item {
+    user-select: none;
+}
+
+/* Sidebar logic */
+#sidebar {
+    min-width: 180px;
+    max-width: 180px;
+
+    -webkit-transition: all .3s;
+    -o-transition: all .3s;
+    transition: all .3s;
+
+    overflow: hidden;
+    padding-right: 0;
+    user-select: none;
+}
+
+#sidebar i {
+    font-size: 1.50rem;
+}
+
+#sidebar .icon-svg {
+    width: 1.50rem;
+}
+
+#sidebar span {
+    padding-left: 10px;
+}
+
+#sidebar .nav-link {
+    display: flex;
+    align-items: center;
+}
+
+#sidebar .btn-toggle-sidebar {
+    margin-top: auto;
+    border-top: 1px solid var(--bs-gray-600);
+    user-select: none;
+}
+
+#sidebar.active {
+    min-width: 60px;
+    max-width: 60px;
+}
+
+#sidebar.active span {
+    display: none;
+}
+
+.sidebar .nav-link {
+    color: var(--bs-light);
+    margin: 0.125rem 0;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link:focus {
+    background-color: rgba(var(--bs-light-rgb), 0.1);
+}
+
+.sidebar .nav-link.active {
+    background-color: rgba(var(--bs-light-rgb), 0.25);
+}
+
+/* I am not sure if this is needed
+#sidebar .nav-item.active::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 40px;
+    background-color: rgba(var(--bs-tertiary-bg-rgb),var(--bs-bg-opacity));
+}
+*/
+
+/* mini loading animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.icon-spin {
+    display: inline-block;
+    animation: spin 2s linear infinite;
+}
+
+.icon-svg {
+    color: var(--bs-body-color);
+    width: 1em;
+    height: auto;
+}
+
+/* fix icon-svg in buttons */
+.btn .icon-svg {
+    vertical-align: sub;
+}
+
+/* for use in about section */
+.about-image {
+    max-width: 100%;
+    height: auto;
+}

@@ -1,0 +1,19 @@
+{
+  "title": "Demo Module",
+  "name": "demo-module",
+  "description": "Demo module for scaffolding a new module",
+  "icon": "zap",
+  "author": {
+    "name": "DSR!",
+    "email": "xcharze@gmail.com"
+  },
+  "keywords": [
+    "development"
+  ],
+  "repository": "https://github.com/xchwarze",
+  "bugs": "https://github.com/xchwarze",
+  "homepage": "https://github.com/xchwarze",
+  "system": false,
+  "forceSidebar": true,
+  "version": "1.0.0"
+}

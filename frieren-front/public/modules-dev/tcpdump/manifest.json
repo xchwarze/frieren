@@ -1,0 +1,26 @@
+{
+  "title": "TCP Dump",
+  "name": "tcpdump",
+  "description": "TCPDump Web Interface for Simplified Packet Analysis",
+  "icon": "icon.png",
+  "author": {
+    "name": "DSR!",
+    "email": "xchwarze@gmail.com"
+  },
+  "keywords": [
+    "network",
+    "tools"
+  ],
+  "repository": "https://github.com/xchwarze/",
+  "bugs": "https://github.com/xchwarze/",
+  "homepage": "https://github.com/xchwarze/",
+  "guestType": [
+    "OpenWrt"
+  ],
+  "dependencies": [
+    "tcpdump"
+  ],
+  "system": false,
+  "forceSidebar": false,
+  "version": "1.0.0"
+}

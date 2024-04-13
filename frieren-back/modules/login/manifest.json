@@ -1,0 +1,17 @@
+{
+  "title": "Login",
+  "name": "login",
+  "description": "Adds to Frieren the possibility to log in with username and password.",
+  "author": {
+    "name": "DSR!",
+    "email": "xchwarze@gmail.com"
+  },
+  "keywords": [],
+  "repository": "https://github.com/xchwarze/frieren",
+  "bugs": "https://github.com/xchwarze/frieren/issues",
+  "homepage": "https://github.com/xchwarze",
+  "guestType": [],
+  "system": true,
+  "forceSidebar": false,
+  "version": "1.0.0"
+}

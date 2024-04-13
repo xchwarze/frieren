@@ -1,0 +1,9 @@
+.login-background {
+    background-image: url('bg.png');
+    background-position: center;
+    background-repeat: repeat;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

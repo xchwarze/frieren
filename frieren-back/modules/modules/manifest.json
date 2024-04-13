@@ -1,0 +1,19 @@
+{
+  "title": "Modules",
+  "name": "modules",
+  "description": "Adds support for third party modules to Frieren.",
+  "icon": "package",
+  "author": {
+    "name": "DSR!",
+    "email": "xchwarze@gmail.com"
+  },
+  "keywords": [],
+  "repository": "https://github.com/xchwarze/frieren",
+  "bugs": "https://github.com/xchwarze/frieren/issues",
+  "homepage": "https://github.com/xchwarze",
+  "guestType": [],
+  "system": true,
+  "forceSidebar": true,
+  "version": "1.0.0",
+  "order": 2
+}

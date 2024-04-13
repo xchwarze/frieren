@@ -1,0 +1,15 @@
+{
+    "name": "frieren-icons",
+    "prefix": "icon",
+    "inputDir": "./src/icons",
+    "outputDir": "./src/assets/fonts",
+    "fontTypes": ["woff2"],
+    "assetTypes": ["css", "html"],
+    "formatOptions": {
+        "svg": {
+            "centerHorizontally": true,
+            "centerVertically": true,
+            "normalize": true
+        }
+    }
+}

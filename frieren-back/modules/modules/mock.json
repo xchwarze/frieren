@@ -1,0 +1,72 @@
+[
+    {
+        "title": "Cabinet",
+        "version": "1.1",
+        "description": "A file manager for the Web Interface",
+        "author": "newbi3",
+        "size": "4.05K"
+    },
+    {
+        "title": "Commander",
+        "version": "2.1",
+        "description": "Control the Pineapple via IRC",
+        "author": "Foxtrot",
+        "size": "3.96K"
+    },
+    {
+        "title": "ConnectedClients",
+        "version": "1.4",
+        "description": "Connected Clients is an infusion for the Wifi Pineapple that gives information about connected clients",
+        "author": "r3dfish",
+        "size": "2.23K"
+    },
+    {
+        "title": "CursedScreech",
+        "version": "1.6",
+        "description": "Securely control compromised systems.",
+        "author": "sud0nick",
+        "size": "308.35K"
+    },
+    {
+        "title": "DNSMasqSpoof",
+        "version": "1.2",
+        "description": "Forge replies to arbitrary DNS queries using DNSMasq",
+        "author": "Whistle Master",
+        "size": "4.54K"
+    },
+    {
+        "title": "DNSspoof",
+        "version": "1.7",
+        "description": "Forge replies to arbitrary DNS queries using DNSspoof",
+        "author": "Whistle Master",
+        "size": "6.13K"
+    },
+    {
+        "title": "DWall",
+        "version": "1.6",
+        "description": "Display's Plaintext HTTP URLs, Cookies, POST DATA, and images from browsing clients.",
+        "author": "Sebkinne & DSR!",
+        "size": "6.85K"
+    },
+    {
+        "title": "Deauth",
+        "version": "1.7",
+        "description": "Deauthentication attacks of all devices connected to APs nearby",
+        "author": "Whistle Master",
+        "size": "6.98K"
+    },
+    {
+        "title": "EvilPortal",
+        "version": "3.2",
+        "description": "An Evil Captive Portal.",
+        "author": "newbi3",
+        "size": "22.98K"
+    },
+    {
+        "title": "HTTPProxy",
+        "version": "1.0",
+        "description": "HTTP Proxy",
+        "author": "Malduhaymi",
+        "size": "34.91K"
+    }
+]
