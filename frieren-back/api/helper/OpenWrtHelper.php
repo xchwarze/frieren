@@ -208,7 +208,7 @@ class OpenWrtHelper
         $url = escapeshellarg($url);
         $savePath = escapeshellarg($savePath);
         $flagPath = escapeshellarg($flagPath);
-        self::execBackground("uclient-fetch -q -T 10 -O {$savePath} {$url} && touch {$flagPath}");
+        self::execBackground("uclient-fetch -q -T 10 -O {$savePath} {$url} ; touch {$flagPath}");
     }
 
     /**

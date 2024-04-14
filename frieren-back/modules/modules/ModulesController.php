@@ -158,9 +158,12 @@ class ModulesController extends \frieren\core\Controller
     {
         @unlink(self::DOWN_FLAG);
 
-        $fileName = self::getModuleCompressName($this->request['moduleName']);
-        $filePath = "/tmp/{$fileName}";
-        $url = sprintf(\DeviceConfig::MODULE_PACKAGE_PATH, \DeviceConfig::MODULE_SERVER_URL, $fileName);
+        $remoteFileName = self::getModuleCompressName(
+            "{$this->request['moduleName']}-{$this->request['version']}"
+        );
+        $localFileName = self::getModuleCompressName($this->request['moduleName']);
+        $filePath = "/tmp/{$localFileName}";
+        $url = sprintf(\DeviceConfig::MODULE_PACKAGE_PATH, \DeviceConfig::MODULE_SERVER_URL, $remoteFileName);
         self::setupCoreHelper()::downloadFile($url, $filePath , self::DOWN_FLAG);
 
         self::setSuccess([

@@ -27,9 +27,13 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
         data: installedModules,
     } = installedQuery;
 
-    const checkInstalled = (newModule) => {
-        return installedModules.some((module) => module.name === newModule.name);
-    };
+    const checkInstalled = (newModule) => (
+        installedModules.some((module) => module.name === newModule.name)
+    );
+
+    const checkUpdateable = (newModule) => (
+        checkInstalled(newModule) && installedModules.some((module) => module.version !== newModule.version)
+    );
 
     const handleDownloadClick = (value) => {
         setSelectedRemoteModule(value);
@@ -87,6 +91,16 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                                             label={''}
                                             icon={'download-cloud'}
                                             variant={'outline-primary'}
+                                            size={'sm'}
+                                            className={'ms-2'}
+                                            onClick={() => handleDownloadClick(module)}
+                                        />
+                                    )}
+                                    {checkUpdateable(module) && (
+                                        <Button
+                                            label={''}
+                                            icon={'download-cloud'}
+                                            variant={'outline-warning'}
                                             size={'sm'}
                                             className={'ms-2'}
                                             onClick={() => handleDownloadClick(module)}

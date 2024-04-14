@@ -53,7 +53,7 @@ const InstallModal = () => {
             </Modal.Header>
             <Modal.Body>
                 {isProcessing && (
-                    <div className={'text-center'}>
+                    <div className={'text-center mt-3'}>
                         <Spinner animation={'border'}/><p>Downloading and installing...</p>
                     </div>
                 )}

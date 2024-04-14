@@ -17,7 +17,7 @@ import useDownloadStatus from '@src/features/modules/hooks/useDownloadStatus.js'
  * @return {Function} The mutation hook.
  */
 const useDownloadModule = () => {
-    const { name: moduleName } = useAtomValue(installModuleAtom);
+    const { name: moduleName, version } = useAtomValue(installModuleAtom);
     const downloadStatusQuery = useDownloadStatus();
 
     return useAuthenticatedMutation({
@@ -25,6 +25,7 @@ const useDownloadModule = () => {
             module: 'modules',
             action: 'downloadModule',
             moduleName,
+            version,
         }),
         onSuccess: ({ success }) => {
             if (success) {
