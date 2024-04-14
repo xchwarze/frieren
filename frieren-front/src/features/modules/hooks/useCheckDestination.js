@@ -4,23 +4,32 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * More info at: https://github.com/xchwarze/frieren
  */
-import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
+import { useAtomValue } from 'jotai';
+
+import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
 import { fetchPost } from '@src/services/fetchService.js';
+import { MODULES_CHECK_DESTINATION } from '@src/features/modules/helpers/queryKeys.js';
+import { installModuleAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
 
 /**
- * Function to utilize a mutation hook to check a destination using the provided module name and size.
+ * Function to utilize a mutation hook to check a destination using the atom provided module name and size.
  *
  * @return {Function} The mutation hook.
  */
-const useCheckDestination = () => (
-    useAuthenticatedMutation({
-        mutationFn: ({ moduleName, moduleSize }) => fetchPost({
+const useCheckDestination = () => {
+    const { name: moduleName, size: moduleSize } = useAtomValue(installModuleAtom);
+
+    return useAuthenticatedQuery({
+        queryKey: [MODULES_CHECK_DESTINATION, moduleName, moduleSize],
+        queryFn: () => fetchPost({
             module: 'modules',
             action: 'checkDestination',
-            name: moduleName,
-            size: moduleSize,
+            moduleName,
+            moduleSize,
         }),
-    })
-);
+        enabled: false,
+        staleTime: 0,
+    });
+};
 
 export default useCheckDestination;

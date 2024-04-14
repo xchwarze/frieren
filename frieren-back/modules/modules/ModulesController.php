@@ -154,59 +154,50 @@ class ModulesController extends \frieren\core\Controller
         return "{$name}.tar.gz";
     }
 
-    private function getModuleTemp()
-    {
-        return $this->request['destination'] === 'sd' ? '/sd/tmp' : '/tmp';
-    }
-
     public function downloadModule()
     {
         @unlink(self::DOWN_FLAG);
 
-        $destination = $this->getModuleTemp();
-        @mkdir($destination, 0777, true);
-
         $fileName = self::getModuleCompressName($this->request['moduleName']);
+        $filePath = "/tmp/{$fileName}";
         $url = sprintf(\DeviceConfig::MODULE_PACKAGE_PATH, \DeviceConfig::MODULE_SERVER_URL, $fileName);
-        self::setupCoreHelper()::downloadFile($url, "{$destination}/{$fileName}", self::DOWN_FLAG);
+        self::setupCoreHelper()::downloadFile($url, $filePath , self::DOWN_FLAG);
 
-        self::setSuccess();
+        self::setSuccess([
+            'success' => true,
+            'url' => $url,
+        ]);
     }
 
     public function downloadStatus()
     {
-        if (file_exists(self::DOWN_FLAG)) {
-            $destination = $this->getModuleTemp();
-            $fileName = self::getModuleCompressName($this->request['moduleName']);
-            if (hash_file('sha256', "{$destination}/{$fileName}") == $this->request['checksum']) {
-                return self::setSuccess();
-            }
-        }
-
-        self::setSuccess(['success' => false]);
+        self::setSuccess(['success' => file_exists(self::DOWN_FLAG)]);
     }
 
     public function installModule()
     {
         $moduleName = $this->request['moduleName'];
-        $moduleDirPath = \DeviceConfig::MODULE_ROOT_FOLDER;
-        $moduleSDDirPath = \DeviceConfig::MODULE_SD_ROOT_FOLDER;
-        $useSD = $this->request['destination'] === 'sd';
+        $fileName = self::getModuleCompressName($moduleName);
+        $filePath = "/tmp/{$fileName}";
+        if (hash_file('sha256', $filePath) !== $this->request['checksum']) {
+            return self::setError('Checksum mismatch');
+        }
 
         @unlink(self::INSTALL_FLAG);
         $this->removeModule();
 
+        $useSD = $this->request['destination'] === 'sd';
+        $moduleDirPath = \DeviceConfig::MODULE_ROOT_FOLDER;
+        $moduleSDDirPath = \DeviceConfig::MODULE_SD_ROOT_FOLDER;
         if ($useSD) {
             @mkdir($moduleSDDirPath, 0777, true);
             exec("ln -s {$moduleSDDirPath}/{$moduleName} {$moduleDirPath}/{$moduleName}");
         }
 
         $installPath = $useSD ? $moduleSDDirPath : $moduleDirPath;
-        $tempPath = $this->getModuleTemp();
-        $fileName = self::getModuleCompressName($moduleName);
         self::setupCoreHelper()::execBackground(
-            "tar -xzvC {$installPath} -f {$tempPath}/{$fileName} && " .
-            "rm {$tempPath}/{$fileName} && " .
+            "tar -xzC {$installPath} -f {$filePath} && " .
+            "rm {$filePath} && " .
             "touch " . self::INSTALL_FLAG
         );
 
@@ -221,16 +212,17 @@ class ModulesController extends \frieren\core\Controller
     public function checkDestination()
     {
         $moduleName = $this->request['moduleName'];
+        $moduleSize = $this->request['moduleSize'];
         $moduleDirPath = \DeviceConfig::MODULE_ROOT_FOLDER;
         $moduleSDDirPath = \DeviceConfig::MODULE_SD_ROOT_FOLDER;
 
         $alreadyInstalled = is_dir("{$moduleDirPath}/{$moduleName}") || is_dir("{$moduleSDDirPath}/{$moduleName}");
-        $validSpace = disk_free_space('/') > ($this->request['size'] + self::MIN_DISK_SPACE);
+        $validSpace = disk_free_space('/') > ($moduleSize + self::MIN_DISK_SPACE);
 
         self::setSuccess([
             'alreadyInstalled' => $alreadyInstalled,
-            'internalAvailable' => $validSpace && \DeviceConfig::MODULE_USE_INTERNAL_STORAGE,
-            'SDAvailable' => self::setupCoreHelper()::isSDAvailable() && \DeviceConfig::MODULE_USE_USB_STORAGE,
+            'isInternalAvailable' => $validSpace && \DeviceConfig::MODULE_USE_INTERNAL_STORAGE,
+            'isSDAvailable' => self::setupCoreHelper()::isSDAvailable() && \DeviceConfig::MODULE_USE_USB_STORAGE,
         ]);
     }
 

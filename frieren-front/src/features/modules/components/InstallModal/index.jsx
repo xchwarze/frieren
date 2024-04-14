@@ -4,16 +4,18 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useState, useEffect, useCallback } from 'react';
-import { useAtom } from 'jotai';
-import { Modal, Button, Spinner } from 'react-bootstrap';
+import { useEffect, useCallback } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import Modal from 'react-bootstrap/Modal';
+import Spinner from 'react-bootstrap/Spinner';
 
-import selectedRemoteModuleAtom from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
+import { installModuleAtom, setModuleDestinationAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
 import useCheckDestination from '@src/features/modules/hooks/useCheckDestination';
 import useDownloadModule from '@src/features/modules/hooks/useDownloadModule';
-import useInstallModule from '@src/features/modules/hooks/useInstallModule';
-import useDownloadStatus from '@src/features/modules/hooks/useDownloadStatus';
-import useInstallationStatus from '@src/features/modules/hooks/useInstallationStatus';
+import Button from '@src/components/Button';
+
+const TYPE_SD = 'sd';
+const TYPE_INTERNAL = 'internal';
 
 /**
  * Generates a modal for installing modules. Handles the download and installation process
@@ -21,86 +23,74 @@ import useInstallationStatus from '@src/features/modules/hooks/useInstallationSt
  * @return {ReactElement} The modal component for installing modules
  */
 const InstallModal = () => {
-    const STATUS_DOWNLOADING = 'downloading';
-    const STATUS_INSTALLING = 'installing';
-
-    const [destination, setDestination] = useState('');
-    const [status, setStatus] = useState('');
-    const [selectedRemoteModule, setSelectedRemoteModule] = useAtom(selectedRemoteModuleAtom);
-
-    const { mutate: checkDestination } = useCheckDestination();
+    const [selectedRemoteModule, setSelectedRemoteModule] = useAtom(installModuleAtom);
+    const setDestination = useSetAtom(setModuleDestinationAtom);
+    const { data: destinationStatus, refetch: checkDestination, isSuccess: isDestinationSuccess } = useCheckDestination();
     const { mutate: downloadModule } = useDownloadModule();
-    const { mutate: installModule } = useInstallModule();
-    const isDownloadComplete  = useDownloadStatus({
-        isActive: status === STATUS_DOWNLOADING,
-        moduleName: selectedRemoteModule?.title,
-        destination
-    });
-    const isInstallationComplete = useInstallationStatus({
-        isActive: status === STATUS_INSTALLING,
-        moduleName: selectedRemoteModule?.title
-    });
+    const { title, author, repository, destination, updating } = selectedRemoteModule ?? {};
+    const { isInternalAvailable, isSDAvailable } = destinationStatus ?? {};
+    const isProcessing = destination !== undefined;
 
-    const handleDownloadClick = (dest) => {
-        setDestination(dest);
-        downloadModule({
-            moduleName: selectedRemoteModule.title,
-            destination: dest
-        });
-        setStatus(STATUS_DOWNLOADING);
+    const handleDownloadClick = (destination) => {
+        setDestination(destination);
+        downloadModule();
     };
 
     const handleCloseClick = useCallback(() => {
         setSelectedRemoteModule(false);
-        setStatus('');
     }, [setSelectedRemoteModule]);
 
     useEffect(() => {
         if (selectedRemoteModule) {
-            // TODO esto esta por la mitad
-            checkDestination({
-                moduleName: selectedRemoteModule.title,
-                moduleSize: selectedRemoteModule.size
-            });
+            checkDestination();
         }
     }, [selectedRemoteModule, checkDestination]);
-
-    useEffect(() => {
-        if (isDownloadComplete) {
-            installModule({
-                moduleName: selectedRemoteModule.title,
-                destination
-            });
-            setStatus(STATUS_INSTALLING);
-        }
-    }, [destination, installModule, isDownloadComplete, selectedRemoteModule.title]);
-
-    useEffect(() => {
-        if (isInstallationComplete) {
-            handleCloseClick();
-        }
-    }, [handleCloseClick, isInstallationComplete]);
 
     return (
         <Modal show={selectedRemoteModule} onHide={handleCloseClick} centered>
             <Modal.Header closeButton>
                 <Modal.Title>
-                    {selectedRemoteModule?.updating ? `Update Module ${selectedRemoteModule.title}` : `Install Module ${selectedRemoteModule.title}`}
+                    {updating ? `Update Module ${title}` : `Install Module ${title}`}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {status === STATUS_DOWNLOADING && <div className="text-center"><Spinner animation="border" /><p>Downloading...</p></div>}
-                {status === STATUS_INSTALLING && <div className="text-center"><Spinner animation="border" /><p>Installing...</p></div>}
-                {status === '' && (
+                {isProcessing && (
+                    <div className={'text-center'}>
+                        <Spinner animation={'border'}/><p>Downloading and installing...</p>
+                    </div>
+                )}
+                {!isProcessing && (
                     <>
-                        <p>This community module was developed by: <b>{selectedRemoteModule.author}</b></p>
-                        <p>If you have any problem or comment about the module you can leave it to the developer at the <a href="" target="_blank" rel="noopener noreferrer">following link</a></p>
+                        <p>This community module was developed by: <b>{author}</b></p>
+                        <p>If you have any problem or comment about the module you can leave it to the developer at the
+                            &nbsp;<a href={repository} target={'_blank'} rel={'noopener noreferrer'}>following link</a></p>
                     </>
                 )}
             </Modal.Body>
             <Modal.Footer>
-                <Button onClick={() => handleDownloadClick('sd')} disabled={status !== ''}>Install to SD Card</Button>
-                <Button onClick={() => handleDownloadClick('internal')} disabled={status !== ''} className="ms-2">Install Internally</Button>
+                {!isDestinationSuccess && (
+                    <Spinner animation={'border'} />
+                )}
+                {isDestinationSuccess && (
+                    <>
+                        {isSDAvailable && (
+                            <Button
+                                label={'Install to SD Card'}
+                                icon={'moon'}
+                                disabled={destination === TYPE_INTERNAL}
+                                loading={destination === TYPE_SD}
+                                onClick={() => handleDownloadClick(TYPE_SD)}
+                            />
+                        )}
+                        <Button
+                            label={'Install Internally'}
+                            icon={'hard-drive'}
+                            disabled={!isInternalAvailable || destination === TYPE_SD}
+                            loading={destination === TYPE_INTERNAL}
+                            onClick={() => handleDownloadClick(TYPE_INTERNAL)}
+                        />
+                    </>
+                )}
             </Modal.Footer>
         </Modal>
     );

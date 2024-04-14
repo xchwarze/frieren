@@ -4,39 +4,45 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import useInterval from '@src/hooks/useInterval';
 import { fetchPost } from '@src/services/fetchService.js';
+import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
+import { MODULES_DOWNLOAD_STATUS } from '@src/features/modules/helpers/queryKeys.js';
+import useInstallModule from '@src/features/modules/hooks/useInstallModule.js';
 
 /**
  * Generates a hook to track download status.
  *
- * @param {String} moduleName - The name of the module.
- * @param {String} destination - The destination for the download.
- * @param {String} checksum - The checksum for validation.
- * @param {Boolean} isActive - Flag to indicate if the download is active.
  * @return {Boolean} Returns true when download is complete.
  */
-const useDownloadStatus = ({ moduleName, destination, checksum, isActive }) => {
-    const [downloadComplete, setDownloadComplete] = useState(false);
-    const callback = async () => {
-        if (!downloadComplete) {
-            const response = await fetchPost({
-                module: 'modules',
-                action: 'downloadStatus',
-                moduleName,
-                destination,
-                checksum,
-            });
-            if (response.success) {
-                setDownloadComplete(true);
+const useDownloadStatus = () => {
+    const [isRunning, setIsRunning] = useState(false);
+    const { mutate: installModule } = useInstallModule();
+
+    const query = useAuthenticatedQuery({
+        queryKey: [MODULES_DOWNLOAD_STATUS],
+        queryFn: () => fetchPost({
+            module: 'modules',
+            action: 'downloadStatus',
+        }),
+        enabled: isRunning,
+        staleTime: 0,
+        refetchInterval: 2500,
+    });
+
+    useEffect(() => {
+        if (query.isSuccess) {
+            // for enabling polling
+            setIsRunning(query.data.success === false);
+
+            if (query.data.success) {
+                installModule();
             }
         }
-    }
-    useInterval(callback, isActive && !downloadComplete ? 2000 : null);
+    }, [query.data, query.isSuccess]);
 
-    return downloadComplete;
+    return query
 };
 
 export default useDownloadStatus;

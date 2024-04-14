@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import { openLink } from '@src/helpers/actionsHelper.js';
 import PanelCard from '@src/components/PanelCard';
 import Button from '@src/components/Button';
-import selectedRemoteModuleAtom from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
+import { installModuleAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
 
 /**
  * Generates a card component displaying available modules. Handles click events for downloading modules.
@@ -21,7 +21,7 @@ import selectedRemoteModuleAtom from '@src/features/modules/atoms/selectedRemote
  * @return {ReactElement} The AvailableModulesCard component.
  */
 const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
-    const setSelectedRemoteModule = useSetAtom(selectedRemoteModuleAtom);
+    const setSelectedRemoteModule = useSetAtom(installModuleAtom);
     const { data, isSuccess, isFetching, refetch } = availableQuery;
     const {
         data: installedModules,
@@ -73,7 +73,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                                 <td>{module.description}</td>
                                 <td>{module.author}</td>
                                 <td>{module.version}</td>
-                                <td>{module.size}</td>
+                                <td>{module.sizeHuman}</td>
                                 <td>
                                     <Button
                                         label={''}

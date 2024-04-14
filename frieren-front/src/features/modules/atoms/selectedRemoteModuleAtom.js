@@ -6,6 +6,15 @@
  */
 import { atom } from 'jotai'
 
-const selectedRemoteModuleAtom = atom(false);
+const installModuleAtom = atom(false);
 
-export default selectedRemoteModuleAtom;
+// this atom is a wrapper around installModuleAtom
+const setModuleDestinationAtom = atom(
+    null,
+    (get, set, newState) => {
+        const state = get(installModuleAtom);
+        set(installModuleAtom, { ...state, destination: newState });
+    }
+);
+
+export { installModuleAtom, setModuleDestinationAtom };

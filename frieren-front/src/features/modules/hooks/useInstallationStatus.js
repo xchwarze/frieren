@@ -4,35 +4,52 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { useQueryClient } from '@tanstack/react-query';
 
-import useInterval from '@src/hooks/useInterval';
 import { fetchPost } from '@src/services/fetchService.js';
+import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
+import { MODULES_INSTALLATION_STATUS, MODULES_GET_INSTALLED_MODULES } from '@src/features/modules/helpers/queryKeys.js';
+import { installModuleAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
 
 /**
- * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
+ * Generates a hook to track installation status.
  *
- * @param {String} moduleName - The name of the module.
- * @param {Boolean} isActive - Indicates whether the module is active.
- * @return {Boolean} Returns a boolean indicating if the installation is complete.
+ * @return {Boolean} Returns true when download is complete.
  */
-const useInstallationStatus = ({ moduleName, isActive }) => {
-    const [installationComplete, setInstallationComplete] = useState(false);
-    const callback = async () => {
-        if (!installationComplete) {
-            const response = await fetchPost({
-                module: 'modules',
-                action: 'installStatus',
-                moduleName,
-            });
-            if (response.success) {
-                setInstallationComplete(true);
+const useInstallationStatus = () => {
+    const [isRunning, setIsRunning] = useState(false);
+    const setInstallModule = useSetAtom(installModuleAtom);
+    const queryClient = useQueryClient();
+
+    const query = useAuthenticatedQuery({
+        queryKey: [MODULES_INSTALLATION_STATUS],
+        queryFn: () => fetchPost({
+            module: 'modules',
+            action: 'installStatus',
+        }),
+        enabled: isRunning,
+        staleTime: 0,
+        refetchInterval: 2500,
+    });
+
+    useEffect(() => {
+        if (query.isSuccess) {
+            // for enabling polling
+            setIsRunning(query.data.success === false);
+
+            if (query.data.success) {
+                queryClient.refetchQueries({
+                    queryKey: [MODULES_GET_INSTALLED_MODULES],
+                    active: true,
+                });
+                setInstallModule(false);
             }
         }
-    }
-    useInterval(callback,  isActive && !installationComplete ? 1000 : null);
+    }, [query.data, query.isSuccess, queryClient, setInstallModule]);
 
-    return installationComplete;
+    return query
 };
 
 export default useInstallationStatus;
