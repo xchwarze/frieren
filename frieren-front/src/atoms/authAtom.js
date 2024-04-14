@@ -6,6 +6,6 @@
  */
 import { atomWithStorage } from 'jotai/utils';
 
-const authAtom = atomWithStorage('user-logged', null);
+const authAtom = atomWithStorage('user-logged', false);
 
 export default authAtom;
