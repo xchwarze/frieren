@@ -9,13 +9,11 @@ import { useAtom, useSetAtom } from 'jotai';
 import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
 
+import { MODULE_INSTALL_TYPE_INTERNAL, MODULE_INSTALL_TYPE_SD } from '@src/features/modules/helpers/constants.js';
 import { installModuleAtom, setModuleDestinationAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
 import useCheckDestination from '@src/features/modules/hooks/useCheckDestination';
 import useDownloadModule from '@src/features/modules/hooks/useDownloadModule';
 import Button from '@src/components/Button';
-
-const TYPE_SD = 'sd';
-const TYPE_INTERNAL = 'internal';
 
 /**
  * Generates a modal for installing modules. Handles the download and installation process
@@ -77,17 +75,17 @@ const InstallModal = () => {
                             <Button
                                 label={'Install to SD Card'}
                                 icon={'moon'}
-                                disabled={destination === TYPE_INTERNAL}
-                                loading={destination === TYPE_SD}
-                                onClick={() => handleDownloadClick(TYPE_SD)}
+                                disabled={destination === MODULE_INSTALL_TYPE_INTERNAL}
+                                loading={destination === MODULE_INSTALL_TYPE_SD}
+                                onClick={() => handleDownloadClick(MODULE_INSTALL_TYPE_SD)}
                             />
                         )}
                         <Button
                             label={'Install Internally'}
                             icon={'hard-drive'}
-                            disabled={!isInternalAvailable || destination === TYPE_SD}
-                            loading={destination === TYPE_INTERNAL}
-                            onClick={() => handleDownloadClick(TYPE_INTERNAL)}
+                            disabled={!isInternalAvailable || destination === MODULE_INSTALL_TYPE_SD}
+                            loading={destination === MODULE_INSTALL_TYPE_INTERNAL}
+                            onClick={() => handleDownloadClick(MODULE_INSTALL_TYPE_INTERNAL)}
                         />
                     </>
                 )}

@@ -9,12 +9,10 @@ import Alert from 'react-bootstrap/Alert';
 import { useAtomValue } from 'jotai';
 import PropTypes from 'prop-types';
 
+import { MODULE_INSTALL_TYPE_INTERNAL, MODULE_INSTALL_TYPE_SD } from '@src/features/modules/helpers/constants.js';
 import { dependencyInstallStatusAtom } from '@src/atoms/dependencyInstallStatusAtom.js';
 import useInstallModuleDependencies from '@src/hooks/useInstallModuleDependencies.js';
 import Button from '@src/components/Button';
-
-const TYPE_SD = 'sd';
-const TYPE_INTERNAL = 'internal';
 
 /**
  * Render an alert for missing required dependencies.
@@ -36,16 +34,16 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
     const hasLog = hasDependencies === false && logContent.length > 0;
 
     const handleInstallToSDClick = useCallback(() => {
-        setSelectedOption(TYPE_SD);
+        setSelectedOption(MODULE_INSTALL_TYPE_SD);
         installDependencies({
-            destination: TYPE_SD
+            destination: MODULE_INSTALL_TYPE_SD
         });
     }, [installDependencies, setSelectedOption]);
 
     const handleInstallInternallyClick = useCallback(() => {
-        setSelectedOption(TYPE_INTERNAL);
+        setSelectedOption(MODULE_INSTALL_TYPE_INTERNAL);
         installDependencies({
-            destination: ''
+            destination: MODULE_INSTALL_TYPE_INTERNAL
         });
     }, [installDependencies, setSelectedOption]);
 
@@ -76,8 +74,8 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
                         label={'Install to SD Card'}
                         icon={'moon'}
                         variant={'outline-primary'}
-                        disabled={isLoading && selectedOption === TYPE_INTERNAL}
-                        loading={isLoading && selectedOption === TYPE_SD}
+                        disabled={isLoading && selectedOption === MODULE_INSTALL_TYPE_INTERNAL}
+                        loading={isLoading && selectedOption === MODULE_INSTALL_TYPE_SD}
                         onClick={handleInstallToSDClick}
                     />
                 )}
@@ -85,8 +83,8 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
                     label={'Install Internally'}
                     icon={'hard-drive'}
                     variant={'outline-primary'}
-                    disabled={!internalAvailable || isLoading && selectedOption === TYPE_SD}
-                    loading={isLoading && selectedOption === TYPE_INTERNAL}
+                    disabled={!internalAvailable || isLoading && selectedOption === MODULE_INSTALL_TYPE_SD}
+                    loading={isLoading && selectedOption === MODULE_INSTALL_TYPE_INTERNAL}
                     onClick={handleInstallInternallyClick}
                 />
             </div>
