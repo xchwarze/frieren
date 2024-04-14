@@ -54,10 +54,6 @@ class ModulesController extends \frieren\core\Controller
             }
 
             $info = json_decode(file_get_contents($moduleManifest), true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                continue;
-            }
-
             $this->categorizeModule($info, $sidebarSettings, $modules);
         }
 
@@ -72,7 +68,7 @@ class ModulesController extends \frieren\core\Controller
     }
 
     private function categorizeModule($info, $sidebarSettings, &$modules) {
--        $module = [
+        $module = [
             'name'  => $info['name'],
             'title' => $info['title'],
         ];
@@ -94,14 +90,10 @@ class ModulesController extends \frieren\core\Controller
 
     public function getAvailableModules()
     {
-        //$url = sprintf(\DeviceConfig::MODULES_PATH, \DeviceConfig::SERVER_URL);
-        //$moduleData = self::setupModuleHelper()::fileGetContentsSSL($url);
-        $moduleData = file_get_contents(__DIR__ . '/mock.json');
+        $url = sprintf(\DeviceConfig::MODULE_JSON_PATH, \DeviceConfig::MODULE_SERVER_URL);
+        $moduleData = self::setupCoreHelper()::fileGetContentsSSL($url);
         if ($moduleData !== false) {
-            $moduleData = json_decode($moduleData);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return self::setSuccess($moduleData);
-            }
+            return self::setSuccess(json_decode($moduleData));
         }
 
         self::setError('Error connecting to remote host. Please check your connection.');
@@ -175,8 +167,8 @@ class ModulesController extends \frieren\core\Controller
         @mkdir($destination, 0777, true);
 
         $fileName = self::getModuleCompressName($this->request['moduleName']);
-        $url = sprintf(\DeviceConfig::INSTALL_MODULE_PATH, \DeviceConfig::SERVER_URL, $fileName);
-        self::setupModuleHelper()::downloadFile($url, "{$destination}/{$fileName}", self::DOWN_FLAG);
+        $url = sprintf(\DeviceConfig::MODULE_PACKAGE_PATH, \DeviceConfig::MODULE_SERVER_URL, $fileName);
+        self::setupCoreHelper()::downloadFile($url, "{$destination}/{$fileName}", self::DOWN_FLAG);
 
         self::setSuccess();
     }
@@ -212,7 +204,7 @@ class ModulesController extends \frieren\core\Controller
         $installPath = $useSD ? $moduleSDDirPath : $moduleDirPath;
         $tempPath = $this->getModuleTemp();
         $fileName = self::getModuleCompressName($moduleName);
-        self::setupModuleHelper()::execBackground(
+        self::setupCoreHelper()::execBackground(
             "tar -xzvC {$installPath} -f {$tempPath}/{$fileName} && " .
             "rm {$tempPath}/{$fileName} && " .
             "touch " . self::INSTALL_FLAG
@@ -238,7 +230,7 @@ class ModulesController extends \frieren\core\Controller
         self::setSuccess([
             'alreadyInstalled' => $alreadyInstalled,
             'internalAvailable' => $validSpace && \DeviceConfig::MODULE_USE_INTERNAL_STORAGE,
-            'SDAvailable' => self::setupModuleHelper()::isSDAvailable() && \DeviceConfig::MODULE_USE_USB_STORAGE,
+            'SDAvailable' => self::setupCoreHelper()::isSDAvailable() && \DeviceConfig::MODULE_USE_USB_STORAGE,
         ]);
     }
 

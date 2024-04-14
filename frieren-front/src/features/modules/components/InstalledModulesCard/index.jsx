@@ -128,6 +128,11 @@ const InstalledModulesCard = ({ installedQuery }) => {
                             </tr>
                         );
                     })}
+                    {data.length === 0 && (
+                        <tr>
+                            <td colSpan={6}>There are no modules installed yet.</td>
+                        </tr>
+                    )}
                     </tbody>
                 </Table>
             )}

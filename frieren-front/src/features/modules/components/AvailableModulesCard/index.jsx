@@ -8,6 +8,7 @@ import { Table } from 'react-bootstrap';
 import { useSetAtom } from 'jotai';
 import PropTypes from 'prop-types';
 
+import { openLink } from '@src/helpers/actionsHelper.js';
 import PanelCard from '@src/components/PanelCard';
 import Button from '@src/components/Button';
 import selectedRemoteModuleAtom from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
@@ -27,8 +28,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
     } = installedQuery;
 
     const checkInstalled = (newModule) => {
-        // TODO esta no es la estructura final pensada asi que cuando implemente el resto no va a andar
-        return installedModules.some((module) => module.title === newModule.title);
+        return installedModules.some((module) => module.name === newModule.name);
     };
 
     const handleDownloadClick = (value) => {
@@ -75,12 +75,20 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                                 <td>{module.version}</td>
                                 <td>{module.size}</td>
                                 <td>
+                                    <Button
+                                        label={''}
+                                        icon={'external-link'}
+                                        variant={'outline-secondary'}
+                                        size={'sm'}
+                                        onClick={() => openLink(module.repository)}
+                                    />
                                     {!checkInstalled(module) && (
                                         <Button
                                             label={''}
                                             icon={'download-cloud'}
                                             variant={'outline-primary'}
                                             size={'sm'}
+                                            className={'ms-2'}
                                             onClick={() => handleDownloadClick(module)}
                                         />
                                     )}

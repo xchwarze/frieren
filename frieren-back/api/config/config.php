@@ -15,15 +15,13 @@ class DeviceConfig
     // Module behaviour
     const MODULE_ROOT_FOLDER = '/pineapple/modules-dev';
     const MODULE_SD_ROOT_FOLDER = '/sd/modules';
-    const MODULE_WEB_ROOT_FOLDER = '/modules-dev';
     const MODULE_USE_INTERNAL_STORAGE = true;
     const MODULE_USE_USB_STORAGE = true;
     const MODULE_HIDE_SYSTEM_MODULES = true;
 
 
     // Remote content
-    const SERVER_URL = 'https://raw.githubusercontent.com/xchwarze/wifi-pineapple-community/main';
-    const UPGRADE_PATH = '%s/json/upgrades.json';
-    const MODULES_PATH = '%s/json/modules.json';
-    const INSTALL_MODULE_PATH = '%s/modules/build/%s';
+    const MODULE_SERVER_URL = 'https://raw.githubusercontent.com/xchwarze/frieren-modules-release/master';
+    const MODULE_JSON_PATH = '%s/json/modules.json';
+    const MODULE_PACKAGE_PATH = '%s/modules/%s';
 }
