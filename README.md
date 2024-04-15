@@ -22,18 +22,36 @@ The project also features a scaffolding tool, the `frieren-module-template`, for
 - Optimized React stack for a minimal footprint and enhanced performance.
 - Support for third-party modules, fostering an extendable ecosystem.
 
-## Getting Started
+## Related Repositories
 
-To dive into the Frieren project:
+- **[Frieren Modules](https://github.com/xchwarze/frieren-modules)**: Contains community-developed modules based on the `frieren-module-template`. This repository is a resource for users looking to extend the functionality of their Frieren installation with additional features.
+- **[Frieren Release](https://github.com/xchwarze/frieren-release)**: Hosts the installers for deploying precompiled versions of Frieren. This repository is ideal for users who wish to install Frieren quickly and easily without going through the build process.
 
-### Installation
+## Installation
+
+Frieren can be installed quickly using an automated script or compiled manually for more control over the installation process.
+
+### Quick Installation
+
+For a quick and easy installation, execute the following command in your terminal. This script will handle all necessary configurations and setup steps:
 
 ```bash
-git clone https://github.com/xchwarze/frieren
-cd frieren
+curl -fsSL https://frieren.example.com/setup.sh | sudo -E bash -
 ```
 
-Please refer to the respective `frieren-back` or `frieren-front` directories for detailed installation instructions.
+**Note:** Please ensure that you trust the source of the script before executing it with administrative privileges.
+
+### Manual Compilation
+
+For those who prefer to compile Frieren manually or need to customize the installation:
+
+1. Clone the main repository:
+   ```bash
+   git clone https://github.com/xchwarze/frieren
+   cd frieren
+   ```
+
+2. Each component within the Frieren project (`frieren-back`, `frieren-front`) has its own detailed `README.md` file with specific build and installation instructions. Please refer to these files in their respective directories for more detailed guidance.
 
 ### Module Development
 
