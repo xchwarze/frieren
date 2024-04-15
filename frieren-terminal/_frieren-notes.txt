@@ -1,0 +1,9 @@
+Project
+	https://github.com/tsl0922/ttyd
+
+Cloned from commit
+	ed551d48c6d3d644da4f2d54462d688d9e31d164
+
+THIS PROJECT USE YARN BERRY
+	yarn set version berry && yarn install
+

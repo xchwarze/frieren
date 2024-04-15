@@ -1,0 +1,193 @@
+Subject: [PATCH] Frieren modifications
+---
+Index: html/src/components/terminal/xterm/index.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/html/src/components/terminal/xterm/index.ts b/html/src/components/terminal/xterm/index.ts
+--- a/html/src/components/terminal/xterm/index.ts	(revision ed551d48c6d3d644da4f2d54462d688d9e31d164)
++++ b/html/src/components/terminal/xterm/index.ts	(date 1710616569520)
+@@ -58,7 +58,7 @@
+ 
+ export interface XtermOptions {
+     wsUrl: string;
+-    tokenUrl: string;
++    tokenUrl?: string;
+     flowControl: FlowControl;
+     clientOptions: ClientOptions;
+     termOptions: ITerminalOptions;
+@@ -123,6 +123,9 @@
+ 
+     @bind
+     public async refreshToken() {
++        this.token = this.options.tokenUrl ?? '';
++
++        /*
+         try {
+             const resp = await fetch(this.options.tokenUrl);
+             if (resp.ok) {
+@@ -132,6 +135,7 @@
+         } catch (e) {
+             console.error(`[ttyd] fetch ${this.options.tokenUrl}: `, e);
+         }
++        */
+     }
+ 
+     @bind
+@@ -267,6 +271,11 @@
+ 
+         this.doReconnect = this.reconnect;
+         this.initListeners();
++
++        // send custom event: open
++        const dispatchEvent = new CustomEvent('ws-terminal', { detail: { status: true } });
++        window.dispatchEvent(dispatchEvent);
++
+         terminal.focus();
+     }
+ 
+@@ -292,6 +301,11 @@
+                     refreshToken().then(connect);
+                 }
+             });
++
++            // send custom event: closed
++            const dispatchEvent = new CustomEvent('ws-terminal', { detail: { status: false } });
++            window.dispatchEvent(dispatchEvent);
++
+             overlayAddon.showOverlay('Press ⏎ to Reconnect');
+         }
+     }
+Index: html/package.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/html/package.json b/html/package.json
+--- a/html/package.json	(revision ed551d48c6d3d644da4f2d54462d688d9e31d164)
++++ b/html/package.json	(date 1710615733510)
+@@ -11,9 +11,9 @@
+   "license": "MIT",
+   "scripts": {
+     "prestart": "gulp clean",
+-    "start": "NODE_ENV=development && webpack serve",
+-    "build": "NODE_ENV=production webpack && gulp",
+-    "inline": "NODE_ENV=production webpack && gulp inline",
++    "start": "cross-env NODE_ENV=development && webpack serve",
++    "build": "cross-env NODE_ENV=production webpack && gulp",
++    "inline": "cross-env NODE_ENV=production webpack && gulp inline",
+     "check": "gts check",
+     "fix": "gts fix"
+   },
+@@ -23,6 +23,7 @@
+   "devDependencies": {
+     "@typescript-eslint/eslint-plugin": "^7.1.1",
+     "copy-webpack-plugin": "^12.0.2",
++    "cross-env": "^7.0.3",
+     "css-loader": "^6.10.0",
+     "css-minimizer-webpack-plugin": "^6.0.0",
+     "eslint": "^8.57.0",
+@@ -69,5 +70,5 @@
+   "resolutions": {
+     "zmodem.js@^0.1.10": "patch:zmodem.js@npm%3A0.1.10#./.yarn/patches/zmodem.js-npm-0.1.10-e5537fa2ed.patch"
+   },
+-  "packageManager": "yarn@3.6.3"
++  "packageManager": "yarn@4.1.1"
+ }
+Index: html/src/template.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/html/src/template.html b/html/src/template.html
+--- a/html/src/template.html	(revision ed551d48c6d3d644da4f2d54462d688d9e31d164)
++++ b/html/src/template.html	(date 1710615498512)
+@@ -4,8 +4,7 @@
+     <meta charset="UTF-8">
+     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+     <meta name="apple-mobile-web-app-capable" content="yes">
+-    <title><%= htmlWebpackPlugin.options.title %></title>
+-    <link inline rel="icon" type="image/png" href="favicon.png">
++    <title>terminal</title>
+     <% for (const css in htmlWebpackPlugin.files.css) { %>
+     <link inline rel="stylesheet" type="text/css" href="<%= htmlWebpackPlugin.files.css[css] %>">
+     <% } %>
+Index: html/src/components/app.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/html/src/components/app.tsx b/html/src/components/app.tsx
+--- a/html/src/components/app.tsx	(revision ed551d48c6d3d644da4f2d54462d688d9e31d164)
++++ b/html/src/components/app.tsx	(date 1710616706802)
+@@ -5,9 +5,16 @@
+ import { Terminal } from './terminal';
+ 
+ const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
++
++/*
+ const path = window.location.pathname.replace(/[/]+$/, '');
+ const wsUrl = [protocol, '//', window.location.host, path, '/ws', window.location.search].join('');
+ const tokenUrl = [window.location.protocol, '//', window.location.host, path, '/token'].join('');
++*/
++const port = 1477;
++const wsUrl = [protocol, window.location.hostname, ':', port, '/ws', window.location.search].join('');
++const tokenUrl = undefined;
++
+ const clientOptions = {
+     rendererType: 'webgl',
+     disableLeaveAlert: false,
+Index: html/.yarnrc.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/html/.yarnrc.yml b/html/.yarnrc.yml
+--- a/html/.yarnrc.yml	(revision ed551d48c6d3d644da4f2d54462d688d9e31d164)
++++ b/html/.yarnrc.yml	(date 1710610029451)
+@@ -1,1 +1,3 @@
+ nodeLinker: node-modules
++
++yarnPath: .yarn/releases/yarn-4.1.1.cjs
+Index: html/webpack.config.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/html/webpack.config.js b/html/webpack.config.js
+--- a/html/webpack.config.js	(revision ed551d48c6d3d644da4f2d54462d688d9e31d164)
++++ b/html/webpack.config.js	(date 1710615571220)
+@@ -93,9 +93,30 @@
+ const prodConfig = {
+     mode: 'production',
+     optimization: {
+-        minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
++        minimizer: [
++            new TerserPlugin({
++                terserOptions: {
++                    format: {
++                        comments: false,
++                    },
++                },
++                extractComments: false,
++            }),
++            new CssMinimizerPlugin(),
++        ],
+     },
+-    devtool: 'source-map',
++    devtool: false,
+ };
++
++if (devMode) {
++    const message = `
++=============================================
++
++WARNING: You are in development mode. Do not use this build in production.
++
++=============================================
++`;
++    console.warn(message);
++}
+ 
+ module.exports = merge(baseConfig, devMode ? devConfig : prodConfig);
