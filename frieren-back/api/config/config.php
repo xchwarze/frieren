@@ -13,7 +13,7 @@ class DeviceConfig
 
 
     // Module behaviour
-    const MODULE_ROOT_FOLDER = '/pineapple/modules-dev';
+    const MODULE_ROOT_FOLDER = '/frieren/modules';
     const MODULE_SD_ROOT_FOLDER = '/sd/modules';
     const MODULE_USE_INTERNAL_STORAGE = true;
     const MODULE_USE_USB_STORAGE = true;

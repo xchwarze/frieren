@@ -52,8 +52,7 @@ class Router {
     private function loadModule($moduleName)
     {
         $controllerName = ucfirst($moduleName) . 'Controller';
-        //$moduleFilePath = __DIR__ . "/../../modules/{$moduleName}/{$controllerName}.php";
-        $moduleFilePath = __DIR__ . "/../../modules-dev/{$moduleName}/{$controllerName}.php";
+        $moduleFilePath = __DIR__ . "/../../modules/{$moduleName}/{$controllerName}.php";
         if (!file_exists($moduleFilePath)) {
             throw new \Exception("Module file for '{$moduleName}' does not exist.");
         }
