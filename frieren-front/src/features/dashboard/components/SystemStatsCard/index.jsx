@@ -23,14 +23,6 @@ const SystemStatsCard = () => {
         >
             {isSuccess && !isFetching && (
                 <div className={'d-flex justify-content-evenly mt-2'}>
-                    <div className={'text-center me-3'}>
-                        <p className={'fs-4 mb-0'}>
-                            {data?.cpu_cores ?? ''}
-                        </p>
-                        <span className={'text-muted text-uppercase'}>
-                            cpu cores
-                        </span>
-                    </div>
                     <div className={'text-center'}>
                         <p className={'fs-4 mb-0'}>
                             {data?.cpu_usage ?? ''}
@@ -53,6 +45,14 @@ const SystemStatsCard = () => {
                         </p>
                         <span className={'text-muted text-uppercase'}>
                             swap
+                        </span>
+                    </div>
+                    <div className={'text-center me-3'}>
+                        <p className={'fs-4 mb-0'}>
+                            {data?.uptime ?? ''}
+                        </p>
+                        <span className={'text-muted text-uppercase'}>
+                            uptime
                         </span>
                     </div>
                 </div>

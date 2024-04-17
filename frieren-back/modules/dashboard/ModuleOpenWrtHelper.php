@@ -34,24 +34,20 @@ class ModuleOpenWrtHelper
             return false;
         }
 
-        // TODO esto se tiene que leer desde el .config
-        $totalCores = 1;
-        /* mi idea es agregar esto parte de la seccion diagnistics
-         $data = file('/proc/stat');
-
-        $cores = 0;
+        $data = file('/proc/stat');
+        $totalCores = 0;
         foreach ($data as $line) {
             if (preg_match('/^cpu[0-9]+/', $line)) {
-                $cores++;
+                $totalCores++;
             }
         }
-         */
 
         $loadPercentage = ($resume['load'][0] / self::SYSTEM_LOAD_SCALE_FACTOR) / $totalCores * 100;
         $swapUsed = $resume['swap']['total'] - $resume['swap']['free'];
         $memUsed = $resume['memory']['total'] - $resume['memory']['free'] - $resume['memory']['buffered'] - $resume['memory']['cached'];
 
         return [
+            'total_cores' => $totalCores,
             'load' => min(round($loadPercentage, 1), 100),
             'swap_used' => $swapUsed,
             'swap_total' => $resume['swap']['total'],
@@ -134,21 +130,12 @@ class ModuleOpenWrtHelper
         $hours = floor(($seconds % 86400) / 3600);
         $minutes = floor(($seconds % 3600) / 60);
 
-        $uptimeParts = [];
         if ($days > 0) {
-            $uptimeParts[] = $days . ' ' . ($days == 1 ? 'day' : 'days');
+            return sprintf("%dd %02d:%02d hrs", $days, $hours, $minutes);
+        } else if ($hours > 0 || $minutes > 0) {
+            return sprintf("%02d:%02d hrs", $hours, $minutes);
+        } else {
+            return sprintf("%d sec", $seconds);
         }
-        if ($hours > 0 || $days > 0) {
-            $uptimeParts[] = $hours . ' ' . ($hours == 1 ? 'hour' : 'hours');
-        }
-        if ($minutes > 0 || $hours > 0 || $days > 0) {
-            $uptimeParts[] = $minutes . ' ' . ($minutes == 1 ? 'minute' : 'minutes');
-        }
-
-        if (empty($uptimeParts)) {
-            return 'less than 1 minute';
-        }
-
-        return implode(', ', $uptimeParts);
     }
 }

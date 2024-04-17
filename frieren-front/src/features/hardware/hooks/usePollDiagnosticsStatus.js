@@ -31,7 +31,6 @@ const usePollDiagnosticsStatus = () => {
     const checkDiagnosticsStatus = async () => {
         await queryClient.refetchQueries({
             queryKey: [HARDWARE_GET_DIAGNOSTICS_STATUS],
-            active: true,
         });
         const queryState = queryClient.getQueryState([HARDWARE_GET_DIAGNOSTICS_STATUS]);
         if (queryState?.data?.completed) {

@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { fetchPost } from '@src/services/fetchService.js';
 import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
+import { MODULES_GET_MODULE_LIST } from '@src/helpers/queryKeys.js';
 import { MODULES_INSTALLATION_STATUS, MODULES_GET_INSTALLED_MODULES } from '@src/features/modules/helpers/queryKeys.js';
 import { installModuleAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
 
@@ -39,15 +40,18 @@ const useInstallationStatus = () => {
             // for enabling polling
             setIsRunning(query.data.success === false);
 
-            if (query.data.success) {
-                queryClient.refetchQueries({
+            // I use both of them to force the effect to always run...!
+            if (query.isSuccess && query.isFetching === false) {
+                queryClient.invalidateQueries({
+                    queryKey: [MODULES_GET_MODULE_LIST],
+                });
+                queryClient.invalidateQueries({
                     queryKey: [MODULES_GET_INSTALLED_MODULES],
-                    active: true,
                 });
                 setInstallModule(false);
             }
         }
-    }, [query.data, query.isSuccess, queryClient, setInstallModule]);
+    }, [query.data, query.isSuccess, query.isFetching, queryClient, setInstallModule]);
 
     return query
 };

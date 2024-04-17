@@ -32,7 +32,8 @@ const useDownloadStatus = () => {
     });
 
     useEffect(() => {
-        if (query.isSuccess) {
+        // I use both of them to force the effect to always run...!
+        if (query.isSuccess && query.isFetching === false) {
             // for enabling polling
             setIsRunning(query.data.success === false);
 
@@ -40,7 +41,7 @@ const useDownloadStatus = () => {
                 installModule();
             }
         }
-    }, [query.data, query.isSuccess]);
+    }, [query.data, query.isSuccess, query.isFetching, installModule]);
 
     return query
 };
