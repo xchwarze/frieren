@@ -23,7 +23,7 @@ const FRIEREN_MODULE_PREFIX = 'FrierenModule';
  * @return {ReactElement} The rendered dynamic module.
  */
 const DynamicModule = ({ name }) => {
-    const modulesFolder = import.meta.env.VITE_WEB_ROOT_FOLDER;
+    const modulesFolder = import.meta.env.VITE_WEB_MODULES_FOLDER;
     const src = `${window.location.origin}/${modulesFolder}/${name}/module.umd.js`;
     const libraryName =  FRIEREN_MODULE_PREFIX + ucfirst(name);
     const { status, retry } = useScript(src);

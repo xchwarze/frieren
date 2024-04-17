@@ -23,6 +23,9 @@ const Terminal = () => {
     const collapseStatus = useAtomValue(collapseStatusAtom);
     const terminalStatus = useAtomValue(terminalStatusAtom)
     const iframeRef = useRef(null);
+
+    const modulesFolder = import.meta.env.VITE_WEB_MODULES_FOLDER;
+    const iframeSrc = `${window.location.origin}/${modulesFolder}/terminal/inline.html`;
     const defaultHeight = 200;
 
     useTerminalStatusEvent(iframeRef, terminalStatus);
@@ -57,7 +60,7 @@ const Terminal = () => {
                         >
                             <iframe
                                 ref={iframeRef}
-                                src={'modules/Terminal/iframe.html'}
+                                src={iframeSrc}
                                 style={{
                                     width: '100%',
                                     height: defaultHeight,

@@ -16,7 +16,7 @@ import PropTypes from 'prop-types';
  */
 const ModuleIcon = ({ name, module, ...rest }) => {
     if (name.endsWith('.svg') || name.endsWith('.png')) {
-        const modulesFolder = import.meta.env.VITE_WEB_ROOT_FOLDER;
+        const modulesFolder = import.meta.env.VITE_WEB_MODULES_FOLDER;
         const src = `${window.location.origin}/${modulesFolder}/${module}/${name}`;
         return (
             <img alt={''} src={src} className={'icon-svg'} {...rest} />

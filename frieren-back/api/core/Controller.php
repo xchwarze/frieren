@@ -234,6 +234,21 @@ abstract class Controller
     }
 
     /**
+     * Logs a message to the system's syslog.
+     *
+     * @param string $message The message to log.
+     * @param string $level The severity level of the log ('emerg', 'alert', 'crit', 'err',
+     *                       'warning', 'notice', 'info', 'debug'). Default is 'err'.
+     */
+    protected function logger($message, $level = 'err')
+    {
+        $status = self::setupCoreHelper()->logger($message, $level);
+        if ($status === false) {
+            throw new \Exception("Error logging message: {$message}");
+        }
+    }
+
+    /**
      * Gets the response handler instance.
      *
      * @return ResponseHandler The response handler object.

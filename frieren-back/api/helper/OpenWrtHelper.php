@@ -48,7 +48,7 @@ class OpenWrtHelper
     public static function execBackground($command)
     {
         // the use of escapeshellarg() can break the command in this context
-        exec("echo \"{$command}\" | /usr/bin/at now");
+        exec("/usr/bin/nohup {$command} > /dev/null 2>&1 &");
         //exec("{$command} > /dev/null 2>&1 &");
     }
 
@@ -90,7 +90,7 @@ class OpenWrtHelper
      */
     public static function checkDependency($dependencies)
     {
-        $output = self::exec('opkg list-installed');
+        $output = self::exec('/bin/opkg list-installed');
         $missingDependencies = [];
         foreach ($dependencies as $dependency) {
             if (strpos($output, "{$dependency} -") === false) {
@@ -278,5 +278,18 @@ class OpenWrtHelper
         }
 
         return false;
+    }
+
+    /**
+     * Logs a message to the system's syslog.
+     *
+     * @param string $message The message to log.
+     * @param string $level The severity level of the log ('emerg', 'alert', 'crit', 'err',
+     *                       'warning', 'notice', 'info', 'debug'). Default is 'err'.
+     * @return null|false Null if the command executes successfully, false if it fails.
+     */
+    public static function logger($message, $level = 'err')
+    {
+        return self::exec("/usr/bin/logger -p user.{$level} '{$message}'");
     }
 }
