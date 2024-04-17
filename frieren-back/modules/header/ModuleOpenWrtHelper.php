@@ -6,7 +6,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 
-namespace frieren\modules\dashboard;
+namespace frieren\modules\header;
 
 use frieren\helper\OpenWrtHelper;
 
