@@ -21,7 +21,7 @@ const TerminalHeader = () => {
     const [collapseStatus, setCollapseStatus] = useAtom(collapseStatusAtom);
     const socketStatus = useAtomValue(socketStatusAtom);
     const { mutate: closeTerminalMutation } = useCloseTerminalMutation();
-    const isOffline = socketStatus === 'offline';
+    const isOffline = socketStatus === 'disconnected';
 
     return (
         <div className={`d-flex justify-content-between align-items-center w-100 text-white user-select-none ${isOffline ? 'bg-danger' : 'bg-secondary'}`}>

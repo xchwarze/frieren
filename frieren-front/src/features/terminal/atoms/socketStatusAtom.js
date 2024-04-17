@@ -6,6 +6,6 @@
  */
 import { atomWithReset } from 'jotai/utils';
 
-const socketStatusAtom = atomWithReset(false);
+const socketStatusAtom = atomWithReset('');
 
 export default socketStatusAtom;

@@ -7,3 +7,4 @@ Cloned from commit
 THIS PROJECT USE YARN BERRY
 	yarn set version berry && yarn install
 
+gzip -k inline.html

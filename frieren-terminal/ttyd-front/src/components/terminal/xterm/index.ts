@@ -245,6 +245,7 @@ export class Xterm {
     public connect() {
         this.socket = new WebSocket(this.options.wsUrl, ['tty']);
         const { socket, register } = this;
+        this.dispatchEvent('initializing');
 
         socket.binaryType = 'arraybuffer';
         register(addEventListener(socket, 'open', this.onSocketOpen));
@@ -265,16 +266,14 @@ export class Xterm {
             terminal.reset();
             terminal.options.disableStdin = false;
             overlayAddon.showOverlay('Reconnected', 300);
+            this.dispatchEvent('reconnected');
         } else {
             this.opened = true;
+            this.dispatchEvent('connected');
         }
 
         this.doReconnect = this.reconnect;
         this.initListeners();
-
-        // send custom event: open
-        const dispatchEvent = new CustomEvent('ws-terminal', { detail: { status: true } });
-        window.dispatchEvent(dispatchEvent);
 
         terminal.focus();
     }
@@ -286,11 +285,13 @@ export class Xterm {
         const { refreshToken, connect, doReconnect, overlayAddon } = this;
         overlayAddon.showOverlay('Connection Closed');
         this.dispose();
+        this.dispatchEvent('disconnected');
 
         // 1000: CLOSE_NORMAL
         if (event.code !== 1000 && doReconnect) {
             overlayAddon.showOverlay('Reconnecting...');
             refreshToken().then(connect);
+            this.dispatchEvent('reconnecting');
         } else {
             const { terminal } = this;
             const keyDispose = terminal.onKey(e => {
@@ -301,10 +302,6 @@ export class Xterm {
                     refreshToken().then(connect);
                 }
             });
-
-            // send custom event: closed
-            const dispatchEvent = new CustomEvent('ws-terminal', { detail: { status: false } });
-            window.dispatchEvent(dispatchEvent);
 
             overlayAddon.showOverlay('Press ⏎ to Reconnect');
         }
@@ -493,5 +490,11 @@ export class Xterm {
             default:
                 break;
         }
+    }
+
+    @bind
+    private dispatchEvent(status: string) {
+        const dispatchEvent = new CustomEvent('ws-terminal', { detail: { status: status } });
+        window.dispatchEvent(dispatchEvent);
     }
 }
