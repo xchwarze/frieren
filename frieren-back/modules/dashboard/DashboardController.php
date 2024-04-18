@@ -29,14 +29,14 @@ class DashboardController extends \frieren\core\Controller
     {
         $resume = self::setupModuleHelper()::getUbusSystemInfo();
         if ($resume) {
-            $memory_used_pct = @round(($resume['memory_used'] / $resume['memory_total']) * 100, 2);
-            $swap_used_pct = @round(($resume['swap_used'] / $resume['swap_total']) * 100, 2);
+            $memory_used_pct = $resume['memory_total'] > 0 ? round(($resume['memory_used'] / $resume['memory_total']) * 100, 2) : 0;
+            $swap_used_pct = $resume['swap_total'] > 0 ? round(($resume['swap_used'] / $resume['swap_total']) * 100, 2) : 0;
 
             return self::setSuccess([
                 'cpu_cores' => $resume['total_cores'],
                 'cpu_usage' => $resume['load'] . '%',
-                'memory_used' =>  is_nan($memory_used_pct) ? '0%' : $memory_used_pct . '%',
-                'swap_used' => is_nan($swap_used_pct) ? '0%' : $swap_used_pct . '%',
+                'memory_used' => $memory_used_pct . '%',
+                'swap_used' => $swap_used_pct . '%',
                 'uptime' => $resume['uptime'],
                 'localtime' => $resume['localtime'],
             ]);

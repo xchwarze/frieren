@@ -43,12 +43,13 @@ class OpenWrtHelper
      * Executes a command in the background.
      *
      * @param string $command The command to execute.
+     * @param string $redirect The file path for redirecting the command's output (default is /dev/null).
      * @return mixed The result of the command execution.
      */
-    public static function execBackground($command)
+    public static function execBackground($command, $redirect = '/dev/null 2>&1')
     {
         // the use of escapeshellarg() can break the command in this context
-        exec("/usr/bin/nohup {$command} > /dev/null 2>&1 &");
+        exec("/usr/bin/nohup {$command} > {$redirect} &");
         //exec("{$command} > /dev/null 2>&1 &");
     }
 
@@ -208,7 +209,7 @@ class OpenWrtHelper
         $url = escapeshellarg($url);
         $savePath = escapeshellarg($savePath);
         $flagPath = escapeshellarg($flagPath);
-        self::execBackground("uclient-fetch -q -T 10 -O {$savePath} {$url} ; touch {$flagPath}");
+        self::execBackground("/bin/uclient-fetch -q -T 10 -O {$savePath} {$url} ; touch {$flagPath}");
     }
 
     /**
@@ -236,7 +237,7 @@ class OpenWrtHelper
         }
 
         $url = escapeshellarg($url);
-        return self::exec("uclient-fetch -q -T 10 -O - {$url}");
+        return self::exec("/bin/uclient-fetch -q -T 10 -O - {$url}");
     }
 
     /**
@@ -271,7 +272,7 @@ class OpenWrtHelper
     public static function execUbusCall($command)
     {
         //$command = escapeshellarg($command);
-        $resume = self::exec("ubus call {$command}");
+        $resume = self::exec("/bin/ubus call {$command}");
         $parsed = json_decode($resume, true);
         if (json_last_error() === JSON_ERROR_NONE) {
             return $parsed;
