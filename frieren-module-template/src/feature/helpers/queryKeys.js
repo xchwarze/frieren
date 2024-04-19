@@ -4,8 +4,5 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * More info at: https://github.com/xchwarze/frieren
  */
-import DemoPage from './feature/containers/Demo';
-
-const Loader = () => <DemoPage />;
-
-export default Loader;
+// format: FEATURE_ACTION
+export const DEMO_GET_SYSTEM_STATS = 'demo-get-system-stats';

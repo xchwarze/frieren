@@ -1,7 +1,7 @@
 {
   "title": "Demo Module",
-  "name": "demo-module",
-  "description": "Demo module for scaffolding a new module",
+  "name": "demo",
+  "description": "Demo for scaffolding a new module",
   "icon": "zap",
   "author": {
     "name": "DSR!",
@@ -10,9 +10,9 @@
   "keywords": [
     "development"
   ],
-  "repository": "https://github.com/xchwarze",
-  "bugs": "https://github.com/xchwarze",
-  "homepage": "https://github.com/xchwarze",
+  "repository": "https://github.com/xchwarze/frieren-modules/tree/master/demo",
+  "bugs": "https://github.com/xchwarze/frieren-modules/issues",
+  "homepage": "https://github.com/xchwarze/frieren-modules",
   "system": false,
   "forceSidebar": true,
   "version": "1.0.0"

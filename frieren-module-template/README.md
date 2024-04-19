@@ -12,7 +12,7 @@ To begin developing your own module for the Frieren project, follow these steps:
 
 1. **Setup**: Clone the repository and install both `frieren-front` and `frieren-module-template` dependencies with `yarn install`.
 2. **Feature Creation**: In the `frieren-front` project, create a new feature. Utilize the `@module` alias to ensure this new feature is completely isolated.
-3. **Module Wizard**: Navigate to the `frieren-module-template` directory in your console and execute `yarn wizard`. Follow the wizard's guidance through the setup process.
+3. **Module Wizard**: Navigate to the `frieren-module-template` directory in your console and execute `yarn wizard`. Follow the wizard's guidance through the setup process. This command will also use as .env the .env.prod file.
 4. **Feature Integration**: Transfer the isolated feature from `frieren-front` to `frieren-module-template`, connecting it to `entry.jsx`. Remember to correct the paths by doing a mass replace similar to this: `features/tcpdump` -> `feature`.
 5. **Build Module**: In the `frieren-module-template` project, run `yarn build` to compile your module.
 6. **Finalize and Publish**: Rename the module folder to match your module's name and upload it to GitHub.
@@ -25,6 +25,16 @@ This template comes equipped with various scripts to aid in your module developm
 - `build`: Compiles your module into a distributable format.
 - `wizard`: A guided setup to scaffold your module.
 - `validate`: Ensures your module meets the required specifications.
+
+## Advanced Examples for Reference
+
+This section provides insights into more complex scenarios that you might encounter while developing modules for the Frieren project. These examples highlight advanced usage of the framework's capabilities and can serve as a reference for implementing sophisticated features in your modules.
+
+- **[WPA Online Crack](https://github.com/xchwarze/frieren-modules/tree/master/wpaonlinecrack)**: This example demonstrates the automatic dependency installation system. It illustrates how the module seamlessly integrates required libraries without manual interventions, ensuring that all dependencies are correctly managed and installed.
+- **[TCP Dump](https://github.com/xchwarze/frieren-modules/tree/master/tcpdump)**: Here, you can see a variation of the dependency installation system, which includes additional checks performed by a third-party module. This ensures that all dependencies not only get installed but are also verified and validated against specific criteria before being utilized.
+- **[WPA Online Crack](https://github.com/xchwarze/frieren-modules/tree/master/wpaonlinecrack)**: This example provides insights into using the system to persist configurations. It shows how to effectively save and retrieve configuration settings to ensure that data persistence is maintained across sessions, which is crucial for modules that require state management.
+
+These examples are designed to provide a deeper understanding of how you can leverage the Frieren project's infrastructure to develop robust and efficient modules.
 
 ## Common Configuration
 
