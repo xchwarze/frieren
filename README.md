@@ -6,7 +6,7 @@
 
 Frieren is an advanced micro-framework and application stack designed for routers and Single Board Computers (SBCs). <br/>
 Combining a lightweight PHP backend with a React frontend, it aims to provide an efficient, modular, and easily integrable framework. <br/>
-The project also features a scaffolding tool, the `frieren-module-template`, for developing new modules with UMD libraries, further enhancing the Frieren ecosystem.
+The project also features a scaffolding tool for developing new modules with UMD libraries, further enhancing the Frieren ecosystem.
 
 ## Components
 
@@ -29,37 +29,23 @@ The project also features a scaffolding tool, the `frieren-module-template`, for
 
 ## Installation
 
-Frieren can be installed quickly using an automated script or compiled manually for more control over the installation process.
+Frieren can be installed quickly using an automated script or compiled manually for more control over the installation process. Frieren is currently fully supported only on OpenWRT platforms.
 
 ### Quick Installation
 
 For a quick and easy installation, execute the following command in your terminal. This script will handle all necessary configurations and setup steps:
 
 ```bash
-curl -fsSL https://frieren.example.com/setup.sh | sudo -E bash -
+wget -qO- https://raw.githubusercontent.com/xchwarze/frieren-release/master/install/install-openwrt.sh | sh
 ```
-
-**Note:** Please ensure that you trust the source of the script before executing it with administrative privileges.
 
 ### Manual Compilation
 
-For those who prefer to compile Frieren manually or need to customize the installation:
-
-1. Clone the main repository:
-   ```bash
-   git clone https://github.com/xchwarze/frieren
-   cd frieren
-   ```
-
-2. Each component within the Frieren project (`frieren-back`, `frieren-front`) has its own detailed `README.md` file with specific build and installation instructions. Please refer to these files in their respective directories for more detailed guidance.
+Each component within the Frieren project (`frieren-back`, `frieren-front` and `frieren-module-template`) has its own detailed `README.md` file with specific build and installation instructions. Please refer to these files in their respective directories for more detailed guidance.
 
 ### Module Development
 
-Each component and module within the Frieren project comes with its detailed documentation, guiding you through specific installation steps, features, and how to leverage its functionalities. The `frieren-module-template` serves as a starting point for developing additional modules, enriching the Frieren ecosystem.
-
-## Configuration and Development Notes
-
-The project includes common configurations essential for compiling and optimizing modules. These settings are particularly crucial for managing dependencies and testing with real hardware, ensuring modules are lightweight and performant.
+The `frieren-module-template` serves as a comprehensive scaffolding tool, specifically designed to streamline the development of UMD modules fully integrated within the Frieren ecosystem. This template simplifies the process of creating and integrating modular features, which are both reusable and distributable, thus significantly enhancing the project ecosystem.
 
 ## License
 

@@ -4,7 +4,7 @@
 
 ## Description
 
-Frieren Web is the frontend part of the Frieren project, built with modern web technologies like React and Vite. It provides a responsive and intuitive user interface for interacting with the Frieren backend services on routers and Single Board Computers (SBCs). This project aims to deliver a seamless experience for managing and configuring network devices.
+Frieren Web is the frontend part of the Frieren project, built with modern web technologies like React and Vite. It provides a responsive and intuitive user interface for interacting with the Frieren backend services. This project aims to deliver a seamless experience for managing and configuring network devices.
 
 ## Features
 
@@ -31,12 +31,16 @@ yarn install
 To start the development server, run:
 
 ```bash
+cd frieren/frieren-front
+cp config/.env.dev .env
 yarn dev
 ```
 
 For building the project for production, use:
 
 ```bash
+cd frieren/frieren-front
+cp config/.env.prod .env
 yarn build
 ```
 
@@ -64,7 +68,7 @@ Image Licensing Information: The images used in this project are subject to thei
 
 ## Authors and Acknowledgment
 
-- DSR! - xchwarze@gmail.com
+- **Lead Developer**: DSR! - xchwarze@gmail.com
 
 Thank you to all the contributors and the community for supporting the Frieren project.
 

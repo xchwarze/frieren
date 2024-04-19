@@ -48,8 +48,8 @@ The general idea is that based on the current orm and helper you create the ones
 ## Requirements
 
 - PHP 7.2 or higher
-- OpenWrt 19 or higher
-- Other dependencies that you may need are: at, uclient-fetch, uci, grep
+- OpenWrt 19 or higher. **Other platforms can also be used**, but OpenWRT is ready to use as it is the main platform of the project.
+- Other dependencies that you may need are: php7-mod-hash, php7-mod-json, php7-mod-mbstring, php7-mod-session, php7-mod-sqlite3, coreutils-nohup, uclient-fetch, usbutils, ttyd
 
 ## Contributing
 
@@ -63,7 +63,7 @@ Image Licensing Information: The images used in this project are subject to thei
 
 ## Authors and Acknowledgment
 
-- DSR! - xchwarze@gmail.com
+- **Lead Developer**: DSR! - xchwarze@gmail.com
 
 Thank you to all the contributors and the community for supporting the Frieren project.
 
