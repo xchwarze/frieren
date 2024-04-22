@@ -54,16 +54,14 @@ The Frieren project is licensed under the LGPL-3.0-only License, emphasizing ope
 
 The Frieren project welcomes contributions. Your input helps enhance the project, whether through new features, improvements to the frontend experience, or the development of modules.
 
+## Authors, Acknowledgments, and Contact
+
+- **Lead Developer**: DSR! - xchwarze@gmail.com
+- **Contributors**: A heartfelt thank you to all contributors for supporting and growing the Frieren project.
+
 ## Support the Development
 
 We're constantly working on new features and improvements for Frieren, and your support can make a big difference! If you find value in Frieren and want to help us continue innovating, consider making a donation. Your contributions will directly fund the acquisition of testing hardware and support the ongoing development of robust security solutions. Send your donation via Binance or for a more engaged experience, where you can receive exclusive updates and builds, join us on [Patreon](https://www.patreon.com/xchwarze).
 
 [![patreon](assets/patreon.png)](https://www.patreon.com/xchwarze)
 ![binance-qr](assets/binance-qr.png)
-
-## Authors, Acknowledgments, and Contact
-
-- **Lead Developer**: DSR! - xchwarze@gmail.com
-- **Contributors**: A heartfelt thank you to all contributors for supporting and growing the Frieren project.
-
-For support or queries regarding the Frieren project, please contact xchwarze@gmail.com.
