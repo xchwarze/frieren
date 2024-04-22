@@ -4,7 +4,7 @@
 
 ## Description
 
-Frieren is a highly efficient PHP micro-framework, meticulously crafted for routers and Single Board Computers (SBCs). With its lightweight architecture, Frieren excels in performance and offers seamless integration into a wide range of PHP projects. Its design principles emphasize simplicity and flexibility, making it an ideal choice for developers seeking a robust framework without the overhead of conventional solutions.
+Frieren is a highly efficient PHP micro-framework tailored for backend development. Its lightweight design is optimized for performance across various environments, making it suitable for a range of PHP projects. Frieren's core features simplicity and flexibility, making it ideal for developers seeking a streamlined, robust backend solution without the overhead of larger frameworks.
 
 ## Features
 

@@ -4,8 +4,7 @@
 
 ## Description
 
-Frieren is an advanced micro-framework and application stack designed for routers and Single Board Computers (SBCs). <br/>
-Combining a lightweight PHP backend with a React frontend, it aims to provide an efficient, modular, and easily integrable framework. <br/>
+Frieren is an advanced micro-framework and application stack crafted for developing security gadgets and tools on routers and Single Board Computers (SBCs). It integrates a lightweight PHP backend with a responsive React frontend, aiming to offer an efficient, modular, and easily adaptable framework for security-focused applications. <br/>
 The project also features a scaffolding tool for developing new modules with UMD libraries, further enhancing the Frieren ecosystem.
 
 ## Components
@@ -54,6 +53,13 @@ The Frieren project is licensed under the LGPL-3.0-only License, emphasizing ope
 ## Contributing
 
 The Frieren project welcomes contributions. Your input helps enhance the project, whether through new features, improvements to the frontend experience, or the development of modules.
+
+## Support the Development
+
+We're constantly working on new features and improvements for Frieren, and your support can make a big difference! If you find value in Frieren and want to help us continue innovating, consider making a donation. Your contributions will directly fund the acquisition of testing hardware and support the ongoing development of robust security solutions. Send your donation via Binance or for a more engaged experience, where you can receive exclusive updates and builds, join us on [Patreon](https://www.patreon.com/xchwarze).
+
+[![patreon](assets/patreon.png)](https://www.patreon.com/xchwarze)
+![binance-qr](assets/binance-qr.png)
 
 ## Authors, Acknowledgments, and Contact
 
