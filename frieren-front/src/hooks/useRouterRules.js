@@ -5,7 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useAtomValue } from 'jotai';
-import { useLocationProperty, navigate } from 'wouter/use-location';
+import { useLocationProperty, navigate } from 'wouter/use-browser-location';
 
 import authAtom from '@src/atoms/authAtom.js';
 
