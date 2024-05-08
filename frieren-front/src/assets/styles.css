@@ -50,6 +50,7 @@
 #sidebar {
     min-width: 180px;
     max-width: 180px;
+    min-height: 400px;
 
     -webkit-transition: all .3s;
     -o-transition: all .3s;

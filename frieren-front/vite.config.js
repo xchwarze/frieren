@@ -28,6 +28,8 @@ export default defineConfig(({ mode }) => {
     },
 
     // for local dev
+    // the idea of this is to run `cd tools && php -S localhost:8000`
+    // and that api-proxy.php redirects calls to the actual hardware
     server: {
       proxy: {
         '^/api/.*': {
