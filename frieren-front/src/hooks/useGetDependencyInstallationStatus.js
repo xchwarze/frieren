@@ -42,7 +42,7 @@ const useGetDependencyInstallationStatus = ({ module, dependenciesQueryKey }) =>
                 });
             }
         }
-    }, [query.data, query.isSuccess, dependenciesQueryKey, setDependencyInstallStatus, queryClient]);
+    }, [query.data, query.isSuccess, query.dataUpdatedAt, dependenciesQueryKey, setDependencyInstallStatus, queryClient]);
 
     return query
 };

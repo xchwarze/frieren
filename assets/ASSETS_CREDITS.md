@@ -21,8 +21,4 @@ We thank the creators of these assets for allowing their use in this project. Th
 
 ## Contact
 
-If you hold the rights to any of the assets listed and have questions or concerns regarding their use, please contact [Your Contact] at [Your Email].
-
----
-
-This document will be updated as external assets used in the project are added or modified.
+If you hold the rights to any of the assets listed and have questions or concerns regarding their use, please contact DSR! at xchwarze@gmail.com
