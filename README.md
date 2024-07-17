@@ -28,7 +28,7 @@ The project also features a scaffolding tool for developing new modules with UMD
 
 ## Installation
 
-Frieren can be installed quickly using an automated script or compiled manually for more control over the installation process. Frieren is currently fully supported only on OpenWRT platforms.
+Frieren can be installed quickly using an automated script or compiled manually for more control over the installation process. Frieren is currently fully supported only on OpenWRT platforms (official OpenWrt and not any of its forks).
 
 ### Quick Installation
 
