@@ -1,5 +1,8 @@
 <?php
 
+// for local dev
+// the idea of this is to run `cd tools && php -S localhost:8000`
+// and that api-proxy.php redirects calls to the actual hardware
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
@@ -42,7 +45,6 @@ class RequestForwarder
      * @param array $cookies The array of cookies to build the header from.
      * @return string The resulting cookie header.
      */
-
     private function buildCookieHeader($cookies)
     {
         $cookieHeader = [];
@@ -91,5 +93,5 @@ class RequestForwarder
 }
 
 $forwarder = new RequestForwarder();
-$endpoint = 'http://172.16.42.1:1471/api-dev/index.php';
+$endpoint = 'http://192.168.7.1:5000/api/index.php';
 $forwarder->forwardRequest($endpoint);
