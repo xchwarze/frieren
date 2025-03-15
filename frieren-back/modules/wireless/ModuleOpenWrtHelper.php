@@ -223,14 +223,15 @@ class ModuleOpenWrtHelper
      */
     public static function getClientConfig()
     {
-        $config = OpenWrtHelper::uciReadConfig('frieren');
-        $iwinfo = self::getCurrentNetworkInfo($config['@settings[0]']['client_interface']);
+        // maybe in openwrt it makes more sense to use more ubus and discard more universal solutions ....
+        //$config = OpenWrtHelper::uciReadConfig('frieren');
         $status = OpenWrtHelper::execUbusCall('network.interface.wwan status');
+        $iwinfo = self::getCurrentNetworkInfo($status['device']);
 
         return [
             //'connected' => $iwinfo['mode'] === 'client' && $iwinfo['security'] !== 'unknown',
             'connected' => $status['up'],
-            'interface' => $config['@settings[0]']['client_interface'],
+            'interface' => $status['device'],
             'ssid' => $iwinfo['ssid'] ?? '',
         ];
 
