@@ -66,6 +66,12 @@ remove_package() {
     PACKAGE=$1
     add_log "Removing $PACKAGE"
     /bin/opkg remove "$PACKAGE"
+
+    if [ $? -ne 0 ]; then
+        add_log "ERROR: opkg remove $PACKAGE failed"
+        rm "$FLAG_FILE"
+        exit 1
+    fi
 }
 
 if [ "$ACTION" = "install" ]; then
