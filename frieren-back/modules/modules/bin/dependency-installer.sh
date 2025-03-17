@@ -12,6 +12,7 @@ function usage {
 }
 
 function add_log {
+    echo "$1"
     echo "$TIMESTAMP $1" >> "$LOG_FILE"
 }
 
