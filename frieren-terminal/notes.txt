@@ -1,10 +1,11 @@
 Project
 	https://github.com/tsl0922/ttyd
 
-Cloned from commit
-	ed551d48c6d3d644da4f2d54462d688d9e31d164
+Cloned from tag 1.7.7
+	40e79c706be14029b391f369bee6613c31667abb
 
 THIS PROJECT USE YARN BERRY
 	yarn set version berry && yarn install
 
 gzip -k inline.html
+

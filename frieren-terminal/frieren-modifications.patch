@@ -1,0 +1,194 @@
+diff -Naur html-original/.yarnrc.yml html/.yarnrc.yml
+--- html-original/.yarnrc.yml	2024-03-30 00:04:51.000000000 -0300
++++ html/.yarnrc.yml	2025-03-25 02:19:35.719516900 -0300
+@@ -1 +1,3 @@
+ nodeLinker: node-modules
++
++yarnPath: .yarn/releases/yarn-4.1.1.cjs
+diff -Naur html-original/package.json html/package.json
+--- html-original/package.json	2024-03-30 00:04:51.000000000 -0300
++++ html/package.json	2025-03-25 02:19:35.735154400 -0300
+@@ -11,9 +11,9 @@
+   "license": "MIT",
+   "scripts": {
+     "prestart": "gulp clean",
+-    "start": "NODE_ENV=development && webpack serve",
+-    "build": "NODE_ENV=production webpack && gulp",
+-    "inline": "NODE_ENV=production webpack && gulp inline",
++    "start": "cross-env NODE_ENV=development && webpack serve",
++    "build": "cross-env NODE_ENV=production webpack && gulp",
++    "inline": "cross-env NODE_ENV=production webpack && gulp inline",
+     "check": "gts check",
+     "fix": "gts fix"
+   },
+@@ -23,6 +23,7 @@
+   "devDependencies": {
+     "@typescript-eslint/eslint-plugin": "^7.1.1",
+     "copy-webpack-plugin": "^12.0.2",
++    "cross-env": "^7.0.3",
+     "css-loader": "^6.10.0",
+     "css-minimizer-webpack-plugin": "^6.0.0",
+     "eslint": "^8.57.0",
+@@ -69,5 +70,5 @@
+   "resolutions": {
+     "zmodem.js@^0.1.10": "patch:zmodem.js@npm%3A0.1.10#./.yarn/patches/zmodem.js-npm-0.1.10-e5537fa2ed.patch"
+   },
+-  "packageManager": "yarn@3.6.3"
++  "packageManager": "yarn@4.1.1"
+ }
+diff -Naur html-original/src/components/app.tsx html/src/components/app.tsx
+--- html-original/src/components/app.tsx	2024-03-30 00:04:51.000000000 -0300
++++ html/src/components/app.tsx	2025-03-25 02:19:35.697372200 -0300
+@@ -6,9 +6,16 @@
+ import type { ClientOptions, FlowControl } from './terminal/xterm';
+ 
+ const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
++
++/*
+ const path = window.location.pathname.replace(/[/]+$/, '');
+ const wsUrl = [protocol, '//', window.location.host, path, '/ws', window.location.search].join('');
+ const tokenUrl = [window.location.protocol, '//', window.location.host, path, '/token'].join('');
++*/
++const port = 1477;
++const wsUrl = [protocol, window.location.hostname, ':', port, '/ws', window.location.search].join('');
++const tokenUrl = undefined;
++
+ const clientOptions = {
+     rendererType: 'webgl',
+     disableLeaveAlert: false,
+diff -Naur html-original/src/components/terminal/xterm/index.ts html/src/components/terminal/xterm/index.ts
+--- html-original/src/components/terminal/xterm/index.ts	2024-03-30 00:04:51.000000000 -0300
++++ html/src/components/terminal/xterm/index.ts	2025-03-25 18:07:44.341577600 -0300
+@@ -59,7 +59,7 @@
+ 
+ export interface XtermOptions {
+     wsUrl: string;
+-    tokenUrl: string;
++    tokenUrl?: string;
+     flowControl: FlowControl;
+     clientOptions: ClientOptions;
+     termOptions: ITerminalOptions;
+@@ -124,6 +124,9 @@
+ 
+     @bind
+     public async refreshToken() {
++        this.token = this.options.tokenUrl ?? '';
++
++        /*
+         try {
+             const resp = await fetch(this.options.tokenUrl);
+             if (resp.ok) {
+@@ -133,6 +136,7 @@
+         } catch (e) {
+             console.error(`[ttyd] fetch ${this.options.tokenUrl}: `, e);
+         }
++        */
+     }
+ 
+     @bind
+@@ -242,6 +246,7 @@
+     public connect() {
+         this.socket = new WebSocket(this.options.wsUrl, ['tty']);
+         const { socket, register } = this;
++        this.dispatchEvent('initializing');
+ 
+         socket.binaryType = 'arraybuffer';
+         register(addEventListener(socket, 'open', this.onSocketOpen));
+@@ -262,12 +267,15 @@
+             terminal.reset();
+             terminal.options.disableStdin = false;
+             overlayAddon.showOverlay('Reconnected', 300);
++            this.dispatchEvent('reconnected');
+         } else {
+             this.opened = true;
++            this.dispatchEvent('connected');
+         }
+ 
+         this.doReconnect = this.reconnect;
+         this.initListeners();
++
+         terminal.focus();
+     }
+ 
+@@ -278,11 +286,13 @@
+         const { refreshToken, connect, doReconnect, overlayAddon } = this;
+         overlayAddon.showOverlay('Connection Closed');
+         this.dispose();
++        this.dispatchEvent('disconnected');
+ 
+         // 1000: CLOSE_NORMAL
+         if (event.code !== 1000 && doReconnect) {
+             overlayAddon.showOverlay('Reconnecting...');
+             refreshToken().then(connect);
++            this.dispatchEvent('reconnecting');
+         } else {
+             const { terminal } = this;
+             const keyDispose = terminal.onKey(e => {
+@@ -293,6 +303,7 @@
+                     refreshToken().then(connect);
+                 }
+             });
++
+             overlayAddon.showOverlay('Press ⏎ to Reconnect');
+         }
+     }
+@@ -516,4 +527,10 @@
+                 break;
+         }
+     }
++
++    @bind
++    private dispatchEvent(status: string) {
++        const dispatchEvent = new CustomEvent('ws-terminal', { detail: { status: status } });
++        window.dispatchEvent(dispatchEvent);
++    }
+ }
+diff -Naur html-original/src/template.html html/src/template.html
+--- html-original/src/template.html	2024-03-30 00:04:51.000000000 -0300
++++ html/src/template.html	2025-03-25 02:19:35.697372200 -0300
+@@ -4,8 +4,7 @@
+     <meta charset="UTF-8">
+     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+     <meta name="apple-mobile-web-app-capable" content="yes">
+-    <title><%= htmlWebpackPlugin.options.title %></title>
+-    <link inline rel="icon" type="image/png" href="favicon.png">
++    <title>terminal</title>
+     <% for (const css in htmlWebpackPlugin.files.css) { %>
+     <link inline rel="stylesheet" type="text/css" href="<%= htmlWebpackPlugin.files.css[css] %>">
+     <% } %>
+diff -Naur html-original/webpack.config.js html/webpack.config.js
+--- html-original/webpack.config.js	2024-03-30 00:04:51.000000000 -0300
++++ html/webpack.config.js	2025-03-25 02:19:35.761190800 -0300
+@@ -93,9 +93,30 @@
+ const prodConfig = {
+     mode: 'production',
+     optimization: {
+-        minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
++        minimizer: [
++            new TerserPlugin({
++                terserOptions: {
++                    format: {
++                        comments: false,
++                    },
++                },
++                extractComments: false,
++            }),
++            new CssMinimizerPlugin(),
++        ],
+     },
+-    devtool: 'source-map',
++    devtool: false,
+ };
+ 
++if (devMode) {
++    const message = `
++=============================================
++
++WARNING: You are in development mode. Do not use this build in production.
++
++=============================================
++`;
++    console.warn(message);
++}
++
+ module.exports = merge(baseConfig, devMode ? devConfig : prodConfig);
