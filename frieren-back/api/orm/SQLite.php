@@ -23,12 +23,17 @@ class SQLite
      * 
      * @param string $databasePath Path to the SQLite database file.
      * @param bool $enableExceptions Flag to enable or disable SQLite3 exceptions.
+     * @param bool $performanceMode Whether to enable performance mode.
      */
-    public function __construct($databasePath, bool $enableExceptions = true)
+    public function __construct($databasePath, bool $enableExceptions = true, bool $performanceMode = false)
     {
         $this->db = new \SQLite3($databasePath);
         $this->db->busyTimeout(20000);
         $this->db->enableExceptions($enableExceptions);
+        if ($performanceMode) {
+            $this->db->exec('PRAGMA journal_mode=MEMORY');
+            $this->db->exec('PRAGMA synchronous=OFF');
+        }
     }
 
     /**
@@ -96,7 +101,7 @@ class SQLite
      * @param string $table Table name.
      * @param array $conditions Conditions for the WHERE clause.
      * @param array $columns Columns to select.
-     * @return array The fetched record.
+     * @return array|null The record as assoc. array, or null if not found.
      */
     public function find(string $table, array $conditions, array $columns = []): array
     {
@@ -108,7 +113,7 @@ class SQLite
         $this->bindParams($stmt, array_values($conditions));
         $result = $stmt->execute();
 
-        return $result->fetchArray(SQLITE3_ASSOC) ?: [];
+        return $result->fetchArray(SQLITE3_ASSOC) ?: null;
     }
 
     /**
@@ -221,7 +226,29 @@ class SQLite
         $this->bindParams($stmt, array_values($conditions));
         $result = $stmt->execute();
         
-        $row = $result->fetchArray();
+        $row = $stmt->execute()->fetchArray(SQLITE3_NUM);
         return (int) $row[0];
+    }
+
+    /**
+     * Iterate rows lazily without full buffering.
+     *
+     * @param string $table Table name.
+     * @param array $conditions WHERE clause params.
+     * @param array $columns Columns to select.
+     * @return \Generator<int,array<string,mixed>> Yields each record as assoc array.
+     */
+    public function each(string $table, array $conditions = [], array $columns = []): \Generator
+    {
+        $cols = $this->processColumns($columns);
+        $where = $this->buildWhereClause($conditions);
+        $sql = "SELECT {$cols} FROM {$table}{$where}";
+
+        $stmt = $this->db->prepare($sql);
+        $this->bindParams($stmt, array_values($conditions));
+        $result = $stmt->execute();
+        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+            yield $row;
+        }
     }
 }
