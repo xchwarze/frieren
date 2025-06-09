@@ -72,7 +72,8 @@ class ApiCore
         }
 
         if (!isset($_COOKIE['XSRF-TOKEN']) || $_COOKIE['XSRF-TOKEN'] !== $_SESSION['XSRF-TOKEN']) {
-            setcookie('XSRF-TOKEN', $_SESSION['XSRF-TOKEN'], 0, '/', '', false, false);
+            $secure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+            setcookie('XSRF-TOKEN', $_SESSION['XSRF-TOKEN'], 0, '/', '', $secure, false);
         }
     }
 

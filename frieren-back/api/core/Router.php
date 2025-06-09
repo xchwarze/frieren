@@ -33,13 +33,13 @@ class Router {
      * @throws \Exception if the module is not specified or cannot be loaded.
      */
     public function routeModule() {
-        if (isset($this->request['module']) && !empty($this->request['module'])) {
-            $moduleInstance = $this->loadModule($this->request['module']);
-
-            return $moduleInstance->getResponseHandler();
+        $module = $this->request['module'] ?? '';
+        //if (empty($module) || !preg_match('/^[a-z0-9_]+$/i', $module)) {
+        if (empty($module)) {
+            throw new \Exception('No valid module has been specified.');
         }
-    
-        throw new \Exception('No valid module has been specified.');
+
+        return $this->loadModule($module)->getResponseHandler();
     }
 
     /**
@@ -51,9 +51,12 @@ class Router {
      */
     private function loadModule($moduleName)
     {
+        $baseDir = \DeviceConfig::MODULE_ROOT_FOLDER;
         $controllerName = ucfirst($moduleName) . 'Controller';
-        $moduleFilePath = __DIR__ . "/../../modules/{$moduleName}/{$controllerName}.php";
-        if (!file_exists($moduleFilePath)) {
+
+        $moduleFilePath = "{$baseDir}/{$moduleName}/{$controllerName}.php";
+        $moduleRealPath = realpath($moduleFilePath);
+        if (!$moduleRealPath || strpos($moduleRealPath, $baseDir) !== 0) {
             throw new \Exception("Module file for '{$moduleName}' does not exist.");
         }
 
