@@ -55,8 +55,9 @@ class Router {
         $controllerName = ucfirst($moduleName) . 'Controller';
 
         $moduleFilePath = "{$baseDir}/{$moduleName}/{$controllerName}.php";
-        $moduleRealPath = realpath($moduleFilePath);
-        if (!$moduleRealPath || strpos($moduleRealPath, $baseDir) !== 0) {
+        //$moduleRealPath = realpath($moduleFilePath);
+        //if (!$moduleRealPath || strpos($moduleRealPath, $baseDir) !== 0) {
+        if (!file_exists($moduleFilePath)) {
             throw new \Exception("Module file for '{$moduleName}' does not exist.");
         }
 
