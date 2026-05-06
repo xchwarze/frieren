@@ -34,8 +34,7 @@ class Router {
      */
     public function routeModule() {
         $module = $this->request['module'] ?? '';
-        //if (empty($module) || !preg_match('/^[a-z0-9_]+$/i', $module)) {
-        if (empty($module)) {
+        if (empty($module) || !preg_match('/^[a-z0-9_]+$/i', $module)) {
             throw new \Exception('No valid module has been specified.');
         }
 
@@ -63,7 +62,7 @@ class Router {
 
         require($moduleFilePath);
         $moduleClass = "frieren\\modules\\{$moduleName}\\{$controllerName}";
-        if (!class_exists($moduleClass)) {
+        if (!class_exists($moduleClass, false)) {
             throw new \Exception("The class {$moduleClass} does not exist in the module file.");
         }
 

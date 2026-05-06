@@ -35,25 +35,29 @@ class UciConfigHelper
         $sectionCounter = [];
 
         foreach ($lines as $line) {
+            $trimmed = ltrim($line);
+
             // Ignore comments
-            if (strpos($line, '#') === 0) {
+            if ($trimmed === '' || $trimmed[0] === '#') {
                 continue;
             }
 
+            $keyword = $trimmed[0];
+
             // Section support
-            if (preg_match('/^\s*config\s+(\w+)\s*(\w*)/', $line, $matches)) {
+            if ($keyword === 'c' && preg_match('/^config\s+(\w+)\s*(\w*)/', $trimmed, $matches)) {
                 $currentSectionKey = self::parseConfig($matches, $config, $sectionCounter);
                 continue;
             }
 
             // Option support
-            if (preg_match('/^\s*option\s+(\w+)\s+(.*)$/', $line, $matches)) {
+            if ($keyword === 'o' && preg_match('/^option\s+(\w+)\s+(.*)$/', $trimmed, $matches)) {
                 self::parseOption($matches, $config[$currentSectionKey]);
                 continue;
             }
 
             // List support
-            if (preg_match('/^\s*list\s+(\w+)\s+(.*)$/', $line, $matches)) {
+            if ($keyword === 'l' && preg_match('/^list\s+(\w+)\s+(.*)$/', $trimmed, $matches)) {
                 self::parseList($matches, $config[$currentSectionKey]);
                 continue;
             }

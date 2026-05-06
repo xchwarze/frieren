@@ -16,9 +16,9 @@ class TerminalController extends \frieren\core\Controller
     const TTYD_SD_PATH = "/sd/usr/bin/ttyd";
 
     public $endpointRoutes = [
-        'startTerminal',
-        'stopTerminal',
-        'getStatus'
+        'startTerminal' => true,
+        'stopTerminal' => true,
+        'getStatus' => true,
     ];
 
     private function getTerminalPath()

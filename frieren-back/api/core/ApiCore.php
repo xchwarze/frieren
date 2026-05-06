@@ -41,6 +41,11 @@ class ApiCore
     {
         $this->responseHandler = new ResponseHandler();
 
+        // Skip session/JSON parsing for CORS preflight requests
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            return;
+        }
+
         $this->initRequest();
         $this->setCSRFToken();
         $this->router = new Router($this->request);

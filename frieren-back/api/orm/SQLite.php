@@ -28,11 +28,13 @@ class SQLite
     public function __construct($databasePath, bool $enableExceptions = true, bool $performanceMode = false)
     {
         $this->db = new \SQLite3($databasePath);
-        $this->db->busyTimeout(20000);
+        $this->db->busyTimeout(5000);
         $this->db->enableExceptions($enableExceptions);
+        $this->db->exec('PRAGMA journal_mode=WAL');
         if ($performanceMode) {
-            $this->db->exec('PRAGMA journal_mode=MEMORY');
             $this->db->exec('PRAGMA synchronous=OFF');
+        } else {
+            $this->db->exec('PRAGMA synchronous=NORMAL');
         }
     }
 
@@ -225,8 +227,8 @@ class SQLite
         $stmt = $this->db->prepare($sql);
         $this->bindParams($stmt, array_values($conditions));
         $result = $stmt->execute();
-        
-        $row = $stmt->execute()->fetchArray(SQLITE3_NUM);
+
+        $row = $result->fetchArray(SQLITE3_NUM);
         return (int) $row[0];
     }
 

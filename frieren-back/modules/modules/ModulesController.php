@@ -16,16 +16,16 @@ class ModulesController extends \frieren\core\Controller
     const MIN_DISK_SPACE = 524288;
 
     public $endpointRoutes = [
-        'getModuleList',
-        'getAvailableModules',
-        'getInstalledModules',
-        'downloadModule',
-        'downloadStatus',
-        'installModule',
-        'installStatus',
-        'checkDestination',
-        'removeModule',
-        'pinModule',
+        'getModuleList' => true,
+        'getAvailableModules' => true,
+        'getInstalledModules' => true,
+        'downloadModule' => true,
+        'downloadStatus' => true,
+        'installModule' => true,
+        'installStatus' => true,
+        'checkDestination' => true,
+        'removeModule' => true,
+        'pinModule' => true,
     ];
 
     public function getModuleList()
@@ -101,12 +101,13 @@ class ModulesController extends \frieren\core\Controller
 
     public function getInstalledModules()
     {
-        $modulesDir = new \DirectoryIterator(\DeviceConfig::MODULE_ROOT_FOLDER);
+        $moduleRoot = \DeviceConfig::MODULE_ROOT_FOLDER;
+        $modulesDir = new \DirectoryIterator($moduleRoot);
         if (!$modulesDir->isReadable()) {
             return self::setError('Unable to access modules directory');
         }
 
-        self::setupModuleHelper();
+        $moduleSizes = self::setupModuleHelper()::getAllModuleSizes($moduleRoot);
         $modules = [];
         $sidebarSettings = self::setupCoreHelper()::uciGetJson(self::UCI_SIDEBAR);
 
@@ -142,7 +143,7 @@ class ModulesController extends \frieren\core\Controller
                 'repository' => $info['repository'],
                 'bugs' => $info['bugs'],
                 'system' => $info['system'],
-                'size' => $this->moduleHelper::getLocalModuleSize($moduleFolder),
+                'size' => $moduleSizes[basename($moduleFolder)] ?? '0K',
             ];
         }
 
@@ -187,20 +188,22 @@ class ModulesController extends \frieren\core\Controller
         }
 
         @unlink(self::INSTALL_FLAG);
-        $this->removeModule();
+        $this->removeModuleFiles($moduleName);
 
         $useSD = $this->request['destination'] === 'sd';
         $moduleDirPath = \DeviceConfig::MODULE_ROOT_FOLDER;
         $moduleSDDirPath = \DeviceConfig::MODULE_SD_ROOT_FOLDER;
+        $safeModuleName = escapeshellarg($moduleName);
         if ($useSD) {
             @mkdir($moduleSDDirPath, 0777, true);
-            exec("ln -s {$moduleSDDirPath}/{$moduleName} {$moduleDirPath}/{$moduleName}");
+            exec("ln -s {$moduleSDDirPath}/{$safeModuleName} {$moduleDirPath}/{$safeModuleName}");
         }
 
-        $installPath = $useSD ? $moduleSDDirPath : $moduleDirPath;
+        $installPath = escapeshellarg($useSD ? $moduleSDDirPath : $moduleDirPath);
+        $safeFilePath = escapeshellarg($filePath);
         self::setupCoreHelper()::execBackground(
-            "tar -xzC {$installPath} -f {$filePath} && " .
-            "rm {$filePath} && " .
+            "tar -xzC {$installPath} -f {$safeFilePath} && " .
+            "rm {$safeFilePath} && " .
             "touch " . self::INSTALL_FLAG
         );
 
@@ -231,7 +234,16 @@ class ModulesController extends \frieren\core\Controller
 
     public function removeModule()
     {
-        $moduleName = $this->request['moduleName'];
+        $this->removeModuleFiles($this->request['moduleName']);
+        self::setSuccess();
+    }
+
+    private function removeModuleFiles($moduleName)
+    {
+        if (!preg_match('/^[a-zA-Z0-9_-]+$/', $moduleName)) {
+            throw new \Exception('Invalid module name');
+        }
+
         $moduleDirPath = \DeviceConfig::MODULE_ROOT_FOLDER;
         $moduleSDDirPath = \DeviceConfig::MODULE_SD_ROOT_FOLDER;
         $modulePath = "{$moduleDirPath}/{$moduleName}";
@@ -239,12 +251,10 @@ class ModulesController extends \frieren\core\Controller
 
         if (is_link($modulePath)) {
             @unlink($modulePath);
-            exec("rm -rf {$modulePathSD}");
+            exec("rm -rf " . escapeshellarg($modulePathSD));
         } else if (is_dir($modulePath)) {
-            exec("rm -rf {$modulePath}");
+            exec("rm -rf " . escapeshellarg($modulePath));
         }
-
-        self::setSuccess();
     }
 
     public function pinModule()

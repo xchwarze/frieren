@@ -6,9 +6,11 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 
-// debug
+// debug — disable in production for performance
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
+//error_reporting(0);
+//ini_set('display_errors', '0');
 
 /**
  * Autoloader and Application Initializer

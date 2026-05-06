@@ -11,9 +11,9 @@ namespace frieren\modules\header;
 class HeaderController extends \frieren\core\Controller
 {
     public $endpointRoutes = [
-        'shutDownHardware',
-        'resetHardware',
-        'serverPing',
+        'shutDownHardware' => true,
+        'resetHardware' => true,
+        'serverPing' => true,
     ];
 
     public function shutDownHardware()

@@ -34,25 +34,28 @@ class ModuleOpenWrtHelper
             return false;
         }
 
-        $data = file('/proc/stat');
         $totalCores = 0;
-        foreach ($data as $line) {
-            if (preg_match('/^cpu[0-9]+/', $line)) {
+        $handle = fopen('/proc/stat', 'r');
+        while (($line = fgets($handle)) !== false) {
+            if ($line[0] === 'c' && $line[1] === 'p' && $line[2] === 'u' && $line[3] >= '0' && $line[3] <= '9') {
                 $totalCores++;
+            } else if ($totalCores > 0) {
+                break;
             }
         }
+        fclose($handle);
 
         $loadPercentage = ($resume['load'][0] / self::SYSTEM_LOAD_SCALE_FACTOR) / $totalCores * 100;
-        $swapUsed = $resume['swap']['total'] - $resume['swap']['free'];
-        $memUsed = $resume['memory']['total'] - $resume['memory']['free'] - $resume['memory']['buffered'] - $resume['memory']['cached'];
+        $swapTotal = $resume['swap']['total'];
+        $swapUsed = $swapTotal - $resume['swap']['free'];
+        $memTotal = $resume['memory']['total'];
+        $memUsed = $memTotal - $resume['memory']['free'] - $resume['memory']['buffered'] - $resume['memory']['cached'];
 
         return [
-            'total_cores' => $totalCores,
-            'load' => min(round($loadPercentage, 1), 100),
-            'swap_used' => $swapUsed,
-            'swap_total' => $resume['swap']['total'],
-            'memory_used' => $memUsed,
-            'memory_total' => $resume['memory']['total'],
+            'cpu_cores' => $totalCores,
+            'cpu_usage' => min(round($loadPercentage, 1), 100) . '%',
+            'memory_used' => ($memTotal > 0 ? round(($memUsed / $memTotal) * 100, 2) : 0) . '%',
+            'swap_used' => ($swapTotal > 0 ? round(($swapUsed / $swapTotal) * 100, 2) : 0) . '%',
             'uptime' => self::secondsToUptime($resume['uptime']),
             'localtime' => date('Y-m-d H:i:s', $resume['localtime']),
         ];
@@ -64,16 +67,17 @@ class ModuleOpenWrtHelper
      * @return array Memory info with total, used, and free memory in MB.
      */
     public static function getMemoryInfo() {
-        $lines = file('/proc/meminfo');
-        $validType = ['MemTotal', 'MemFree', 'Buffers', 'Cached'];
+        $validType = ['MemTotal' => true, 'MemFree' => true, 'Buffers' => true, 'Cached' => true];
         $memoryInfo = [];
 
-        foreach ($lines as $line) {
+        $handle = fopen('/proc/meminfo', 'r');
+        while (($line = fgets($handle)) !== false && count($memoryInfo) < 4) {
             list($key, $val) = explode(':', $line, 2);
-            if (in_array($key, $validType)) {
-                $memoryInfo[$key] = (int)trim(str_replace('kB', '', $val));
+            if (isset($validType[$key])) {
+                $memoryInfo[$key] = (int)$val;
             }
         }
+        fclose($handle);
 
         // I understand that for a more accurate calculation this would be the correct way to get this data for real
         $memUsed = $memoryInfo['MemTotal'] - $memoryInfo['MemFree'] - $memoryInfo['Buffers'] - $memoryInfo['Cached'];

@@ -73,7 +73,7 @@ abstract class Controller
             return self::setError('No action was specified');
         }
 
-        if (in_array($this->request['action'], $this->endpointRoutes)) {
+        if (isset($this->endpointRoutes[$this->request['action']])) {
             $content = $this->{$this->request['action']}();
             session_write_close();
             return $content;
@@ -89,7 +89,9 @@ abstract class Controller
      * @throws \Exception If the core helper cannot be created.
      */
     protected function setupCoreHelper() {
-        $this->coreHelper = \frieren\helper\HelperFactory::create(\DeviceConfig::GUESS_TYPE);
+        if ($this->coreHelper === null) {
+            $this->coreHelper = \frieren\helper\HelperFactory::create(\DeviceConfig::GUESS_TYPE);
+        }
 
         return $this->coreHelper;
     }
@@ -101,7 +103,9 @@ abstract class Controller
      * @throws \Exception If the module helper cannot be created.
      */
     protected function setupModuleHelper() {
-        $this->moduleHelper = \frieren\helper\HelperFactory::createModuleHelper($this->moduleName, \DeviceConfig::GUESS_TYPE);
+        if ($this->moduleHelper === null) {
+            $this->moduleHelper = \frieren\helper\HelperFactory::createModuleHelper($this->moduleName, \DeviceConfig::GUESS_TYPE);
+        }
 
         return $this->moduleHelper;
     }
@@ -156,7 +160,7 @@ abstract class Controller
      */
     public function installModuleDependencies() {
         $manifest = $this->getModuleManifest();
-        $dependencies = implode(' ', $manifest['dependencies'] ?? false);
+        $dependencies = implode(' ', $manifest['dependencies'] ?? []);
         if (!empty($dependencies)) {
             $installToSD = $this->request['destination'] === 'sd';
             self::setupCoreHelper()::installDependency($dependencies, $installToSD);
@@ -262,25 +266,25 @@ abstract class Controller
      * Sets an error message.
      *
      * @param string $message Error message.
-     * @return true
+     * @return ResponseHandler The response handler object.
      */
     protected function setError($message = 'The action could not be completed due to an error.')
     {
         $this->responseHandler->setError($message);
 
-        return true;
+        return $this->responseHandler;
     }
 
     /**
      * Sets a success response.
      *
      * @param array $response Success response data.
-     * @return true
+     * @return ResponseHandler The response handler object.
      */
     protected function setSuccess($response = ['success' => true])
     {
         $this->responseHandler->setData($response);
 
-        return true;
+        return $this->responseHandler;
     }
 }

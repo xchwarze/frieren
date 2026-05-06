@@ -58,15 +58,15 @@ class ModuleOpenWrtHelper
      */
     public static function getSystemWirelessInterfaces()
     {
-        $output = OpenWrtHelper::exec('ls -1 /sys/class/net/', false);
-        if (!$output) {
-            throw new \Exception('Error executing ls -1 /sys/class/net/');
+        $entries = @scandir('/sys/class/net/');
+        if ($entries === false) {
+            throw new \Exception('Error reading /sys/class/net/');
         }
 
         $interfaces = [];
-        foreach ($output as $interface) {
-            if (preg_match('/(wlan|phy)/', $interface)) {
-                $interfaces[] = $interface;
+        foreach ($entries as $entry) {
+            if ($entry[0] !== '.' && (strpos($entry, 'wlan') === 0 || strpos($entry, 'phy') === 0)) {
+                $interfaces[] = $entry;
             }
         }
 

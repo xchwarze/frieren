@@ -11,8 +11,8 @@ namespace frieren\modules\login;
 class LoginController extends \frieren\core\Controller
 {
     public $endpointRoutes = [
-        'login',
-        'logout'
+        'login' => true,
+        'logout' => true,
     ];
 
     public function login()
@@ -26,7 +26,7 @@ class LoginController extends \frieren\core\Controller
             }
         }
 
-        self::setError('Not logged_in');
+        return self::setError('Not logged_in');
     }
 
     public function logout()
@@ -37,6 +37,6 @@ class LoginController extends \frieren\core\Controller
         setcookie('XSRF-TOKEN', '', time() - 3600, '/');
         session_destroy();
 
-        self::setSuccess();
+        return self::setSuccess();
     }
 }

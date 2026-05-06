@@ -11,12 +11,12 @@ namespace frieren\modules\hardware;
 class HardwareController extends \frieren\core\Controller
 {
     public $endpointRoutes = [
-        'getUsbDevices',
-        'getFileSystemUsage',
-        'getSystemLogs',
-        'startDiagnosticsScript',
-        'getDiagnosticsStatus',
-        'downloadDiagnosticsFile'
+        'getUsbDevices' => true,
+        'getFileSystemUsage' => true,
+        'getSystemLogs' => true,
+        'startDiagnosticsScript' => true,
+        'getDiagnosticsStatus' => true,
+        'downloadDiagnosticsFile' => true,
     ];
 
     public function getUsbDevices()

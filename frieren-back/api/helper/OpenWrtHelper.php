@@ -66,7 +66,7 @@ class OpenWrtHelper
         $command = $isFullPath ? '/usr/bin/pgrep -f' : '/usr/bin/pgrep';
         exec("{$command} {$processName}", $output);
 
-        return count($output) > 0;
+        return !empty($output);
     }
 
     /**
@@ -122,7 +122,7 @@ class OpenWrtHelper
         if (!empty($dependencies)) {
             $scriptPath = \DeviceConfig::MODULE_ROOT_FOLDER . '/modules/bin/dependency-installer.sh';
             $sdFlag = $installToSD ? 1 : 0;
-            $command = sprintf("%s install --sd %d --deps '%s'", $scriptPath, $sdFlag, escapeshellarg($dependencies));
+            $command = sprintf("%s install --sd %d --deps %s", $scriptPath, $sdFlag, escapeshellarg($dependencies));
             self::execBackground($command);
         }
 
@@ -219,9 +219,7 @@ class OpenWrtHelper
      */
     public static function isSDAvailable()
     {
-        $output = exec('/bin/mount | /bin/grep "on /sd" -c');
-
-        return $output >= 1;
+        return strpos(file_get_contents('/proc/mounts'), ' /sd ') !== false;
     }
 
     /**
@@ -271,7 +269,7 @@ class OpenWrtHelper
      */
     public static function execUbusCall($command)
     {
-        //$command = escapeshellarg($command);
+        $command = escapeshellcmd($command);
         $resume = self::exec("/bin/ubus call {$command}");
         $parsed = json_decode($resume, true);
         if (json_last_error() === JSON_ERROR_NONE) {
@@ -291,6 +289,12 @@ class OpenWrtHelper
      */
     public static function logger($message, $level = 'err')
     {
-        return self::exec("/usr/bin/logger -p user.{$level} '{$message}'");
+        $validLevels = ['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug'];
+        if (!in_array($level, $validLevels, true)) {
+            $level = 'err';
+        }
+
+        $message = escapeshellarg($message);
+        return self::exec("/usr/bin/logger -p user.{$level} {$message}");
     }
 }

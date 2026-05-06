@@ -11,12 +11,12 @@ namespace frieren\modules\settings;
 class SettingsController extends \frieren\core\Controller
 {
     public $endpointRoutes = [
-        'getSectionData',
-        'setHostname',
-        'setTimezone',
-        'setDatetimeFromBrowser',
-        'setUserPassword',
-        'setPanelTheme'
+        'getSectionData' => true,
+        'setHostname' => true,
+        'setTimezone' => true,
+        'setDatetimeFromBrowser' => true,
+        'setUserPassword' => true,
+        'setPanelTheme' => true,
     ];
 
     public function getSectionData()

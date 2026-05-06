@@ -11,13 +11,13 @@ namespace frieren\modules\wireless;
 class WirelessController extends \frieren\core\Controller
 {
     public $endpointRoutes = [
-        'getWirelessInterfaces',
-        'getManagementConfig',
-        'setManagementConfig',
-        'scanForNetworks',
-        'getClientConfig',
-        'setClientConfig',
-        'disableWwanInterface'
+        'getWirelessInterfaces' => true,
+        'getManagementConfig' => true,
+        'setManagementConfig' => true,
+        'scanForNetworks' => true,
+        'getClientConfig' => true,
+        'setClientConfig' => true,
+        'disableWwanInterface' => true,
     ];
 
     public function getWirelessInterfaces()

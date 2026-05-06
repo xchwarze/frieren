@@ -82,7 +82,7 @@ class ModuleOpenWrtHelper
     public static function setSystemHostname($hostname)
     {
         OpenWrtHelper::uciSet('system.@system[0].hostname', $hostname);
-        OpenWrtHelper::exec("echo {$hostname} > /proc/sys/kernel/hostname");
+        OpenWrtHelper::exec("echo " . escapeshellarg($hostname) . " > /proc/sys/kernel/hostname");
 
         return OpenWrtHelper::uciGet('system.@system[0].hostname') === $hostname;
     }
@@ -111,8 +111,9 @@ class ModuleOpenWrtHelper
 
         $salt = '$' . $currentHashParts[1] . '$' . $currentHashParts[2] . '$';
         $currentShadowPass = $salt . $currentHashParts[3];
-        if (crypt($current, $salt) == $currentShadowPass) {
-            $newHashedPassword = crypt($new, $salt);
+        if (hash_equals($currentShadowPass, crypt($current, $salt))) {
+            $newSalt = '$' . $currentHashParts[1] . '$' . bin2hex(random_bytes(8)) . '$';
+            $newHashedPassword = crypt($new, $newSalt);
             $rootEntry[1] = $newHashedPassword;
             $lines[0] = implode(':', $rootEntry);
 
@@ -151,7 +152,7 @@ class ModuleOpenWrtHelper
     public static function getSectionData()
     {
         return [
-            'hostname' => getHostname(),
+            'hostname' => gethostname(),
             'timezone' => self::getSystemTimeZone(),
             'theme' => OpenWrtHelper::uciGet('frieren.@settings[0].theme'),
         ];
