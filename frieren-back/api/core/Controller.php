@@ -73,13 +73,14 @@ abstract class Controller
             return self::setError('No action was specified');
         }
 
-        if (isset($this->endpointRoutes[$this->request['action']])) {
-            $content = $this->{$this->request['action']}();
-            session_write_close();
-            return $content;
+        if (!isset($this->endpointRoutes[$this->request['action']])) {
+            return self::setError('Unknown action');
         }
 
-        return self::setError('Unknown action');
+        $content = $this->{$this->request['action']}();
+        session_write_close();
+
+        return $content;
     }
 
     /**
@@ -161,13 +162,14 @@ abstract class Controller
     public function installModuleDependencies() {
         $manifest = $this->getModuleManifest();
         $dependencies = implode(' ', $manifest['dependencies'] ?? []);
-        if (!empty($dependencies)) {
-            $installToSD = $this->request['destination'] === 'sd';
-            self::setupCoreHelper()::installDependency($dependencies, $installToSD);
-            return self::setSuccess();
+        if (empty($dependencies)) {
+            return self::setError();
         }
 
-        return self::setError();
+        $installToSD = $this->request['destination'] === 'sd';
+        self::setupCoreHelper()::installDependency($dependencies, $installToSD);
+
+        return self::setSuccess();
     }
 
     /**

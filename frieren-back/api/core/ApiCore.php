@@ -88,7 +88,7 @@ class ApiCore
     public function handleRequest()
     {
         try {
-            if ($_SERVER['REQUEST_METHOD'] !== 'OPTIONS' && $this->authenticated()) {
+            if ($this->authenticated()) {
                 $this->responseHandler = $this->router->routeModule();
             }
         } catch (\Exception $error) {
