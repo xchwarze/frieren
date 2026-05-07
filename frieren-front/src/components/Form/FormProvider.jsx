@@ -14,7 +14,9 @@ import PropTypes from 'prop-types';
  * Generates a form provider for the given children, onSubmit function, schema, and default values.
  *
  * @param {ReactNode} children - The child components to be rendered within the form provider.
- * @param {Function} onSubmit - The function to be called when the form is submitted.
+ * @param {(values: any) => Promise<any>} onSubmit - Async submit handler.
+ *        MUST return a Promise. Form state `isSubmitting` remains true
+ *        until the Promise resolves or rejects.
  * @param {Object} schema - The schema to be used for form validation.
  * @param {Object} defaultValues - The default values for the form fields.
  * @param {Object} rest - Additional props to be spread on the component.

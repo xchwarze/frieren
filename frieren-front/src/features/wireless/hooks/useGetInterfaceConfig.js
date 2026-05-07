@@ -6,21 +6,18 @@
  */
 import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
 import { fetchPost } from '@src/services/fetchService.js';
-import { WIRELESS_GET_WIRELESS_INTERFACES } from '@src/features/wireless/helpers/queryKeys.js';
+import { WIRELESS_GET_INTERFACE_CONFIG } from '@src/features/wireless/helpers/queryKeys.js';
 
-/**
- * Retrieves the wireless interfaces.
- *
- * @return {Object} The result of the query.
- */
-const useGetWirelessInterfaces = () => (
+const useGetInterfaceConfig = (section) => (
     useAuthenticatedQuery({
-        queryKey: [WIRELESS_GET_WIRELESS_INTERFACES],
+        queryKey: [WIRELESS_GET_INTERFACE_CONFIG, section],
         queryFn: () => fetchPost({
             module: 'wireless',
-            action: 'getWirelessInterfaces',
+            action: 'getInterfaceConfig',
+            section,
         }),
+        enabled: !!section,
     })
 );
 
-export default useGetWirelessInterfaces;
+export default useGetInterfaceConfig;

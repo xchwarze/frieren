@@ -12,21 +12,21 @@ import { sleep } from '@src/helpers/actionsHelper.js';
 import { WIRELESS_GET_WIRELESS_OVERVIEW } from '@src/features/wireless/helpers/queryKeys.js';
 
 /**
- * Disable the WWAN interface.
+ * Returns a mutation hook to remove a wireless interface by UCI section.
  *
- * @return {Function} The mutation hook.
+ * @return {Object} The mutation object.
  */
-const useDisableWwanInterface = () => {
+const useRemoveInterface = () => {
     const queryClient = useQueryClient();
 
     return useAuthenticatedMutation({
-        mutationFn: ({ interface: wlanInterface }) => fetchPost({
+        mutationFn: ({ section }) => fetchPost({
             module: 'wireless',
-            action: 'disableWwanInterface',
-            interface: wlanInterface,
+            action: 'removeInterface',
+            section,
         }),
         onSuccess: async () => {
-            await sleep(4500);
+            await sleep(500);
             queryClient.invalidateQueries({
                 queryKey: [WIRELESS_GET_WIRELESS_OVERVIEW],
             });
@@ -34,4 +34,4 @@ const useDisableWwanInterface = () => {
     });
 };
 
-export default useDisableWwanInterface;
+export default useRemoveInterface;

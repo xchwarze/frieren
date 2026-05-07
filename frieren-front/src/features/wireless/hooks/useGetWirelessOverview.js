@@ -6,21 +6,21 @@
  */
 import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
 import { fetchPost } from '@src/services/fetchService.js';
-import { WIRELESS_GET_CLIENT_CONFIG } from '@src/features/wireless/helpers/queryKeys.js';
+import { WIRELESS_GET_WIRELESS_OVERVIEW } from '@src/features/wireless/helpers/queryKeys.js';
 
 /**
- * Get client configuration data.
+ * Returns a hook to get a full wireless overview (radios + interfaces).
  *
  * @return {Object} The result of the query.
  */
-const useGetClientConfig = () => (
+const useGetWirelessOverview = () => (
     useAuthenticatedQuery({
-        queryKey: [WIRELESS_GET_CLIENT_CONFIG],
+        queryKey: [WIRELESS_GET_WIRELESS_OVERVIEW],
         queryFn: () => fetchPost({
             module: 'wireless',
-            action: 'getClientConfig',
+            action: 'getWirelessOverview',
         }),
     })
 );
 
-export default useGetClientConfig;
+export default useGetWirelessOverview;

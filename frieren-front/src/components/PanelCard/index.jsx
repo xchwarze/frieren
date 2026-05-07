@@ -31,11 +31,13 @@ const PanelCard = ({
                        query,
                        refetch,
                        isFetching,
+                       isLoading,
                        children,
                        ...rest
                    }) => {
     const handleReFetch = refetch || (query && query.refetch);
     const currentlyFetching = isFetching !== undefined ? isFetching : (query && query.isFetching);
+    const currentlyLoading = isLoading !== undefined ? isLoading : (query && query.isLoading);
 
     return (
         <Card {...rest}>
@@ -60,7 +62,7 @@ const PanelCard = ({
                     </Card.Subtitle>
                 )}
 
-                {currentlyFetching && (
+                {currentlyLoading && (
                     <div className={'text-center'}>
                         <Spinner animation={'border'} />
                     </div>
@@ -79,6 +81,7 @@ PanelCard.propTypes = {
     query: PropTypes.object,
     refetch: PropTypes.func,
     isFetching: PropTypes.bool,
+    isLoading: PropTypes.bool,
     children: PropTypes.any.isRequired,
 };
 
