@@ -19,7 +19,7 @@ class ModuleOpenWrtHelper
      */
     public static function getUbusSystemBoard()
     {
-        return \frieren\helper\OpenWrtHelper::execUbusCall('system board');
+        return \frieren\helper\OpenWrtHelper::execUbusCall('system', 'board');
     }
 
     /**
@@ -29,7 +29,7 @@ class ModuleOpenWrtHelper
      */
     public static function getUbusSystemInfo()
     {
-        $resume = \frieren\helper\OpenWrtHelper::execUbusCall('system info');
+        $resume = \frieren\helper\OpenWrtHelper::execUbusCall('system', 'info');
         if (!$resume) {
             return false;
         }

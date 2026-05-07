@@ -262,16 +262,21 @@ class OpenWrtHelper
     }
 
     /**
-     * Executes an ubus call with the given command and returns the parsed response as an associative array.
+     * Executes an ubus call and returns the parsed JSON response.
      *
-     * @param string $command The command to be executed.
+     * @param string $namespace The ubus namespace (e.g. 'iwinfo', 'network.wireless', 'system').
+     * @param string $method The method to call (e.g. 'status', 'info', 'scan').
+     * @param array $args Optional associative array of arguments.
      * @return mixed|false The parsed response as an associative array if the JSON decoding is successful, false otherwise.
      */
-    public static function execUbusCall($command)
+    public static function execUbusCall($namespace, $method, $args = [])
     {
-        $command = escapeshellcmd($command);
-        $resume = self::exec("/bin/ubus call {$command}");
-        $parsed = json_decode($resume, true);
+        $cmd = '/bin/ubus call ' . escapeshellarg($namespace) . ' ' . escapeshellarg($method);
+        if (!empty($args)) {
+            $cmd .= ' ' . escapeshellarg(json_encode($args));
+        }
+        $result = self::exec($cmd);
+        $parsed = json_decode($result, true);
         if (json_last_error() === JSON_ERROR_NONE) {
             return $parsed;
         }

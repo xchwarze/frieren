@@ -13,284 +13,57 @@ use frieren\helper\OpenWrtHelper;
 class ModuleOpenWrtHelper
 {
     /**
-     * Get current network information for a specific interface.
-     *
-     * @param string $interface The interface for which to retrieve network information.
-     * @return array|null An array containing the network information or null if no information is available.
-     */
-    public static function getCurrentNetworkInfo($interface)
-    {
-        $interface = escapeshellarg($interface);
-        $networkInfo = OpenWrtHelper::exec("iwinfo {$interface} info", false);
-        if (empty($networkInfo)) {
-            return null;
-        }
-
-        $networkInfoData = [];
-        foreach ($networkInfo as $line) {
-            if (preg_match('/ESSID:\s*"([^"]+)"/', $line, $matches)) {
-                $networkInfoData['ssid'] = $matches[1];
-            } else if (preg_match("/^\s*Access Point:\s*([A-F0-9:]{17})/", $line, $matches)) {
-                $networkInfoData['bssid'] = $matches[1];
-            } else if (preg_match("/^\s*Mode:\s*(\S+)/", $line, $matches)) {
-                $networkInfoData['mode'] = strtolower($matches[1]);
-            } else if (preg_match("/^\s*Channel:\s*(\d+)/", $line, $matches)) {
-                $networkInfoData['channel'] = intval($matches[1]);
-            } else if (preg_match("/^\s*Signal:\s*(-?\d+)/", $line, $matches)) {
-                $networkInfoData['signal'] = $matches[1] . ' dBm';
-            } else if (preg_match("/^\s*Link Quality:\s*([\d\/]+)/", $line, $matches)) {
-                $networkInfoData['quality'] = $matches[1];
-            } else if (preg_match("/^\s*Encryption:\s*(.*)/", $line, $matches)) {
-                $networkInfoData['security'] = $matches[1];
-            } else if (preg_match("/^\s*Bit Rate:\s*(.*)/", $line, $matches)) {
-                $networkInfoData['bit_rate'] = $matches[1];
-            }
-        }
-
-        return $networkInfoData;
-    }
-
-    /**
-     * Retrieves the list of wireless interfaces available in the system.
-     *
-     * @return array The list of wireless interfaces available in the system, or false if the command execution fails.
-     * @throws \Exception If there is an error executing the 'ls -1 /sys/class/net/' command.
-     */
-    public static function getSystemWirelessInterfaces()
-    {
-        $entries = @scandir('/sys/class/net/');
-        if ($entries === false) {
-            throw new \Exception('Error reading /sys/class/net/');
-        }
-
-        $interfaces = [];
-        foreach ($entries as $entry) {
-            if ($entry[0] !== '.' && (strpos($entry, 'wlan') === 0 || strpos($entry, 'phy') === 0)) {
-                $interfaces[] = $entry;
-            }
-        }
-
-        return array_reverse($interfaces);
-    }
-
-    /**
-     * Determines the band and interface type for wireless interfaces.
-     *
-     * @return array An array with details about each wireless interface.
-     */
-    public static function getUbusWirelessStatus() {
-        $data = OpenWrtHelper::execUbusCall('network.wireless status');
-
-        $results = [];
-        foreach ($data as $radio => $details) {
-            if (!$details['up']) {
-                continue;
-            }
-
-            foreach ($details['interfaces'] as $iface) {
-                $band = '2.4 GHz';
-                $channel = $details['config']['channel'];
-                if (($channel >= 36 && $channel <= 64) || ($channel >= 100 && $channel <= 165)) {
-                //if ($details['config']['hwmode'] === '11a' || strpos($details['config']['htmode'], 'VHT') !== false) {
-                    $band = '5 GHz';
-                }
-
-                $interfaceType = 'Internal';
-                if (strpos($details['config']['path'], 'usb') !== false) {
-                    $interfaceType = 'USB';
-                }
-
-                $results[] = [
-                    'radio' => $radio,
-                    'ifname' => $iface['ifname'] ?? $iface['config']['ifname'], // from OpenWrt 19.07.7
-                    'section' => $iface['section'],
-                    'band' => $band,
-                    'interface_type' => $interfaceType,
-                    'mode' => $iface['config']['mode'] ?? '',
-                    'ssid' => $iface['config']['ssid'] ?? '',
-                ];
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Finds the wireless interface details by interface name.
-     *
-     * @param string $interface The interface name to find.
-     * @return array|false The interface details as an array, or false if not found.
-     */
-    public static function findWirelessInterfaceDetails($interface) {
-        $filteredDetails = array_filter(self::getUbusWirelessStatus(), function($detail) use ($interface) {
-            return $detail['ifname'] === $interface;
-        });
-        $interfaceDetail = reset($filteredDetails);
-
-        return $interfaceDetail ?? false;
-    }
-
-
-    /**
-     * Retrieves the wireless interfaces and returns an array of values and labels.
-     *
-     * @return array An array of wireless interfaces with values and labels.
-     */
-    public static function getWirelessInterfaces()
-    {
-        return array_map(function ($interface) {
-            return [
-                'value' => $interface['ifname'],
-                'label' => "{$interface['ifname']} ({$interface['interface_type']}, {$interface['band']})"
-            ];
-        }, self::getUbusWirelessStatus());
-    }
-
-    /**
-     * Retrieves the wireless management network configuration.
-     *
-     * @return array The management configuration array containing the following keys:
-     * - interface: The interface for the management configuration.
-     * - ssid: The SSID for the management configuration.
-     * - hidden: Whether the management configuration is hidden or not.
-     * - disabled: Whether the management configuration is disabled or not.
-     * @throws \Exception If there is an error reading the UCI config file.
-     */
-    public static function getManagementConfig()
-    {
-        $config = OpenWrtHelper::uciReadConfig('frieren');
-
-        return [
-            'interface' => $config['@settings[0]']['management_interface'] ?? '',
-            'ssid' => $config['@management[0]']['ssid'] ?? '',
-            'hidden' => $config['@management[0]']['hidden'] ?? '',
-            'disabled' => $config['@management[0]']['disabled'] ?? '',
-        ];
-    }
-
-    /**
-     * Sets the wireless management configuration for a given interface.
-     *
-     * @param string $interface The interface name.
-     * @param string $ssid The SSID (network name) to set.
-     * @param string $psk The pre-shared key (password) to set.
-     * @param bool $hidden Whether the network should be hidden or not.
-     * @param bool $disabled Whether the network should be disabled or not.
-     * @return bool Returns true if the SSID was successfully set, false otherwise.
-     * @throws \Exception If there Interface to sections translation problem
-     */
-    public static function setManagementConfig($interface, $ssid, $psk, $hidden, $disabled)
-    {
-        // check if already in use
-        $config = OpenWrtHelper::uciReadConfig('frieren');
-        if ($config['@settings[0]']['client_interface'] === $interface) {
-            throw new \Exception('The interface is in use to be able to connect to the internet');
-        }
-
-        // save frieren settings
-        OpenWrtHelper::uciSet('frieren.@settings[0].management_interface', $interface, false, false);
-        OpenWrtHelper::uciSet('frieren.@management[0].ssid', $ssid, false, false);
-        OpenWrtHelper::uciSet('frieren.@management[0].psk', $psk, false, false);
-        OpenWrtHelper::uciSet('frieren.@management[0].hidden', $hidden, false, false);
-        OpenWrtHelper::uciSet('frieren.@management[0].disabled', $disabled, false, false);
-        OpenWrtHelper::uciCommit();
-
-        $interfaceDetail = self::findWirelessInterfaceDetails($interface);
-        if (!$interfaceDetail) {
-            throw new \Exception('Interface to sections translation problem');
-        }
-
-        // create AP
-        $uciInterface = $interfaceDetail['section'];
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.network", 'lan', false, false);
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.mode", 'ap', false, false);
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.encryption", 'psk2+ccmp', false, false);
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.ssid", $ssid, false, false);
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.key", $psk, false, false);
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.hidden", $hidden ? 1 : 0, false, false);
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.disabled", $disabled ? 1 : 0, false, false);
-        OpenWrtHelper::uciCommit();
-
-        OpenWrtHelper::execBackground('wifi');
-
-        return true;
-    }
-
-    /**
-     * Retrieves the client configuration from the OpenWrtHelper class.
-     *
-     * @return array The client configuration data
-     */
-    public static function getClientConfig()
-    {
-        // maybe in openwrt it makes more sense to use more ubus and discard more universal solutions ....
-        //$config = OpenWrtHelper::uciReadConfig('frieren');
-        $status = OpenWrtHelper::execUbusCall('network.interface.wwan status');
-        $iwinfo = self::getCurrentNetworkInfo($status['device']);
-
-        return [
-            //'connected' => $iwinfo['mode'] === 'client' && $iwinfo['security'] !== 'unknown',
-            'connected' => $status['up'],
-            'interface' => $status['device'],
-            'ssid' => $iwinfo['ssid'] ?? '',
-        ];
-
-        /*
-        return [
-            'interface"' => $data['device'],
-            'connected' => $data['up'],
-            'ip_address' => !empty($data['ipv4-address']) ? $data['ipv4-address'][0]['address'] : null,
-            'dns_servers' => !empty($data['dns-server'] ? implode(', ', $data['dns-server']) : null),
-            'uptime' => $data['uptime'] ?? null,
-            'hostname' => $data['data']['hostname'] ?? null,
-        ];
-        */
-    }
-
-    /**
      * Scans for networks on a given interface and returns a list of access points.
      *
      * @param string $interface The network interface to scan for networks.
      * @return array|null An array of access points with their details, or null if no networks are found.
      */
-    public static function scanForNetworks($interface)
+    public static function scanForNetworks($device)
     {
-        // TODO: if disabled....
-        /*
-        uci set wireless.@wifi-device[0].disabled="0"
-        uci commit wireless
-        wifi
-        */
+        $device = preg_replace('/[^a-zA-Z0-9_\-]/', '', $device);
+        $scanData = OpenWrtHelper::execUbusCall('iwinfo', 'scan', ['device' => $device]);
 
-        // TODO: if interface is in monitor mode....
-
-        $interface = escapeshellarg($interface);
-        $apScan = OpenWrtHelper::exec("iwinfo {$interface} scan");
-        if (empty($apScan) || strpos($apScan, 'No scan results') !== false) {
+        if ($scanData === false || !isset($scanData['results'])) {
             return [];
         }
 
-        $apBlocks = preg_split("/^Cell/m", $apScan);
-
         $apList = [];
-        foreach ($apBlocks as $block) {
-            preg_match("~Address:\s*([A-F0-9:]{17})\s+ESSID:\s*\"([^\"]*)\".*?Channel:\s*(\d+).*?Signal:\s*(-?\d+)\s+dBm.*?Quality:\s*([\d/]+).*?Encryption:\s*([^\n]*)~ms", $block, $match);
-            if (!$match) {
-                continue;
-            }
-
-            [$fullMatch, $bssid, $ssid, $channel, $signal, $quality, $security] = $match;
+        foreach ($scanData['results'] as $entry) {
+            $ssid = $entry['ssid'] ?? '';
             if (empty($ssid) || !mb_check_encoding($ssid, 'UTF-8') || $ssid === 'unknown') {
                 continue;
             }
 
+            $enc = $entry['encryption'] ?? [];
+            if (!($enc['enabled'] ?? false)) {
+                $security = 'Open';
+            } else {
+                $wpa = $enc['wpa'] ?? [];
+                $auth = $enc['authentication'] ?? [];
+                $ciphers = $enc['ciphers'] ?? [];
+                $parts = [];
+                if (in_array(2, $wpa) && in_array('sae', $auth)) {
+                    $parts[] = 'WPA3-SAE';
+                } elseif (in_array(2, $wpa) && in_array('psk', $auth)) {
+                    $parts[] = 'WPA2-PSK';
+                } elseif (in_array(1, $wpa) && in_array('psk', $auth)) {
+                    $parts[] = 'WPA-PSK';
+                } elseif (!empty($wpa)) {
+                    $parts[] = 'WPA' . implode('+', $wpa);
+                }
+                if (!empty($ciphers)) {
+                    $parts[] = strtoupper(implode('+', $ciphers));
+                }
+                $security = implode(' / ', $parts) ?: 'Encrypted';
+            }
+
             $apList[] = [
-                'bssid' => $bssid,
-                'ssid' => $ssid,
-                'channel' => intval($channel),
-                'signal' => $signal,
-                'quality' => $quality,
-                'security' => ($security === 'none') ? 'Open' : $security,
+                'bssid'   => $entry['bssid'] ?? '',
+                'ssid'    => $ssid,
+                'channel' => $entry['channel'] ?? 0,
+                'signal'  => $entry['signal'] ?? 0,
+                'quality' => $entry['quality'] ?? 0,
+                'security' => $security,
             ];
         }
 
@@ -298,91 +71,463 @@ class ModuleOpenWrtHelper
     }
 
     /**
-     * Maps the AP security to the corresponding encryption type.
-     *
-     * @param string $security The security type of the AP
-     * @return string|false The corresponding encryption type or false if not found
+     * Disable the WWAN interface.
      */
-    private static function mapApSecurityToEncryption($security) {
-        // simplifies the security type by removing the 'PSK' suffix
-        $security = str_replace(' PSK', '', $security);
-
-        $securityMappings = [
-            'Open' => 'none',
-            'WPA (TKIP)' => 'psk+tkip',
-            'WPA (CCMP)' => 'psk+ccmp',
-            'WPA (TKIP, CCMP)' => 'psk+tkip+ccmp',
-            'WPA2 (TKIP)' => 'psk2+tkip',
-            'WPA2 (CCMP)' => 'psk2+ccmp',
-            'WPA2 (TKIP, CCMP)' => 'psk2+ccmp+tkip',
-            'WPA3 (SAE)' => 'sae',
-            'WPA3 (CCMP)' => 'sae+ccmp',
-            'mixed WPA/WPA2 (TKIP)' => 'psk-mixed+tkip',
-            'mixed WPA/WPA2 (CCMP)' => 'psk-mixed+ccmp',
-            'mixed WPA/WPA2 (TKIP, CCMP)' => 'psk-mixed+ccmp+tkip',
-            'mixed WPA2/WPA3 (SAE)' => 'psk2+sae',
-            'mixed WPA2/WPA3 (CCMP)' => 'psk2+sae+ccmp',
-        ];
-
-        return $securityMappings[$security] ?? false;
+    public static function disableWwanInterface()
+    {
+        OpenWrtHelper::execUbusCall('network.interface.wwan', 'down');
     }
 
     /**
-     * Connects to the specified AP with the provided parameters.
+     * Returns comprehensive radio+interface data using UCI as source of truth,
+     * enriched with runtime state from ubus and iwinfo.
      *
-     * @param mixed $interface The interface to connect to
-     * @param string $ssid The SSID of the AP
-     * @param string $security The security type of the AP
-     * @param string $psk The pre-shared key for authentication
-     * @throws \Exception The interface is already in use, security type not supported, or translation problem
-     * @return bool Returns true if the connection is successful
+     * @return array Array keyed by radio name, each containing radio info + array of interfaces.
      */
-    public static function connectToAP($interface, $ssid, $security, $psk) {
-        // check if already in use
-        $config = OpenWrtHelper::uciReadConfig('frieren');
-        if ($config['@settings[0]']['management_interface'] === $interface) {
-            throw new \Exception('The interface is in use by the management network');
+    public static function getWirelessOverview()
+    {
+        // UCI: source of truth for all radios and interfaces (including disabled)
+        $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'wireless']);
+        $uciSections = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
+
+        // luci-rpc: runtime state, iwinfo data (phy, hardware, htmodes, country)
+        $wirelessDevices = OpenWrtHelper::execUbusCall('luci-rpc', 'getWirelessDevices');
+        $wirelessDevices = ($wirelessDevices !== false) ? $wirelessDevices : [];
+
+        // Build runtime map: section -> {ifname, up} from luci-rpc interfaces
+        $runtimeMap = [];
+        foreach ($wirelessDevices as $radio => $details) {
+            foreach ($details['interfaces'] ?? [] as $iface) {
+                $section = $iface['section'] ?? '';
+                if ($section) {
+                    $runtimeMap[$section] = [
+                        'ifname' => $iface['ifname'] ?? null,
+                        'up'     => $details['up'] ?? false,
+                    ];
+                }
+            }
         }
 
-        // I try to clear all problematic states before connecting to the AP
-        OpenWrtHelper::execUbusCall('network.interface.wwan up');
-        exec('[ ! -z "$(wifi config)" ] && wifi config >> /etc/config/wireless');
-
-        $encryption = self::mapApSecurityToEncryption($security);
-        if (!$encryption) {
-            throw new \Exception('Security type not supported');
+        // Separate radios (wifi-device) and interfaces (wifi-iface) from UCI
+        $radios = [];
+        $interfaces = [];
+        foreach ($uciSections as $name => $config) {
+            $type = $config['.type'] ?? '';
+            if ($type === 'wifi-device') {
+                $radios[$name] = $config;
+            } elseif ($type === 'wifi-iface') {
+                $interfaces[$name] = $config;
+            }
         }
 
-        $interfaceDetail = self::findWirelessInterfaceDetails($interface);
-        if (!$interfaceDetail) {
-            throw new \Exception('Interface to sections translation problem');
+        $overview = [];
+        foreach ($radios as $radioName => $radioConfig) {
+            $ch = $radioConfig['channel'] ?? null;
+            $chNum = is_numeric($ch) ? (int)$ch : 0;
+            $band = (($chNum >= 36 && $chNum <= 64) || ($chNum >= 100 && $chNum <= 165)) ? '5 GHz' : '2.4 GHz';
+
+            $luciRadio = $wirelessDevices[$radioName] ?? [];
+            $iwinfo = $luciRadio['iwinfo'] ?? [];
+
+            $radioInfo = [
+                'channel'    => $ch,
+                'txpower'    => null,
+                'frequency'  => null,
+                'band'       => $band,
+                'htmode'     => $radioConfig['htmode'] ?? null,
+                'up'         => $luciRadio['up'] ?? false,
+                'disabled'   => ($radioConfig['disabled'] ?? '0') === '1',
+                'phy'        => $iwinfo['phy'] ?? null,
+                'country'    => $iwinfo['country'] ?? null,
+                'hardware'   => $iwinfo['hardware']['name'] ?? null,
+                'hwmodes'    => $iwinfo['hwmodes_text'] ?? null,
+                'htmodes'    => $iwinfo['htmodes'] ?? [],
+                'interfaces' => [],
+            ];
+
+            // Enrich with iwinfo runtime data (txpower, frequency) if radio is up
+            if ($radioInfo['up'] && $iwinfo['phy'] ?? null) {
+                $infoData = OpenWrtHelper::execUbusCall('iwinfo', 'info', ['device' => $iwinfo['phy']]);
+                if ($infoData !== false) {
+                    $radioInfo['txpower']   = $infoData['txpower'] ?? null;
+                    $radioInfo['frequency'] = $infoData['frequency'] ?? null;
+                }
+            }
+
+            // Attach interfaces from UCI that belong to this radio
+            foreach ($interfaces as $section => $ifaceConfig) {
+                if (($ifaceConfig['device'] ?? '') !== $radioName) {
+                    continue;
+                }
+
+                $runtime = $runtimeMap[$section] ?? null;
+                $ifname = $runtime['ifname'] ?? null;
+                $ifaceUp = $ifname ? ($runtime['up'] ?? false) : false;
+
+                $radioInfo['interfaces'][] = [
+                    'radio'      => $radioName,
+                    'ifname'     => $ifname,
+                    'section'    => $section,
+                    'mode'       => $ifaceConfig['mode'] ?? '',
+                    'ssid'       => $ifaceConfig['ssid'] ?? '',
+                    'encryption' => $ifaceConfig['encryption'] ?? '',
+                    'network'    => $ifaceConfig['network'] ?? '',
+                    'hidden'     => ($ifaceConfig['hidden'] ?? '0') === '1',
+                    'up'         => $ifaceUp,
+                    'disabled'   => ($ifaceConfig['disabled'] ?? '0') === '1',
+                ];
+            }
+
+            $overview[$radioName] = $radioInfo;
         }
 
-        // save frieren settings
-        OpenWrtHelper::uciSet('frieren.@settings[0].client_interface', $interface);
+        return $overview;
+    }
 
-        // connect to AP
-        $uciInterface = $interfaceDetail['section'];
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.network", 'wwan', false, false);
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.mode", 'sta', false, false);
-        //OpenWrtHelper::uciSet("wireless.{$uciInterface}.bssid", $bssid, false, false);
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.ssid", $ssid, false, false);
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.encryption", $encryption, false, false);
-        OpenWrtHelper::uciSet("wireless.{$uciInterface}.key", $psk, false, false);
+    /**
+     * Returns current radio config and available options for a given radio.
+     *
+     * @param string $radio The UCI radio name (e.g. 'radio0').
+     * @return array Array with 'current' config and 'available' options.
+     */
+    public static function getRadioConfig($radio)
+    {
+        $radio = preg_replace('/[^a-zA-Z0-9_]/', '', $radio);
+
+        $fields = ['channel', 'txpower', 'htmode', 'country', 'disabled'];
+        $current = [];
+        foreach ($fields as $field) {
+            try {
+                $current[$field] = OpenWrtHelper::uciGet("wireless.{$radio}.{$field}");
+            } catch (\Exception $e) {
+                $current[$field] = null;
+            }
+        }
+
+        $channelData  = OpenWrtHelper::execUbusCall('iwinfo', 'freqlist', ['device' => $radio]);
+        $txpowerData  = OpenWrtHelper::execUbusCall('iwinfo', 'txpowerlist', ['device' => $radio]);
+        $countryData  = OpenWrtHelper::execUbusCall('iwinfo', 'countrylist', ['device' => $radio]);
+
+        $channels = [];
+        if ($channelData !== false && isset($channelData['results'])) {
+            foreach ($channelData['results'] as $entry) {
+                $channels[] = [
+                    'channel'    => $entry['channel'] ?? null,
+                    'mhz'        => $entry['mhz'] ?? null,
+                    'restricted' => $entry['restricted'] ?? false,
+                ];
+            }
+        }
+
+        $txpowers = [];
+        if ($txpowerData !== false && isset($txpowerData['results'])) {
+            foreach ($txpowerData['results'] as $entry) {
+                $txpowers[] = [
+                    'dbm' => $entry['dbm'] ?? null,
+                    'mw'  => $entry['mw'] ?? null,
+                ];
+            }
+        }
+
+        $countries = [];
+        if ($countryData !== false && isset($countryData['results'])) {
+            foreach ($countryData['results'] as $entry) {
+                $countries[] = [
+                    'code' => $entry['code'] ?? null,
+                    'name' => $entry['name'] ?? null,
+                ];
+            }
+        }
+
+        // Get hardware-supported htmodes from luci-rpc
+        $wirelessDevices = OpenWrtHelper::execUbusCall('luci-rpc', 'getWirelessDevices');
+        $htmodes = ($wirelessDevices !== false && isset($wirelessDevices[$radio]['iwinfo']['htmodes']))
+            ? $wirelessDevices[$radio]['iwinfo']['htmodes']
+            : [];
+
+        return [
+            'current'   => $current,
+            'available' => [
+                'channels'  => $channels,
+                'txpowers'  => $txpowers,
+                'countries' => $countries,
+                'htmodes'   => $htmodes,
+            ],
+        ];
+    }
+
+    /**
+     * Writes radio configuration via UCI and reloads the radio.
+     *
+     * @param string $radio    UCI radio name (e.g. 'radio0').
+     * @param mixed  $channel  Channel number or 'auto'.
+     * @param mixed  $txpower  TX power in dBm.
+     * @param string $htmode   HT mode string (e.g. 'VHT80').
+     * @param string $country  Country code (e.g. 'US').
+     * @param mixed  $disabled 0 or 1.
+     * @return bool True on success.
+     * @throws \Exception If the radio name is invalid.
+     */
+    public static function setRadioConfig($radio, $channel, $txpower, $htmode, $country, $disabled)
+    {
+        $radio = preg_replace('/[^a-zA-Z0-9_]/', '', $radio);
+
+        // Validate radio exists in UCI
+        $existing = OpenWrtHelper::uciGet("wireless.{$radio}");
+        if ($existing === null || $existing === false) {
+            throw new \Exception("Radio '{$radio}' not found in wireless config");
+        }
+
+        OpenWrtHelper::uciSet("wireless.{$radio}.channel", $channel, false, false);
+        OpenWrtHelper::uciSet("wireless.{$radio}.txpower", $txpower, false, false);
+        OpenWrtHelper::uciSet("wireless.{$radio}.htmode", $htmode, false, false);
+        OpenWrtHelper::uciSet("wireless.{$radio}.country", $country, false, false);
+        OpenWrtHelper::uciSet("wireless.{$radio}.disabled", $disabled ? 1 : 0, false, false);
         OpenWrtHelper::uciCommit();
 
-        //if ($interfaceDetail['radio'] === false) {
-        //    OpenWrtHelper::execBackground('wifi');
-        OpenWrtHelper::exec("wifi reload {$interfaceDetail['radio']} && wifi up {$interfaceDetail['radio']}");
+        $safeRadio = escapeshellarg($radio);
+        OpenWrtHelper::execBackground("wifi reload {$safeRadio} && wifi up {$safeRadio}");
 
         return true;
     }
 
     /**
-     * Disable the WWAN interface.
+     * Creates a new wireless interface under a given radio.
+     *
+     * @param string $radio      UCI radio name (e.g. 'radio0').
+     * @param string $ssid       SSID for the new interface.
+     * @param string $encryption Encryption type (e.g. 'psk2+ccmp', 'sae', 'none').
+     * @param string $key        Pre-shared key (ignored when encryption is 'none').
+     * @param string $mode       Interface mode (e.g. 'ap', 'sta', 'monitor').
+     * @param string $network    UCI network name (e.g. 'lan', 'wwan', 'guest').
+     * @return bool True on success.
      */
-    public static function disableWwanInterface()
+    public static function addInterface($radio, $ssid, $encryption, $key, $mode, $network, $hidden, $disabled)
     {
-        OpenWrtHelper::execUbusCall('network.interface.wwan down');
+        $radio = preg_replace('/[^a-zA-Z0-9_]/', '', $radio);
+
+        OpenWrtHelper::exec('uci add wireless wifi-iface');
+        OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].device', $radio, false, false);
+        OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].mode', $mode, false, false);
+        OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].disabled', $disabled ? 1 : 0, false, false);
+
+        if ($mode === 'monitor') {
+            OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].network', '', false, false);
+        } else {
+            OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].network', $network, false, false);
+            OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].ssid', $ssid, false, false);
+            OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].encryption', $encryption, false, false);
+            OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].hidden', $hidden ? 1 : 0, false, false);
+            if ($encryption !== 'none') {
+                OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].key', $key, false, false);
+            }
+        }
+
+        OpenWrtHelper::uciCommit();
+
+        OpenWrtHelper::execBackground('wifi reload');
+
+        return true;
+    }
+
+    /**
+     * Deletes a wireless interface by its UCI section name.
+     *
+     * @param string $section UCI section name (e.g. 'default_radio0').
+     * @return bool True on success.
+     * @throws \Exception If the section does not exist.
+     */
+    public static function removeInterface($section)
+    {
+        $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
+
+        $existing = OpenWrtHelper::uciGet("wireless.{$section}");
+        if ($existing === null || $existing === false) {
+            throw new \Exception("Interface section '{$section}' not found in wireless config");
+        }
+
+        OpenWrtHelper::exec('uci delete ' . escapeshellarg("wireless.{$section}"));
+        OpenWrtHelper::uciCommit();
+
+        OpenWrtHelper::execBackground('wifi reload');
+
+        return true;
+    }
+
+    /**
+     * Enables or disables a specific wireless interface.
+     *
+     * @param string $section  UCI section name.
+     * @param int    $disabled 1 to disable, 0 to enable.
+     * @return bool True on success.
+     * @throws \Exception If the section does not exist.
+     */
+    public static function toggleInterface($section, $disabled)
+    {
+        $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
+
+        $existing = OpenWrtHelper::uciGet("wireless.{$section}");
+        if ($existing === null || $existing === false) {
+            throw new \Exception("Interface section '{$section}' not found in wireless config");
+        }
+
+        OpenWrtHelper::uciSet("wireless.{$section}.disabled", $disabled ? 1 : 0, false, false);
+        OpenWrtHelper::uciCommit();
+
+        OpenWrtHelper::execBackground('wifi reload');
+
+        return true;
+    }
+
+    /**
+     * Returns the current UCI config for a specific wireless interface section.
+     *
+     * @param string $section UCI section name.
+     * @return array Array with device, network, mode, ssid, encryption, key, disabled, hidden, bssid.
+     */
+    public static function getInterfaceConfig($section)
+    {
+        $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
+
+        $fields = ['device', 'network', 'mode', 'ssid', 'encryption', 'key', 'disabled', 'hidden', 'bssid'];
+        $config = [];
+        foreach ($fields as $field) {
+            try {
+                $config[$field] = OpenWrtHelper::uciGet("wireless.{$section}.{$field}");
+            } catch (\Exception $e) {
+                $config[$field] = '';
+            }
+        }
+
+        return $config;
+    }
+
+    /**
+     * Updates the UCI config for an existing wireless interface section.
+     *
+     * @param string $section    UCI section name.
+     * @param string $ssid       SSID.
+     * @param string $encryption Encryption type.
+     * @param string $key        Pre-shared key.
+     * @param string $mode       Interface mode.
+     * @param string $network    UCI network name.
+     * @param mixed  $hidden     Whether to hide the SSID (1 or 0).
+     * @param mixed  $disabled   Whether to disable the interface (1 or 0).
+     * @return bool True on success.
+     * @throws \Exception If the section does not exist.
+     */
+    public static function setInterfaceConfig($section, $ssid, $encryption, $key, $mode, $network, $hidden, $disabled)
+    {
+        $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
+
+        $existing = OpenWrtHelper::uciGet("wireless.{$section}");
+        if ($existing === null || $existing === false) {
+            throw new \Exception("Interface section '{$section}' not found in wireless config");
+        }
+
+        OpenWrtHelper::uciSet("wireless.{$section}.mode", $mode, false, false);
+        OpenWrtHelper::uciSet("wireless.{$section}.disabled", $disabled ? 1 : 0, false, false);
+
+        if ($mode === 'monitor') {
+            OpenWrtHelper::uciSet("wireless.{$section}.network", '', false, false);
+        } else {
+            OpenWrtHelper::uciSet("wireless.{$section}.ssid", $ssid, false, false);
+            OpenWrtHelper::uciSet("wireless.{$section}.encryption", $encryption, false, false);
+            OpenWrtHelper::uciSet("wireless.{$section}.key", $key, false, false);
+            OpenWrtHelper::uciSet("wireless.{$section}.network", $network, false, false);
+            OpenWrtHelper::uciSet("wireless.{$section}.hidden", $hidden ? 1 : 0, false, false);
+        }
+
+        OpenWrtHelper::uciCommit();
+
+        OpenWrtHelper::execBackground('wifi reload');
+
+        return true;
+    }
+
+    /**
+     * Returns the list of associated clients for a wireless interface.
+     *
+     * @param string $interface The wireless interface name (e.g. 'wlan0').
+     * @return array Array of client entries with mac, signal, noise, rx_rate, tx_rate, inactive.
+     */
+    public static function getAssociationList($interface)
+    {
+        $safeInterface = preg_replace('/[^a-zA-Z0-9_\-]/', '', $interface);
+
+        // Try ubus first
+        $ubusData = OpenWrtHelper::execUbusCall('iwinfo', 'assoclist', ['device' => $safeInterface]);
+        if ($ubusData !== false && isset($ubusData['results']) && !empty($ubusData['results'])) {
+            $clients = [];
+            foreach ($ubusData['results'] as $entry) {
+                $clients[] = [
+                    'mac'      => $entry['mac'] ?? '',
+                    'signal'   => $entry['signal'] ?? null,
+                    'noise'    => $entry['noise'] ?? null,
+                    'rx_rate'  => $entry['rx']['rate'] ?? null,
+                    'tx_rate'  => $entry['tx']['rate'] ?? null,
+                    'inactive' => $entry['inactive'] ?? null,
+                ];
+            }
+            return $clients;
+        }
+
+        // Fallback: parse CLI output of iwinfo <iface> assoclist
+        $escapedInterface = escapeshellarg($safeInterface);
+        $cliOutput = OpenWrtHelper::exec("iwinfo {$escapedInterface} assoclist");
+        if (empty($cliOutput) || strpos($cliOutput, 'No station connected') !== false) {
+            return [];
+        }
+
+        $clients = [];
+        // Each client block starts with a MAC address line
+        // Example lines:
+        //   XX:XX:XX:XX:XX:XX  -65 dBm / -95 dBm (SNR 30)  0 ms ago
+        //   RX: 54.0 MBit/s, MCS 5, 20MHz                         5 Pkts.
+        //   TX: 65.0 MBit/s, MCS 7, 20MHz                         8 Pkts.
+        $blocks = preg_split('/(?=^[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2})/m', $cliOutput);
+        foreach ($blocks as $block) {
+            $block = trim($block);
+            if (empty($block)) {
+                continue;
+            }
+
+            $entry = [
+                'mac'      => '',
+                'signal'   => null,
+                'noise'    => null,
+                'rx_rate'  => null,
+                'tx_rate'  => null,
+                'inactive' => null,
+            ];
+
+            // MAC + signal/noise line
+            if (preg_match('/^([0-9A-Fa-f:]{17})\s+(-?\d+)\s+dBm\s*\/\s*(-?\d+)\s+dBm.*?(\d+)\s+ms\s+ago/i', $block, $m)) {
+                $entry['mac']      = strtoupper($m[1]);
+                $entry['signal']   = intval($m[2]);
+                $entry['noise']    = intval($m[3]);
+                $entry['inactive'] = intval($m[4]);
+            } elseif (preg_match('/^([0-9A-Fa-f:]{17})/i', $block, $m)) {
+                $entry['mac'] = strtoupper($m[1]);
+            }
+
+            if (empty($entry['mac'])) {
+                continue;
+            }
+
+            // RX rate
+            if (preg_match('/RX:\s*([\d.]+)\s*MBit\/s/i', $block, $m)) {
+                $entry['rx_rate'] = floatval($m[1]);
+            }
+
+            // TX rate
+            if (preg_match('/TX:\s*([\d.]+)\s*MBit\/s/i', $block, $m)) {
+                $entry['tx_rate'] = floatval($m[1]);
+            }
+
+            $clients[] = $entry;
+        }
+
+        return $clients;
     }
 }

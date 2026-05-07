@@ -113,8 +113,10 @@ interface HelperInterface
     /**
      * Executes a ubus call with the given command and returns the parsed response as an associative array.
      *
-     * @param string $command The command to be executed.
+     * @param string $namespace The ubus namespace (e.g. 'iwinfo', 'network.wireless', 'system').
+     * @param string $method The method to call (e.g. 'status', 'info', 'scan').
+     * @param array $args Optional associative array of arguments.
      * @return mixed|false The parsed response as an associative array if the JSON decoding is successful, false otherwise.
      */
-    public static function execUbusCall(string $command);
+    public static function execUbusCall(string $namespace, string $method, array $args = []);
 }
