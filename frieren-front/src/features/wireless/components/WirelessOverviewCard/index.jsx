@@ -5,15 +5,15 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useCallback } from 'react';
-import { Table, Badge, Button } from 'react-bootstrap';
+import { Table, Badge } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import PanelCard from '@src/components/PanelCard';
+import Button from '@src/components/Button';
 import ConfirmationModal from '@src/components/ConfirmationModal';
 import useGetWirelessOverview from '@src/features/wireless/hooks/useGetWirelessOverview.js';
 import useRemoveInterface from '@src/features/wireless/hooks/useRemoveInterface.js';
 import useToggleInterface from '@src/features/wireless/hooks/useToggleInterface.js';
-import useDisableWwanInterface from '@src/features/wireless/hooks/useDisableWwanInterface.js';
 import ScanModal from '@src/features/wireless/components/ScanModal';
 import InterfaceFormModal from '@src/features/wireless/components/InterfaceFormModal';
 import RadioConfigModal from '@src/features/wireless/components/RadioConfigModal';
@@ -27,13 +27,16 @@ const mapScanSecurityToEncryption = (security) => {
 };
 
 const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) => {
-    const { mutate: removeInterface } = useRemoveInterface();
-    const { mutate: toggleInterface } = useToggleInterface();
-    const { mutate: disableWwan, isPending: isDisconnecting } = useDisableWwanInterface();
+    const { mutate: removeInterface, isPending: isRemoving } = useRemoveInterface();
+    const { mutate: toggleInterface, isPending: isToggling } = useToggleInterface();
 
     const [confirmRemove, setConfirmRemove] = useState(null);
+    const [togglingSection, setTogglingSection] = useState(null);
+
+    const isBusy = isRemoving || isToggling;
 
     const handleToggle = useCallback((iface) => {
+        setTogglingSection(iface.section);
         toggleInterface({ section: iface.section, disabled: !iface.disabled });
     }, [toggleInterface]);
 
@@ -44,15 +47,11 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) 
         setConfirmRemove(null);
     }, [removeInterface, confirmRemove]);
 
-    const handleDisconnect = useCallback((iface) => {
-        disableWwan({ interface: iface.ifname });
-    }, [disableWwan]);
-
     return (
-        <div className={'mb-3'}>
+        <div className={'mb-5'}>
             <div className={'d-flex align-items-center justify-content-between mb-2'}>
                 <h6 className={'mb-0'}>
-                    {radioName}
+                    {radioName.toUpperCase()}
                     <Badge bg={'secondary'} className={'ms-2'}>{radio.band || 'Unknown'}</Badge>
                     <Badge bg={radio.disabled ? 'danger' : (radio.up ? 'success' : 'warning')} className={'ms-1'}>
                         {radio.disabled ? 'Disabled' : (radio.up ? 'Up' : 'Down')}
@@ -67,29 +66,26 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) 
                     <Button
                         size={'sm'}
                         variant={'outline-secondary'}
+                        icon={'settings'}
                         onClick={() => onConfigure(radioName, radio.band)}
-                    >
-                        Configure
-                    </Button>
+                    />
                     <Button
                         size={'sm'}
                         variant={'outline-info'}
+                        icon={'wifi'}
                         onClick={() => onScan(radioName)}
-                    >
-                        Scan
-                    </Button>
+                    />
                     <Button
                         size={'sm'}
                         variant={'outline-success'}
+                        icon={'plus'}
                         onClick={() => onAdd(radioName)}
-                    >
-                        Add
-                    </Button>
+                    />
                 </div>
             </div>
 
             {radio.interfaces?.length > 0 ? (
-                <Table size={'sm'} striped bordered hover>
+                <Table striped hover responsive>
                     <thead>
                         <tr>
                             <th>Interface</th>
@@ -98,7 +94,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) 
                             <th>BSSID</th>
                             <th>Encryption</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,37 +115,25 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) 
                                         <Button
                                             size={'sm'}
                                             variant={'outline-primary'}
+                                            icon={'edit-2'}
                                             onClick={() => onEdit(iface.section)}
-                                            disabled={!iface.section}
-                                        >
-                                            Edit
-                                        </Button>
+                                            disabled={!iface.section || isBusy}
+                                        />
                                         <Button
                                             size={'sm'}
                                             variant={iface.disabled ? 'outline-success' : 'outline-warning'}
+                                            icon={iface.disabled ? 'toggle-left' : 'toggle-right'}
+                                            loading={isToggling && togglingSection === iface.section}
                                             onClick={() => handleToggle(iface)}
-                                            disabled={!iface.section}
-                                        >
-                                            {iface.disabled ? 'Enable' : 'Disable'}
-                                        </Button>
-                                        {iface.mode === 'sta' && iface.up && (
-                                            <Button
-                                                size={'sm'}
-                                                variant={'outline-danger'}
-                                                onClick={() => handleDisconnect(iface)}
-                                                disabled={isDisconnecting}
-                                            >
-                                                Disconnect
-                                            </Button>
-                                        )}
+                                            disabled={!iface.section || isBusy}
+                                        />
                                         <Button
                                             size={'sm'}
                                             variant={'outline-danger'}
+                                            icon={'trash-2'}
                                             onClick={() => setConfirmRemove(iface.section)}
-                                            disabled={!iface.section}
-                                        >
-                                            Remove
-                                        </Button>
+                                            disabled={!iface.section || isBusy}
+                                        />
                                     </div>
                                 </td>
                             </tr>
@@ -166,6 +150,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) 
                 onConfirm={handleRemoveConfirmed}
                 title={'Remove Interface'}
                 description={`Are you sure you want to remove interface "${confirmRemove}"? This cannot be undone.`}
+                isConfirmLoading={isRemoving}
             />
         </div>
     );

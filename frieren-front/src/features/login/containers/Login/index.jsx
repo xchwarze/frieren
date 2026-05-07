@@ -29,7 +29,7 @@ const Login = () => {
 
   return (
       <div className={'vh-100 d-flex justify-content-center align-items-center login-background position-relative'}>
-        <div className={'position-absolute top-0 start-0 end-0 bottom-0 bg-dark bg-opacity-25'} />
+        <div className={'position-absolute top-0 start-0 end-0 bottom-0 bg-dark bg-opacity-50'} />
         <Col lg={4} md={6} sm={8} xs={10} className={'position-relative z-index-1'}>
           <Card>
             <Card.Body className={'p-4 m-1'}>

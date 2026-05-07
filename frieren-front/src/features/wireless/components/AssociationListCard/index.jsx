@@ -26,7 +26,12 @@ const AssociationListCard = () => {
     const clientList = clients ?? [];
 
     return (
-        <PanelCard title={'Associated Stations'} isFetching={isFetching} refetch={refetch}>
+        <PanelCard
+            title={'Associated Stations'}
+            isFetching={isFetching}
+            refetch={refetch}
+            className={'mt-4'}
+        >
             {allInterfaces.length > 0 && (
                 <Form.Group className={'mb-3'}>
                     <Form.Label>Interface</Form.Label>

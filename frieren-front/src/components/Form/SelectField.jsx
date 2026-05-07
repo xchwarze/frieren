@@ -19,15 +19,18 @@ import PropTypes from 'prop-types';
  * @return {ReactElement} the rendered select field component
  */
 const SelectField = ({ name, label, options, ...rest }) => {
-    const { register, setValue, formState: { errors } } = useFormContext();
+    const { register, setValue, getValues, formState: { errors } } = useFormContext();
     const isOptionObject = options.length > 0 && typeof options[0] === 'object';
 
     useEffect(() => {
         if (options.length > 0) {
-            const defaultValue = isOptionObject ? options[0].value : options[0];
-            setValue(name, defaultValue);
+            const validValues = options.map(option => isOptionObject ? String(option.value) : String(option));
+            const currentValue = String(getValues(name) ?? '');
+            if (!validValues.includes(currentValue)) {
+                setValue(name, isOptionObject ? options[0].value : options[0]);
+            }
         }
-    }, [options, setValue, name, isOptionObject]);
+    }, [options, setValue, getValues, name, isOptionObject]);
 
     return (
         <Form.Group className={'mb-3'}>

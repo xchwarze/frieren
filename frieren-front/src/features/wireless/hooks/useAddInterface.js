@@ -20,7 +20,7 @@ const useAddInterface = () => {
     const queryClient = useQueryClient();
 
     return useAuthenticatedMutation({
-        mutationFn: ({ radio, ssid, encryption, key, mode, network, hidden, disabled }) => fetchPost({
+        mutationFn: ({ radio, ssid, encryption, key, mode, network, hidden, disabled, isManagement, isRecon }) => fetchPost({
             module: 'wireless',
             action: 'addInterface',
             radio,
@@ -31,6 +31,8 @@ const useAddInterface = () => {
             network,
             hidden,
             disabled,
+            isManagement,
+            isRecon,
         }),
         onSuccess: async () => {
             await sleep(500);

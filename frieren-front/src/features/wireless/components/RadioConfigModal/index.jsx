@@ -33,27 +33,33 @@ const RadioConfigForm = ({ radio, onHide }) => {
         label: ch.channel ? `${ch.channel} (${ch.mhz} MHz)` : String(ch),
     }));
 
-    const txpowerOptions = (radioConfig?.available?.txpowers ?? []).map(tp => ({
-        value: String(tp.dbm != null ? tp.dbm : tp),
-        label: tp.dbm != null ? `${tp.dbm} dBm (${tp.mw} mW)` : String(tp),
-    }));
+    const txpowerOptions = [
+        { value: '0', label: 'Default (driver)' },
+        ...(radioConfig?.available?.txpowers ?? []).map(tp => ({
+            value: String(tp.dbm != null ? tp.dbm : tp),
+            label: tp.dbm != null ? `${tp.dbm} dBm (${tp.mw} mW)` : String(tp),
+        })),
+    ];
 
     const htmodeOptions = (radioConfig?.available?.htmodes ?? []).map(m => ({
         value: m,
         label: m,
     }));
 
-    const countryOptions = (radioConfig?.available?.countries ?? []).map(c => ({
-        value: c.code ?? String(c),
-        label: c.code ? (c.name ? `${c.name} (${c.code})` : c.code) : String(c),
-    }));
+    const countryOptions = [
+        { value: '00', label: 'Default (driver)' },
+        ...(radioConfig?.available?.countries ?? []).map(c => ({
+            value: c.code ?? String(c),
+            label: c.code ? (c.name ? `${c.name} (${c.code})` : c.code) : String(c),
+        })),
+    ];
 
     const defaultValues = {
         channel: radioConfig?.current?.channel ?? '',
         txpower: radioConfig?.current?.txpower ?? '',
         htmode: radioConfig?.current?.htmode ?? '',
         country: radioConfig?.current?.country ?? '',
-        disabled: radioConfig?.current?.disabled ?? false,
+        disabled: radioConfig?.current?.disabled === '1',
     };
 
     const handleSubmit = useCallback(async (data) => {
@@ -76,7 +82,9 @@ const RadioConfigForm = ({ radio, onHide }) => {
             <SelectField name={'htmode'} label={'Mode / Bandwidth'} options={htmodeOptions} />
             <SelectField name={'country'} label={'Country'} options={countryOptions} />
             <SwitchField name={'disabled'} label={'Disabled'} />
-            <SubmitButton />
+            <div className={'d-flex justify-content-end gap-2'}>
+                <SubmitButton />
+            </div>
         </FormProvider>
     );
 };

@@ -6,7 +6,6 @@
  */
 import { useState, useMemo } from 'react';
 import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -14,6 +13,7 @@ import PropTypes from 'prop-types';
 
 import PanelCard from '@src/components/PanelCard';
 import TablePagination from '@src/components/TablePagination';
+import Button from '@src/components/Button';
 import Icon from '@src/components/Icon';
 import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
 import usePagination from '@src/hooks/usePagination.js';
@@ -90,10 +90,9 @@ const InstalledPackagesCard = ({ isLoading, isLoaded, onReload }) => {
                                     <Button
                                         variant={'outline-danger'}
                                         size={'sm'}
+                                        icon={'trash-2'}
                                         onClick={() => handleRemoveClick(pkg)}
-                                    >
-                                        <Icon name={'trash-2'} />
-                                    </Button>
+                                    />
                                 </td>
                             </tr>
                         ))}

@@ -6,7 +6,6 @@
  */
 import { useState, useEffect, useMemo, memo } from 'react';
 import Table from 'react-bootstrap/Table';
-import BaseButton from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
@@ -45,18 +44,14 @@ const PackageTable = memo(({ packages, isInstalling, installingName, checkInstal
                 <td>{pkg.description}</td>
                 <td>
                     {!checkInstalled(pkg) && (
-                        <BaseButton
+                        <Button
                             variant={'outline-primary'}
                             size={'sm'}
+                            icon={'download'}
                             disabled={isInstalling}
+                            loading={isInstalling && installingName === pkg.name}
                             onClick={() => onInstall(pkg)}
-                        >
-                            {isInstalling && installingName === pkg.name ? (
-                                <Spinner animation={'border'} size={'sm'} />
-                            ) : (
-                                <Icon name={'download'} />
-                            )}
-                        </BaseButton>
+                        />
                     )}
                 </td>
             </tr>

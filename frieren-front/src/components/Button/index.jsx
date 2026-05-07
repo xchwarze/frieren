@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import Icon from '@src/components/Icon';
 
 /**
- * Renders a Button component with the specified label, icon, and disabled state.
+ * Renders a Button component with icon, optional label, and loading state.
  *
  * @param {String} label - The label to be displayed on the button.
  * @param {String} icon - The name of the icon to be displayed on the button.
@@ -22,16 +22,20 @@ import Icon from '@src/components/Icon';
  */
 const Button = ({ label, icon, disabled, loading, ...rest}) => (
     <BaseButton variant={'primary'} disabled={disabled || loading} {...rest}>
-        <Icon name={icon}/> {label}
-        <Spinner animation={'border'} className={'ms-2'} size={'sm'} hidden={!loading} />
+        {loading ? (
+            <Spinner animation={'border'} size={'sm'} />
+        ) : (
+            <Icon name={icon}/>
+        )}
+        {label && ` ${label}`}
     </BaseButton>
 );
 
 Button.propTypes = {
-    label: PropTypes.string.isRequired,
+    label: PropTypes.string,
     icon: PropTypes.string.isRequired,
     disabled: PropTypes.bool,
-    loading: PropTypes.bool
+    loading: PropTypes.bool,
 };
 
 export default Button;

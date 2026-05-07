@@ -5,9 +5,10 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useEffect, useCallback } from 'react';
-import { Modal, Table, Badge, Button, Spinner } from 'react-bootstrap';
+import { Modal, Table, Badge, Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
+import Button from '@src/components/Button';
 import useScanRadio from '@src/features/wireless/hooks/useScanRadio.js';
 
 const getSignalVariant = (signal) => {
@@ -19,30 +20,38 @@ const getSignalVariant = (signal) => {
 };
 
 const ScanModal = ({ show, onHide, radioName, onConnect }) => {
-    const { mutate: scanRadio, isPending: isScanning, data: scanResults, reset: resetScan } = useScanRadio();
+    const [autoScan, setAutoScan] = useState(true);
+    const { data: scanData, isFetching } = useScanRadio(radioName, show && autoScan);
+    const [results, setResults] = useState([]);
     const [sortField, setSortField] = useState('signal');
 
+    const mergeResults = useCallback((newResults) => {
+        setResults(prev => {
+            const map = new Map(prev.map(r => [r.bssid, r]));
+            for (const r of newResults) {
+                const existing = map.get(r.bssid);
+                if (!existing || (r.signal ?? -999) > (existing.signal ?? -999)) {
+                    map.set(r.bssid, r);
+                }
+            }
+            return Array.from(map.values());
+        });
+    }, []);
+
     useEffect(() => {
-        if (show && radioName) {
-            scanRadio({ radioName });
-        }
         if (!show) {
-            resetScan();
+            setResults([]);
+            setAutoScan(true);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [show, radioName]);
+    }, [show]);
 
-    const handleRescan = useCallback(() => {
-        if (radioName) {
-            scanRadio({ radioName });
+    useEffect(() => {
+        if (Array.isArray(scanData)) {
+            mergeResults(scanData);
         }
-    }, [scanRadio, radioName]);
+    }, [scanData, mergeResults]);
 
-    const handleConnect = useCallback((network) => {
-        onConnect(network);
-    }, [onConnect]);
-
-    const sortedResults = (scanResults || []).slice().sort((a, b) => {
+    const sortedResults = results.slice().sort((a, b) => {
         if (sortField === 'signal') return (b.signal ?? -999) - (a.signal ?? -999);
         if (sortField === 'channel') return (a.channel ?? 0) - (b.channel ?? 0);
         if (sortField === 'ssid') return (a.ssid || '').localeCompare(b.ssid || '');
@@ -50,7 +59,7 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
     });
 
     const renderBody = () => {
-        if (isScanning) {
+        if (results.length === 0 && isFetching) {
             return (
                 <div className={'text-center py-4'}>
                     <Spinner animation={'border'} />
@@ -59,20 +68,12 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
             );
         }
 
-        if (!scanResults) {
-            return (
-                <p className={'text-muted'}>No scan results yet.</p>
-            );
-        }
-
-        if (!scanResults.length) {
-            return (
-                <p className={'text-muted'}>No networks found.</p>
-            );
+        if (results.length === 0) {
+            return <p className={'text-muted'}>No networks found.</p>;
         }
 
         return (
-            <Table size={'sm'} striped bordered hover responsive>
+            <Table striped hover responsive>
                 <thead>
                     <tr>
                         <th role={'button'} onClick={() => setSortField('ssid')}>SSID</th>
@@ -99,10 +100,9 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
                                 <Button
                                     size={'sm'}
                                     variant={'outline-primary'}
-                                    onClick={() => handleConnect(net)}
-                                >
-                                    Connect
-                                </Button>
+                                    icon={'log-in'}
+                                    onClick={() => onConnect(net)}
+                                />
                             </td>
                         </tr>
                     ))}
@@ -117,22 +117,26 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
                 <Modal.Title>
                     Scan Results
                     {radioName && <small className={'text-muted ms-2 fs-6'}>{radioName}</small>}
+                    {isFetching && results.length > 0 && (
+                        <Spinner animation={'border'} size={'sm'} className={'ms-2'} />
+                    )}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {renderBody()}
             </Modal.Body>
             <Modal.Footer>
+                <small className={'text-muted me-auto'}>
+                    {results.length} network{results.length !== 1 ? 's' : ''} found
+                    {isFetching ? ' · scanning…' : ''}
+                </small>
                 <Button
-                    variant={'outline-info'}
-                    onClick={handleRescan}
-                    disabled={isScanning || !radioName}
-                >
-                    {isScanning ? 'Scanning…' : 'Re-scan'}
-                </Button>
-                <Button variant={'secondary'} onClick={onHide}>
-                    Close
-                </Button>
+                    variant={autoScan ? 'outline-warning' : 'outline-success'}
+                    icon={autoScan ? 'pause' : 'play'}
+                    label={autoScan ? 'Pause' : 'Resume'}
+                    onClick={() => setAutoScan(v => !v)}
+                />
+                <Button variant={'secondary'} icon={'x'} label={'Close'} onClick={onHide} />
             </Modal.Footer>
         </Modal>
     );

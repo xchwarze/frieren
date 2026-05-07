@@ -12,6 +12,8 @@ use frieren\helper\OpenWrtHelper;
 
 class ModuleOpenWrtHelper
 {
+    const WIRELESS_CONFIG_PATH = '/etc/config/wireless';
+
     /**
      * Scans for networks on a given interface and returns a list of access points.
      *
@@ -71,14 +73,6 @@ class ModuleOpenWrtHelper
     }
 
     /**
-     * Disable the WWAN interface.
-     */
-    public static function disableWwanInterface()
-    {
-        OpenWrtHelper::execUbusCall('network.interface.wwan', 'down');
-    }
-
-    /**
      * Returns comprehensive radio+interface data using UCI as source of truth,
      * enriched with runtime state from ubus and iwinfo.
      *
@@ -90,19 +84,24 @@ class ModuleOpenWrtHelper
         $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'wireless']);
         $uciSections = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
 
-        // luci-rpc: runtime state, iwinfo data (phy, hardware, htmodes, country)
+        // network.wireless status: authoritative runtime ifnames and radio up state
+        $wirelessStatus = OpenWrtHelper::execUbusCall('network.wireless', 'status');
+        $wirelessStatus = ($wirelessStatus !== false) ? $wirelessStatus : [];
+
+        // luci-rpc: hw metadata only (phy, hardware name, htmodes, hwmodes, country)
         $wirelessDevices = OpenWrtHelper::execUbusCall('luci-rpc', 'getWirelessDevices');
         $wirelessDevices = ($wirelessDevices !== false) ? $wirelessDevices : [];
 
-        // Build runtime map: section -> {ifname, up} from luci-rpc interfaces
+        // Build runtime map: section -> {ifname, up} from network.wireless status
         $runtimeMap = [];
-        foreach ($wirelessDevices as $radio => $details) {
+        foreach ($wirelessStatus as $radio => $details) {
+            $radioUp = $details['up'] ?? false;
             foreach ($details['interfaces'] ?? [] as $iface) {
                 $section = $iface['section'] ?? '';
                 if ($section) {
                     $runtimeMap[$section] = [
                         'ifname' => $iface['ifname'] ?? null,
-                        'up'     => $details['up'] ?? false,
+                        'up'     => $radioUp,
                     ];
                 }
             }
@@ -128,6 +127,7 @@ class ModuleOpenWrtHelper
 
             $luciRadio = $wirelessDevices[$radioName] ?? [];
             $iwinfo = $luciRadio['iwinfo'] ?? [];
+            $statusRadio = $wirelessStatus[$radioName] ?? [];
 
             $radioInfo = [
                 'channel'    => $ch,
@@ -135,7 +135,7 @@ class ModuleOpenWrtHelper
                 'frequency'  => null,
                 'band'       => $band,
                 'htmode'     => $radioConfig['htmode'] ?? null,
-                'up'         => $luciRadio['up'] ?? false,
+                'up'         => $statusRadio['up'] ?? ($luciRadio['up'] ?? false),
                 'disabled'   => ($radioConfig['disabled'] ?? '0') === '1',
                 'phy'        => $iwinfo['phy'] ?? null,
                 'country'    => $iwinfo['country'] ?? null,
@@ -162,7 +162,7 @@ class ModuleOpenWrtHelper
 
                 $runtime = $runtimeMap[$section] ?? null;
                 $ifname = $runtime['ifname'] ?? null;
-                $ifaceUp = $ifname ? ($runtime['up'] ?? false) : false;
+                $ifaceUp = $ifname !== null && ($runtime['up'] ?? false);
 
                 $radioInfo['interfaces'][] = [
                     'radio'      => $radioName,
@@ -302,28 +302,46 @@ class ModuleOpenWrtHelper
      * @param string $network    UCI network name (e.g. 'lan', 'wwan', 'guest').
      * @return bool True on success.
      */
-    public static function addInterface($radio, $ssid, $encryption, $key, $mode, $network, $hidden, $disabled)
+    public static function addInterface($radio, $ssid, $encryption, $key, $mode, $network, $hidden, $disabled, $isManagement = false, $isRecon = false)
     {
         $radio = preg_replace('/[^a-zA-Z0-9_]/', '', $radio);
 
-        OpenWrtHelper::exec('uci add wireless wifi-iface');
-        OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].device', $radio, false, false);
-        OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].mode', $mode, false, false);
-        OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].disabled', $disabled ? 1 : 0, false, false);
+        // Generate unique named section (wifinet0, wifinet1, ...)
+        $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'wireless']);
+        $sections = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
+        $maxN = -1;
+        foreach (array_keys($sections) as $name) {
+            if (preg_match('/^wifinet(\d+)$/', $name, $m)) {
+                $maxN = max($maxN, (int)$m[1]);
+            }
+        }
+        $sectionName = 'wifinet' . ($maxN + 1);
+
+        OpenWrtHelper::exec('uci set ' . escapeshellarg("wireless.{$sectionName}=wifi-iface"));
+        OpenWrtHelper::uciSet("wireless.{$sectionName}.device", $radio, false, false);
+        OpenWrtHelper::uciSet("wireless.{$sectionName}.mode", $mode, false, false);
+        OpenWrtHelper::uciSet("wireless.{$sectionName}.disabled", $disabled ? 1 : 0, false, false);
 
         if ($mode === 'monitor') {
-            OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].network', '', false, false);
+            OpenWrtHelper::uciSet("wireless.{$sectionName}.network", '', false, false);
         } else {
-            OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].network', $network, false, false);
-            OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].ssid', $ssid, false, false);
-            OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].encryption', $encryption, false, false);
-            OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].hidden', $hidden ? 1 : 0, false, false);
+            OpenWrtHelper::uciSet("wireless.{$sectionName}.network", $network, false, false);
+            OpenWrtHelper::uciSet("wireless.{$sectionName}.ssid", $ssid, false, false);
+            OpenWrtHelper::uciSet("wireless.{$sectionName}.encryption", $encryption, false, false);
+            OpenWrtHelper::uciSet("wireless.{$sectionName}.hidden", $hidden ? 1 : 0, false, false);
             if ($encryption !== 'none') {
-                OpenWrtHelper::uciSet('wireless.@wifi-iface[-1].key', $key, false, false);
+                OpenWrtHelper::uciSet("wireless.{$sectionName}.key", $key, false, false);
             }
         }
 
         OpenWrtHelper::uciCommit();
+
+        if ($mode === 'ap' && $isManagement) {
+            OpenWrtHelper::uciSet('frieren.@settings[0].management_interface', $sectionName);
+        }
+        if ($mode === 'monitor' && $isRecon) {
+            OpenWrtHelper::uciSet('frieren.@settings[0].recon_interface', $sectionName);
+        }
 
         OpenWrtHelper::execBackground('wifi reload');
 
@@ -529,5 +547,47 @@ class ModuleOpenWrtHelper
         }
 
         return $clients;
+    }
+
+    /**
+     * Returns the raw content of /etc/config/wireless.
+     *
+     * @return string Raw UCI config file content.
+     */
+    public static function getRawWirelessConfig()
+    {
+        return file_get_contents(self::WIRELESS_CONFIG_PATH) ?: '';
+    }
+
+    /**
+     * Writes raw content to /etc/config/wireless and reloads wifi.
+     *
+     * @param string $content Raw UCI config content.
+     * @return bool True on success.
+     * @throws \Exception If write fails.
+     */
+    public static function setRawWirelessConfig($content)
+    {
+        if (file_put_contents(self::WIRELESS_CONFIG_PATH, $content) === false) {
+            throw new \Exception('Failed to write wireless config');
+        }
+
+        OpenWrtHelper::execBackground('wifi reload');
+
+        return true;
+    }
+
+    /**
+     * Regenerates /etc/config/wireless from hardware defaults using wifi config,
+     * then reloads wifi.
+     *
+     * @return bool True on success.
+     */
+    public static function resetWirelessConfig()
+    {
+        OpenWrtHelper::exec('wifi config > ' . self::WIRELESS_CONFIG_PATH);
+        OpenWrtHelper::execBackground('wifi reload');
+
+        return true;
     }
 }

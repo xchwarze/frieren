@@ -12,7 +12,6 @@ class WirelessController extends \frieren\core\Controller
 {
     public $endpointRoutes = [
         'scanForNetworks' => true,
-        'disableWwanInterface' => true,
         'getWirelessOverview' => true,
         'getRadioConfig' => true,
         'setRadioConfig' => true,
@@ -22,6 +21,9 @@ class WirelessController extends \frieren\core\Controller
         'toggleInterface' => true,
         'getInterfaceConfig' => true,
         'setInterfaceConfig' => true,
+        'getRawWirelessConfig' => true,
+        'setRawWirelessConfig' => true,
+        'resetWirelessConfig' => true,
     ];
 
     public function scanForNetworks()
@@ -29,12 +31,6 @@ class WirelessController extends \frieren\core\Controller
         return self::setSuccess(
             self::setupModuleHelper()::scanForNetworks($this->request['device'])
         );
-    }
-
-    public function disableWwanInterface()
-    {
-        self::setupModuleHelper()::disableWwanInterface();
-        return self::setSuccess();
     }
 
     public function getWirelessOverview()
@@ -84,7 +80,9 @@ class WirelessController extends \frieren\core\Controller
             $this->request['mode'],
             $this->request['network'],
             $this->request['hidden'],
-            $this->request['disabled']
+            $this->request['disabled'],
+            $this->request['isManagement'] ?? false,
+            $this->request['isRecon'] ?? false
         )) {
             return self::setSuccess();
         }
@@ -138,5 +136,30 @@ class WirelessController extends \frieren\core\Controller
         }
 
         self::setError('Error updating interface config.');
+    }
+
+    public function getRawWirelessConfig()
+    {
+        return self::setSuccess([
+            'content' => self::setupModuleHelper()::getRawWirelessConfig(),
+        ]);
+    }
+
+    public function setRawWirelessConfig()
+    {
+        if (self::setupModuleHelper()::setRawWirelessConfig($this->request['content'])) {
+            return self::setSuccess();
+        }
+
+        self::setError('Error writing wireless config.');
+    }
+
+    public function resetWirelessConfig()
+    {
+        if (self::setupModuleHelper()::resetWirelessConfig()) {
+            return self::setSuccess();
+        }
+
+        self::setError('Error resetting wireless config.');
     }
 }

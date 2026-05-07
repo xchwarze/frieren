@@ -38,6 +38,15 @@ const ENCRYPTION_OPTIONS = [
     { value: 'psk-mixed+ccmp', label: 'WPA/WPA2 Mixed' },
 ];
 
+const normalizeEncryption = (enc) => {
+    if (!enc || enc === 'none') return 'none';
+    if (enc === 'psk2') return 'psk2+ccmp';
+    if (enc === 'psk' || enc === 'psk-mixed') return 'psk-mixed+ccmp';
+    if (enc === 'sae+ccmp') return 'sae';
+    const valid = ENCRYPTION_OPTIONS.map(o => o.value);
+    return valid.includes(enc) ? enc : 'none';
+};
+
 const interfaceSchema = yup.object({
     mode: yup.string().required('Mode is mandatory'),
     ssid: yup.string().when('mode', {
@@ -62,14 +71,16 @@ const interfaceSchema = yup.object({
     }),
     hidden: yup.boolean(),
     disabled: yup.boolean(),
+    isManagement: yup.boolean(),
+    isRecon: yup.boolean(),
 });
 
-const ModeAwareFields = () => {
+const ModeAwareFields = ({ isEditMode }) => {
     const mode = useWatch({ name: 'mode', defaultValue: 'ap' });
     const encryption = useWatch({ name: 'encryption', defaultValue: 'none' });
 
     if (mode === 'monitor') {
-        return null;
+        return !isEditMode ? <SwitchField name={'isRecon'} label={'Recon Interface'} /> : null;
     }
 
     return (
@@ -80,9 +91,16 @@ const ModeAwareFields = () => {
             {encryption !== 'none' && (
                 <InputField name={'key'} label={'Key / Passphrase'} type={'password'} />
             )}
-            <SwitchField name={'hidden'} label={'Hidden AP'} />
+            {mode === 'ap' && <SwitchField name={'hidden'} label={'Hidden AP'} />}
+            {mode === 'ap' && !isEditMode && (
+                <SwitchField name={'isManagement'} label={'Management Interface'} />
+            )}
         </>
     );
+};
+
+ModeAwareFields.propTypes = {
+    isEditMode: PropTypes.bool,
 };
 
 const InterfaceForm = ({ radio, section, onHide, defaultValues }) => {
@@ -119,12 +137,12 @@ const InterfaceForm = ({ radio, section, onHide, defaultValues }) => {
                 label={'Mode'}
                 options={MODE_OPTIONS}
             />
-            <ModeAwareFields />
+            <ModeAwareFields isEditMode={isEditMode} />
             <SwitchField
                 name={'disabled'}
                 label={'Disabled'}
             />
-            <div className={'d-flex gap-2'}>
+            <div className={'d-flex justify-content-end gap-2'}>
                 <SubmitButton label={isEditMode ? 'Save' : 'Add Interface'} />
                 <BaseButton variant={'secondary'} onClick={onHide}>
                     Cancel
@@ -149,6 +167,8 @@ const ADD_DEFAULTS = {
     key: '',
     hidden: false,
     disabled: false,
+    isManagement: false,
+    isRecon: false,
 };
 
 const InterfaceFormLoader = ({ radio, section, onHide, initialValues }) => {
@@ -167,8 +187,8 @@ const InterfaceFormLoader = ({ radio, section, onHide, initialValues }) => {
             ssid: interfaceConfig?.ssid ?? '',
             mode: interfaceConfig?.mode ?? 'ap',
             network: interfaceConfig?.network ?? 'lan',
-            encryption: interfaceConfig?.encryption ?? 'none',
-            key: '',
+            encryption: normalizeEncryption(interfaceConfig?.encryption),
+            key: interfaceConfig?.key ?? '',
             hidden: interfaceConfig?.hidden === '1',
             disabled: interfaceConfig?.disabled === '1',
         }
