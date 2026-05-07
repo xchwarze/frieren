@@ -15,6 +15,7 @@ import ErrorFallback from '@src/components/ErrorFallback';
 import About from '@src/components/About';
 import Dashboard from '@src/features/dashboard/containers/Dashboard';
 import Modules from '@src/features/modules/containers/Modules';
+import Packages from '@src/features/packages/containers/Packages';
 import Hardware from '@src/features/hardware/containers/Hardware';
 import Settings from '@src/features/settings/containers/Settings';
 import Wireless from '@src/features/wireless/containers/Wireless';
@@ -42,6 +43,7 @@ const LoginStack = () => {
                     ))}
                     <Route path='/dashboard' component={Dashboard} />
                     <Route path='/modules' component={Modules} />
+                    <Route path='/packages' component={Packages} />
                     <Route path='/hardware' component={Hardware} />
                     <Route path='/settings' component={Settings} />
                     <Route path='/wireless' component={Wireless} />
