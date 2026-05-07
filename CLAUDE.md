@@ -33,7 +33,10 @@ Scaffolding for creating third-party modules. Includes example controller, helpe
 Modified ttyd web terminal frontend. Webpack + TypeScript + xterm.js. Builds inlined HTML (`html.h`) for the ttyd C binary.
 
 ### Tools (`tools/`)
-- **`api-proxy.php`** — Dev proxy: forwards requests to hardware device at `192.168.7.1:5000`. Run with `php -S localhost:8000`.
+- **`api-proxy.php`** — Dev proxy for frontend: forwards `/api/*` requests from Vite dev server to hardware device at `192.168.7.1:5000`. Handles PHPSESSID/XSRF-TOKEN cookie forwarding. Run with `php -S localhost:8000`.
+- **`api-test.sh`** — CLI helper for testing backend APIs via curl. Manages login session (cookies/XSRF). Usage: `./api-test.sh login` then `./api-test.sh req '{"module":"...","action":"..."}'`. Supports `-s SLEEP` for polling, `-o FILE` for saving response.
+- **`deploy.sh`** — Deploys backend or frontend to device via SCP. Usage: `./deploy.sh back|front [host] [password]`. Backend deploys `api/` core + `modules/` to `/usr/share/frieren`. Frontend builds prod, compresses assets, and deploys `dist/`.
+- **`ssh-cmd.sh`** — Run a command on device via SSH. Usage: `./ssh-cmd.sh "command" [host] [password]`. Uses SSH_ASKPASS for non-interactive password auth.
 - **`api-clean.php`** — PHP comment/whitespace stripper for production builds.
 
 ## Architecture Overview
