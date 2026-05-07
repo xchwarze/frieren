@@ -17,6 +17,7 @@ const MAX_VISIBLE_PAGES = 5;
  * @param {number} totalPages - Total number of pages.
  * @param {Function} onPageChange - Callback when a page is selected.
  * @param {number} totalItems - Total number of items in the dataset.
+ * @param {number} pageSize - Number of items per page.
  * @return {ReactElement|null} The pagination component, or null if only one page.
  */
 const TablePagination = ({ currentPage, totalPages, onPageChange, totalItems, pageSize = 25 }) => {

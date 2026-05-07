@@ -72,6 +72,14 @@ const PackageTable = memo(({ packages, isInstalling, installingName, checkInstal
 
 PackageTable.displayName = 'PackageTable';
 
+PackageTable.propTypes = {
+    packages: PropTypes.arrayOf(PropTypes.object).isRequired,
+    isInstalling: PropTypes.bool.isRequired,
+    installingName: PropTypes.string.isRequired,
+    checkInstalled: PropTypes.func.isRequired,
+    onInstall: PropTypes.func.isRequired,
+};
+
 /**
  * Displays available packages with update lists flow, search and install actions.
  *

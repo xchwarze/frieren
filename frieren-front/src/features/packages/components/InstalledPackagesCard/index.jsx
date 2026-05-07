@@ -9,7 +9,6 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
-import Spinner from 'react-bootstrap/Spinner';
 import { useAtomValue, useSetAtom } from 'jotai';
 import PropTypes from 'prop-types';
 
