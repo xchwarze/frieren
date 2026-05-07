@@ -320,11 +320,9 @@ class ModuleOpenWrtHelper
         OpenWrtHelper::exec('uci set ' . escapeshellarg("wireless.{$sectionName}=wifi-iface"));
         OpenWrtHelper::uciSet("wireless.{$sectionName}.device", $radio, false, false);
         OpenWrtHelper::uciSet("wireless.{$sectionName}.mode", $mode, false, false);
-        OpenWrtHelper::uciSet("wireless.{$sectionName}.disabled", $disabled ? 1 : 0, false, false);
 
-        if ($mode === 'monitor') {
-            OpenWrtHelper::uciSet("wireless.{$sectionName}.network", '', false, false);
-        } else {
+        if ($mode !== 'monitor') {
+            OpenWrtHelper::uciSet("wireless.{$sectionName}.disabled", $disabled ? 1 : 0, false, false);
             OpenWrtHelper::uciSet("wireless.{$sectionName}.network", $network, false, false);
             OpenWrtHelper::uciSet("wireless.{$sectionName}.ssid", $ssid, false, false);
             OpenWrtHelper::uciSet("wireless.{$sectionName}.encryption", $encryption, false, false);

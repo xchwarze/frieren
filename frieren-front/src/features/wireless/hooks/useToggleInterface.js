@@ -27,7 +27,7 @@ const useToggleInterface = () => {
             disabled,
         }),
         onSuccess: async () => {
-            await sleep(1000);
+            await sleep(1500);
             queryClient.invalidateQueries({
                 queryKey: [WIRELESS_GET_WIRELESS_OVERVIEW],
             });

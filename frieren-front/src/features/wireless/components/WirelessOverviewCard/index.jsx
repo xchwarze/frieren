@@ -31,6 +31,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) 
     const { mutate: toggleInterface, isPending: isToggling } = useToggleInterface();
 
     const [confirmRemove, setConfirmRemove] = useState(null);
+    const [removingSection, setRemovingSection] = useState(null);
     const [togglingSection, setTogglingSection] = useState(null);
 
     const isBusy = isRemoving || isToggling;
@@ -42,6 +43,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) 
 
     const handleRemoveConfirmed = useCallback(() => {
         if (confirmRemove) {
+            setRemovingSection(confirmRemove);
             removeInterface({ section: confirmRemove });
         }
         setConfirmRemove(null);
@@ -132,6 +134,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) 
                                             variant={'outline-danger'}
                                             icon={'trash-2'}
                                             onClick={() => setConfirmRemove(iface.section)}
+                                            loading={isRemoving && removingSection === iface.section}
                                             disabled={!iface.section || isBusy}
                                         />
                                     </div>
