@@ -4,12 +4,11 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import { useAtomValue, useSetAtom } from 'jotai';
-import PropTypes from 'prop-types';
 
 import PanelCard from '@src/components/PanelCard';
 import TablePagination from '@src/components/TablePagination';
@@ -17,26 +16,29 @@ import Button from '@src/components/Button';
 import Icon from '@src/components/Icon';
 import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
 import usePagination from '@src/hooks/usePagination.js';
+import useInstalledPackages from '@src/features/packages/hooks/useInstalledPackages.js';
 import installedPackagesAtom from '@src/features/packages/atoms/installedPackagesAtom.js';
 import selectedPackageAtom from '@src/features/packages/atoms/selectedPackageAtom.js';
+import reloadPackagesAtom from '@src/features/packages/atoms/reloadPackagesAtom.js';
+import removingPackageAtom from '@src/features/packages/atoms/removingPackageAtom.js';
 
 /**
  * Displays installed packages with search and remove actions.
  *
- * @param {boolean} isLoading - Whether installed packages are being loaded.
- * @param {boolean} isLoaded - Whether installed packages have been loaded.
- * @param {Function} onReload - Callback to reload installed packages.
  * @return {ReactElement} The InstalledPackagesCard component.
  */
-const InstalledPackagesCard = ({ isLoading, isLoaded, onReload }) => {
+const InstalledPackagesCard = () => {
     const installedPackages = useAtomValue(installedPackagesAtom);
     const setSelectedPackage = useSetAtom(selectedPackageAtom);
+    const removingName = useAtomValue(removingPackageAtom);
+    const reloadSignal = useAtomValue(reloadPackagesAtom);
+    const { load, isPolling, isLoaded } = useInstalledPackages();
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearch = useDebouncedValue(searchTerm);
 
-    const handleRemoveClick = (pkg) => {
-        setSelectedPackage(pkg);
-    };
+    useEffect(() => {
+        load();
+    }, [reloadSignal, load]);
 
     const filteredPackages = useMemo(() => {
         if (!debouncedSearch) {
@@ -54,9 +56,9 @@ const InstalledPackagesCard = ({ isLoading, isLoaded, onReload }) => {
         <PanelCard
             title={'Installed Packages'}
             showRefresh={true}
-            refetch={onReload}
-            isFetching={isLoading}
-            isLoading={isLoading}
+            refetch={load}
+            isFetching={isPolling}
+            isLoading={isPolling}
         >
             {isLoaded && (
                 <>
@@ -81,8 +83,8 @@ const InstalledPackagesCard = ({ isLoading, isLoaded, onReload }) => {
                         </tr>
                         </thead>
                         <tbody>
-                        {pageData.map((pkg, index) => (
-                            <tr key={index}>
+                        {pageData.map((pkg) => (
+                            <tr key={pkg.name}>
                                 <td>{pkg.name}</td>
                                 <td>{pkg.version}</td>
                                 <td>{pkg.description}</td>
@@ -91,7 +93,9 @@ const InstalledPackagesCard = ({ isLoading, isLoaded, onReload }) => {
                                         variant={'outline-danger'}
                                         size={'sm'}
                                         icon={'trash-2'}
-                                        onClick={() => handleRemoveClick(pkg)}
+                                        loading={removingName === pkg.name}
+                                        disabled={!!removingName}
+                                        onClick={() => setSelectedPackage(pkg)}
                                     />
                                 </td>
                             </tr>
@@ -114,12 +118,6 @@ const InstalledPackagesCard = ({ isLoading, isLoaded, onReload }) => {
             )}
         </PanelCard>
     );
-};
-
-InstalledPackagesCard.propTypes = {
-    isLoading: PropTypes.bool.isRequired,
-    isLoaded: PropTypes.bool.isRequired,
-    onReload: PropTypes.func.isRequired,
 };
 
 export default InstalledPackagesCard;

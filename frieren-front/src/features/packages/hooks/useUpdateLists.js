@@ -4,34 +4,42 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useQueryClient } from '@tanstack/react-query';
-
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
-import { PACKAGES_GET_INSTALLED, PACKAGES_GET_AVAILABLE } from '@src/features/packages/helpers/queryKeys.js';
+import { PACKAGES_GET_UPDATE_STATUS } from '@src/features/packages/helpers/queryKeys.js';
+import useBackgroundTask from '@src/features/packages/hooks/useBackgroundTask.js';
 
 /**
- * Custom hook to update opkg package lists.
+ * Manages updating package lists via trigger + poll pattern.
  *
- * @return {Function} The mutation function to update lists.
+ * @param {Object} [options]
+ * @param {Function} [options.onCompleted] - Called when update finishes.
+ * @return {Object} { update, isPolling, isPending }
  */
-const useUpdateLists = () => {
-    const queryClient = useQueryClient();
+const useUpdateLists = ({ onCompleted } = {}) => {
+    const taskStatus = useBackgroundTask({
+        queryKey: PACKAGES_GET_UPDATE_STATUS,
+        action: 'getUpdateStatus',
+        onCompleted,
+    });
 
-    return useAuthenticatedMutation({
+    const mutation = useAuthenticatedMutation({
         mutationFn: () => fetchPost({
             module: 'packages',
             action: 'updateLists',
         }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: [PACKAGES_GET_INSTALLED]
-            });
-            queryClient.invalidateQueries({
-                queryKey: [PACKAGES_GET_AVAILABLE]
-            });
+        onSuccess: ({ success }) => {
+            if (success) {
+                taskStatus.start();
+            }
         },
     });
+
+    return {
+        update: mutation.mutate,
+        isPolling: taskStatus.isRunning,
+        isPending: mutation.isPending,
+    };
 };
 
 export default useUpdateLists;

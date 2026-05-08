@@ -4,13 +4,12 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import Table from 'react-bootstrap/Table';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
 import { useAtomValue } from 'jotai';
-import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 
 import PanelCard from '@src/components/PanelCard';
@@ -19,14 +18,13 @@ import Button from '@src/components/Button';
 import Icon from '@src/components/Icon';
 import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
 import usePagination from '@src/hooks/usePagination.js';
+import useAvailablePackages from '@src/features/packages/hooks/useAvailablePackages.js';
 import useUpdateLists from '@src/features/packages/hooks/useUpdateLists.js';
-import useGetUpdateStatus from '@src/features/packages/hooks/useGetUpdateStatus.js';
 import useInstallPackage from '@src/features/packages/hooks/useInstallPackage.js';
-import useGetInstallStatus from '@src/features/packages/hooks/useGetInstallStatus.js';
 import availablePackagesAtom from '@src/features/packages/atoms/availablePackagesAtom.js';
 import installedPackagesAtom from '@src/features/packages/atoms/installedPackagesAtom.js';
 
-const PackageTable = memo(({ packages, isInstalling, installingName, checkInstalled, onInstall }) => (
+const PackageTable = memo(({ packages, isInstalling, installingName, installedNames, onInstall }) => (
     <Table striped hover responsive>
         <thead>
         <tr>
@@ -37,13 +35,13 @@ const PackageTable = memo(({ packages, isInstalling, installingName, checkInstal
         </tr>
         </thead>
         <tbody>
-        {packages.map((pkg, index) => (
-            <tr key={index}>
+        {packages.map((pkg) => (
+            <tr key={pkg.name}>
                 <td>{pkg.name}</td>
                 <td>{pkg.version}</td>
                 <td>{pkg.description}</td>
                 <td>
-                    {!checkInstalled(pkg) && (
+                    {!installedNames.has(pkg.name) && (
                         <Button
                             variant={'outline-primary'}
                             size={'sm'}
@@ -71,67 +69,38 @@ PackageTable.propTypes = {
     packages: PropTypes.arrayOf(PropTypes.object).isRequired,
     isInstalling: PropTypes.bool.isRequired,
     installingName: PropTypes.string.isRequired,
-    checkInstalled: PropTypes.func.isRequired,
+    installedNames: PropTypes.instanceOf(Set).isRequired,
     onInstall: PropTypes.func.isRequired,
 };
 
 /**
  * Displays available packages with update lists flow, search and install actions.
  *
- * @param {boolean} isLoading - Whether available packages are being loaded.
- * @param {boolean} isLoaded - Whether available packages have been loaded.
- * @param {Function} onLoadAvailable - Callback to trigger loading available packages.
- * @param {Function} onReloadInstalled - Callback to reload installed packages after install.
  * @return {ReactElement} The AvailablePackagesCard component.
  */
-const AvailablePackagesCard = ({ isLoading, isLoaded, onLoadAvailable, onReloadInstalled }) => {
+const AvailablePackagesCard = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearch = useDebouncedValue(searchTerm);
-    const [isUpdating, setIsUpdating] = useState(false);
-    const [isInstalling, setIsInstalling] = useState(false);
-    const [installingName, setInstallingName] = useState('');
 
     const availablePackages = useAtomValue(availablePackagesAtom);
     const installedPackages = useAtomValue(installedPackagesAtom);
-    const { mutate: updateLists, isPending: isUpdatePending } = useUpdateLists();
-    const { mutate: installPackage } = useInstallPackage();
-    const isBusy = isUpdatePending || isUpdating || isLoading;
 
-    const updateStatusQuery = useGetUpdateStatus({ enabled: isUpdating });
-    const installStatusQuery = useGetInstallStatus({ enabled: isInstalling });
+    const { load: loadAvailable, isPolling: isLoadingAvailable, isLoaded, isPending: isLoadPending } = useAvailablePackages();
+    const { update, isPolling: isUpdating, isPending: isUpdatePending } = useUpdateLists({
+        onCompleted: () => loadAvailable(),
+    });
+    const { install, isPolling: isInstalling, installingName } = useInstallPackage();
 
-    useEffect(() => {
-        if (isUpdating && updateStatusQuery.data?.completed) {
-            setIsUpdating(false);
-            onLoadAvailable();
-        }
-    }, [isUpdating, updateStatusQuery.data, onLoadAvailable]);
+    const isBusy = isUpdatePending || isUpdating || isLoadingAvailable || isLoadPending;
 
-    useEffect(() => {
-        if (isInstalling && installStatusQuery.data?.completed) {
-            setIsInstalling(false);
-            toast.success(`Package ${installingName} successfully installed`);
-            setInstallingName('');
-            setTimeout(() => onReloadInstalled(), 500);
-        }
-    }, [isInstalling, installStatusQuery.data, installingName, onReloadInstalled]);
-
-    const handleUpdateLists = () => {
-        updateLists(undefined, {
-            onSuccess: () => setIsUpdating(true),
-        });
-    };
-
-    const handleInstallClick = (pkg) => {
-        setInstallingName(pkg.name);
-        installPackage({ packageName: pkg.name }, {
-            onSuccess: () => setIsInstalling(true),
-        });
-    };
-
-    const checkInstalled = (pkg) => (
-        installedPackages.some((installed) => installed.name === pkg.name)
+    const installedNames = useMemo(
+        () => new Set(installedPackages.map((pkg) => pkg.name)),
+        [installedPackages],
     );
+
+    const handleInstallClick = useCallback((pkg) => {
+        install({ packageName: pkg.name });
+    }, [install]);
 
     const filteredPackages = useMemo(() => {
         if (!debouncedSearch) {
@@ -150,7 +119,7 @@ const AvailablePackagesCard = ({ isLoading, isLoaded, onLoadAvailable, onReloadI
             title={'Available Packages'}
             subtitle={'Update the package lists and browse available packages for installation.'}
             showRefresh={isLoaded}
-            refetch={handleUpdateLists}
+            refetch={() => update()}
             isFetching={isBusy}
         >
             <>
@@ -159,7 +128,7 @@ const AvailablePackagesCard = ({ isLoading, isLoaded, onLoadAvailable, onReloadI
                         <Button
                             label={'Update Lists'}
                             icon={'refresh-cw'}
-                            onClick={handleUpdateLists}
+                            onClick={() => update()}
                         />
                     </div>
                 )}
@@ -188,7 +157,7 @@ const AvailablePackagesCard = ({ isLoading, isLoaded, onLoadAvailable, onReloadI
                             packages={pageData}
                             isInstalling={isInstalling}
                             installingName={installingName}
-                            checkInstalled={checkInstalled}
+                            installedNames={installedNames}
                             onInstall={handleInstallClick}
                         />
 
@@ -203,13 +172,6 @@ const AvailablePackagesCard = ({ isLoading, isLoaded, onLoadAvailable, onReloadI
             </>
         </PanelCard>
     );
-};
-
-AvailablePackagesCard.propTypes = {
-    isLoading: PropTypes.bool.isRequired,
-    isLoaded: PropTypes.bool.isRequired,
-    onLoadAvailable: PropTypes.func.isRequired,
-    onReloadInstalled: PropTypes.func.isRequired,
 };
 
 export default AvailablePackagesCard;
