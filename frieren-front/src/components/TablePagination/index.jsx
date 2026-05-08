@@ -29,7 +29,6 @@ const TablePagination = ({ currentPage, totalPages, onPageChange, totalItems, pa
         const half = Math.floor(MAX_VISIBLE_PAGES / 2);
         let start = Math.max(1, currentPage - half);
         let end = start + MAX_VISIBLE_PAGES - 1;
-
         if (end > totalPages) {
             end = totalPages;
             start = Math.max(1, end - MAX_VISIBLE_PAGES + 1);
@@ -44,13 +43,15 @@ const TablePagination = ({ currentPage, totalPages, onPageChange, totalItems, pa
 
     const showStartEllipsis = pageNumbers[0] > 1;
     const showEndEllipsis = pageNumbers[pageNumbers.length - 1] < totalPages;
+    const firstItemValue = Math.min((currentPage - 1) * pageSize + 1, totalItems)
+    const lastItemValue = Math.min(currentPage * pageSize, totalItems);
 
     return (
         <div className={'d-flex justify-content-between align-items-center mt-2'}>
             <small className={'text-muted'}>
-                {Math.min((currentPage - 1) * pageSize + 1, totalItems)}-{Math.min(currentPage * pageSize, totalItems)} of {totalItems} items
+                {firstItemValue}-{lastItemValue} of {totalItems} items
             </small>
-            <Pagination size={'sm'} className={'mb-0'}>
+            <Pagination className={'mb-0'}>
                 <Pagination.First
                     disabled={currentPage === 1}
                     onClick={() => onPageChange(1)}
