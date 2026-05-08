@@ -65,11 +65,12 @@ class ModuleOpenWrtHelper
     public static function listInstalledPackages()
     {
         $script = self::getScriptPath();
-        self::runBackground(
-            "/bin/sh {$script} list-installed",
-            self::INSTALLED_OUTPUT,
-            self::INSTALLED_FLAG
-        );
+        $outputFile = self::INSTALLED_OUTPUT;
+        OpenWrtHelper::exec("/bin/sh {$script} list-installed > {$outputFile} 2>&1");
+
+        return [
+            'packages' => self::parsePackageFile($outputFile),
+        ];
     }
 
     public static function getInstalledPackagesStatus()

@@ -36,8 +36,7 @@ class PackagesController extends \frieren\core\Controller
 
     public function getInstalledPackages()
     {
-        self::setupModuleHelper()::listInstalledPackages();
-        self::setSuccess();
+        self::setSuccess(self::setupModuleHelper()::listInstalledPackages());
     }
 
     public function getInstalledPackagesStatus()

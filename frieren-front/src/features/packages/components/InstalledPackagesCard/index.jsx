@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Table from 'react-bootstrap/Table';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
@@ -19,7 +19,6 @@ import usePagination from '@src/hooks/usePagination.js';
 import useInstalledPackages from '@src/features/packages/hooks/useInstalledPackages.js';
 import installedPackagesAtom from '@src/features/packages/atoms/installedPackagesAtom.js';
 import selectedPackageAtom from '@src/features/packages/atoms/selectedPackageAtom.js';
-import reloadPackagesAtom from '@src/features/packages/atoms/reloadPackagesAtom.js';
 import removingPackageAtom from '@src/features/packages/atoms/removingPackageAtom.js';
 
 /**
@@ -31,14 +30,9 @@ const InstalledPackagesCard = () => {
     const installedPackages = useAtomValue(installedPackagesAtom);
     const setSelectedPackage = useSetAtom(selectedPackageAtom);
     const removingName = useAtomValue(removingPackageAtom);
-    const reloadSignal = useAtomValue(reloadPackagesAtom);
     const { load, isPolling, isLoaded } = useInstalledPackages();
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearch = useDebouncedValue(searchTerm);
-
-    useEffect(() => {
-        load();
-    }, [reloadSignal, load]);
 
     const filteredPackages = useMemo(() => {
         if (!debouncedSearch) {

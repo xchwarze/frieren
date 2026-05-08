@@ -5,7 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState } from 'react';
-import { useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
@@ -19,8 +19,8 @@ import useBackgroundTask from '@src/features/packages/hooks/useBackgroundTask.js
  * @return {Object} { load, isPolling, isLoaded, isPending }
  */
 const useAvailablePackages = () => {
-    const [isLoaded, setIsLoaded] = useState(false);
-    const setAvailablePackages = useSetAtom(availablePackagesAtom);
+    const [availablePackages, setAvailablePackages] = useAtom(availablePackagesAtom);
+    const [isLoaded, setIsLoaded] = useState(() => availablePackages.length > 0);
 
     const taskStatus = useBackgroundTask({
         queryKey: PACKAGES_GET_AVAILABLE_STATUS,

@@ -33,6 +33,10 @@ const useBackgroundTask = ({ queryKey, action, onCompleted, gcTime }) => {
     });
 
     useEffect(() => {
+        if (!isRunning) {
+            return;
+        }
+
         if (query.isSuccess && query.isFetching === false) {
             setIsRunning(query.data?.completed === false);
 
@@ -40,7 +44,7 @@ const useBackgroundTask = ({ queryKey, action, onCompleted, gcTime }) => {
                 onCompletedRef.current?.(query.data);
             }
         }
-    }, [query.data, query.isSuccess, query.isFetching]);
+    }, [isRunning, query.data, query.isSuccess, query.isFetching]);
 
     const start = useCallback(() => {
         setIsRunning(true);

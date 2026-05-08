@@ -5,6 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 // format: FEATURE_ACTION
+export const PACKAGES_GET_INSTALLED = 'packages-get-installed';
 export const PACKAGES_GET_INSTALLED_STATUS = 'packages-get-installed-status';
 export const PACKAGES_GET_AVAILABLE_STATUS = 'packages-get-available-status';
 export const PACKAGES_GET_UPDATE_STATUS = 'packages-get-update-status';
