@@ -58,6 +58,7 @@ export default defineConfig(({ mode }) => {
     config.plugins.push(
         compression({
           include: [/\.(js)$/, /\.(css)$/],
+          algorithms: ['gzip'],
         }),
     );
   }
