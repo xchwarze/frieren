@@ -11,8 +11,11 @@ import { analyzer } from 'vite-bundle-analyzer';
 import path from 'path';
 
 export default defineConfig(({ mode }) => {
-  // eslint-disable-next-line no-undef
-  const env = loadEnv(mode, process.cwd(), '')
+  const resolvedMode = mode === 'production' ? 'prod' : mode;
+  const env = Object.assign(
+      process.env,
+      loadEnv(resolvedMode, `${process.cwd()}/config`)
+  );
 
   const config = {
     plugins: [
@@ -55,11 +58,17 @@ export default defineConfig(({ mode }) => {
   };
 
   if (env.VITE_COMPRESSION_ENABLE === 'true') {
+    const compressOptions = {
+      include: [/\.(js)$/, /\.(css)$/],
+      algorithms: ['gzip'],
+    }
+    if (mode === 'release') {
+      compressOptions.filename = '[path][base]';
+      compressOptions.deleteOriginalAssets = true;
+    }
+
     config.plugins.push(
-        compression({
-          include: [/\.(js)$/, /\.(css)$/],
-          algorithms: ['gzip'],
-        }),
+        compression(compressOptions),
     );
   }
 
