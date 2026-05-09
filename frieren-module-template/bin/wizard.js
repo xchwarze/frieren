@@ -8,7 +8,7 @@
  */
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { input, checkbox  } from '@inquirer/prompts';
+import { input, checkbox } from '@inquirer/prompts';
 import { ExitPromptError, CancelPromptError } from '@inquirer/core';
 import fs from 'fs-extra';
 import path from 'path';

@@ -11,6 +11,8 @@
     "build": "vite build",
     "wizard": "node ./bin/wizard.js",
     "validate": "node ./bin/validate.js",
+    "update-module": "node ./bin/update-module.js",
+    "version-bump": "node ./bin/version-bump.js",
     "outdated": "yarn upgrade-interactive"
   },
   "peerDependencies": {
