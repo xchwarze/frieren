@@ -6,6 +6,6 @@
  */
 import { atomWithStorage } from 'jotai/utils';
 
-const userAtom = atomWithStorage('theme-variant', 'auto');
+const themeVariantAtom = atomWithStorage('theme-variant', 'auto');
 
-export default userAtom;
+export default themeVariantAtom;
