@@ -42,6 +42,9 @@ const SYNCED_FILES = [
     'bin/validate.js',
     'bin/version-bump.js',
     'bin/wizard.js',
+    'config/.env.dev',
+    'config/.env.prod',
+    'config/.env.release',
 ];
 
 /**
