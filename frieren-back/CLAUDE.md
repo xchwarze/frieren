@@ -139,7 +139,7 @@ class ModuleOpenWrtHelper {
 | Module | Actions | Description |
 |---|---|---|
 | login | login, logout | Auth via /etc/shadow |
-| dashboard | getSystemStats, getSystemResume | CPU, memory, uptime, board info |
+| dashboard | getSystemStats, getSystemResume, getNews | CPU, memory, uptime, board info, remote news |
 | header | shutDownHardware, resetHardware, serverPing | System control |
 | hardware | getUsbDevices, getFileSystemUsage, getSystemLogs, startDiagnosticsScript, getDiagnosticsStatus, downloadDiagnosticsFile | Hardware monitoring |
 | modules | getModuleList, getAvailableModules, getInstalledModules, downloadModule, downloadStatus, installModule, installStatus, checkDestination, removeModule, pinModule | Module management |

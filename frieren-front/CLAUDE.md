@@ -207,6 +207,7 @@ All requests: `POST {apiPath}` with JSON body `{ module, action, ...params }`.
 | login | logout | Clear session |
 | dashboard | getSystemStats | CPU, memory, uptime |
 | dashboard | getSystemResume | Board/device info |
+| dashboard | getNews | Fetch remote news JSON |
 | header | shutDownHardware | Shutdown device |
 | header | resetHardware | Reboot device |
 | header | serverPing | Connectivity check |

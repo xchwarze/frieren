@@ -13,6 +13,7 @@ class DashboardController extends \frieren\core\Controller
     public $endpointRoutes = [
         'getSystemResume' => true,
         'getSystemStats' => true,
+        'getNews' => true,
     ];
 
     public function getSystemResume()
@@ -33,5 +34,16 @@ class DashboardController extends \frieren\core\Controller
         }
 
         self::setError();
+    }
+
+    public function getNews()
+    {
+        $url = sprintf(\DeviceConfig::NEWS_JSON_PATH, \DeviceConfig::MODULE_SERVER_URL);
+        $newsData = self::setupCoreHelper()::fileGetContentsSSL($url);
+        if ($newsData !== false) {
+            return self::setSuccess(json_decode($newsData));
+        }
+
+        self::setError('Error connecting to remote host. Please check your connection.');
     }
 }

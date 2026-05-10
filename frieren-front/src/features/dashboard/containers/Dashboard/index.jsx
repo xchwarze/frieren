@@ -6,9 +6,10 @@
  */
 import SystemStatsCard from '@src/features/dashboard/components/SystemStatsCard';
 import SystemInfoCard from '@src/features/dashboard/components/SystemInfoCard';
+import NewsCard from '@src/features/dashboard/components/NewsCard';
 
 /**
- * Renders the Dashboard component, displaying the SystemStatsCard and SystemInfoCard components.
+ * Renders the Dashboard component, displaying system stats, system info, and news.
  *
  * @return {ReactElement} The rendered Dashboard component
  */
@@ -16,6 +17,7 @@ const Dashboard = () => (
     <>
         <SystemStatsCard />
         <SystemInfoCard />
+        <NewsCard />
     </>
 );
 

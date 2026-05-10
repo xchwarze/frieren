@@ -24,4 +24,5 @@ class DeviceConfig
     const MODULE_SERVER_URL = 'https://raw.githubusercontent.com/xchwarze/frieren-modules-release/master';
     const MODULE_JSON_PATH = '%s/json/modules.json';
     const MODULE_PACKAGE_PATH = '%s/modules/%s';
+    const NEWS_JSON_PATH = '%s/json/news.json';
 }
