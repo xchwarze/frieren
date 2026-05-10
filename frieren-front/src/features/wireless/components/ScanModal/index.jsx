@@ -9,15 +9,8 @@ import { Modal, Table, Badge, Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Button from '@src/components/Button';
+import { getSignalVariant } from '@src/features/wireless/helpers/signalHelper.js';
 import useScanRadio from '@src/features/wireless/hooks/useScanRadio.js';
-
-const getSignalVariant = (signal) => {
-    const value = parseInt(signal, 10);
-    if (isNaN(value)) return 'secondary';
-    if (value >= -60) return 'success';
-    if (value >= -75) return 'warning';
-    return 'danger';
-};
 
 const ScanModal = ({ show, onHide, radioName, onConnect }) => {
     const [autoScan, setAutoScan] = useState(true);

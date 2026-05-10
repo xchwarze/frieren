@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Table, Form, Badge } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
+import { getSignalVariant } from '@src/features/wireless/helpers/signalHelper.js';
 import useGetWirelessOverview from '@src/features/wireless/hooks/useGetWirelessOverview.js';
 import useGetAssociationList from '@src/features/wireless/hooks/useGetAssociationList.js';
 
@@ -58,7 +59,7 @@ const AssociationListCard = () => {
                             <tr key={idx}>
                                 <td><code>{client.mac}</code></td>
                                 <td>
-                                    <Badge bg={client.signal >= -70 ? 'success' : client.signal >= -85 ? 'warning' : 'danger'}>
+                                    <Badge bg={getSignalVariant(client.signal)}>
                                         {client.signal} dBm
                                     </Badge>
                                 </td>
