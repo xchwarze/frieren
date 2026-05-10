@@ -5,7 +5,6 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { defineConfig, loadEnv } from 'vite';
-import alias from '@rollup/plugin-alias';
 import replace from '@rollup/plugin-replace';
 import react from '@vitejs/plugin-react';
 import { compression } from 'vite-plugin-compression2';
@@ -15,6 +14,40 @@ import packageJson from './package.json';
 
 const FRIEREN_MODULE_PREFIX = 'FrierenModule';
 
+const EXTERNAL_DEPS = [
+  '@hookform/resolvers',
+  '@hookform/resolvers/yup',
+  '@tanstack/react-query',
+  'jotai',
+  'jotai/utils',
+  'prop-types',
+  'react',
+  'react-dom',
+  'react/jsx-runtime',
+  'react-bootstrap',
+  'react-hook-form',
+  'react-toastify',
+  'wouter',
+  'yup'
+];
+
+const GLOBALS_MAP = {
+  '@hookform/resolvers': 'HookformResolvers',
+  '@hookform/resolvers/yup': 'HookformResolversYup',
+  '@tanstack/react-query': 'ReactQuery',
+  'jotai': 'Jotai',
+  'jotai/utils': 'JotaiUtils',
+  'prop-types': 'PropTypes',
+  'react': 'React',
+  'react-dom': 'ReactDOM',
+  'react/jsx-runtime': 'jsxRuntime',
+  'react-bootstrap': 'ReactBootstrap',
+  'react-hook-form': 'ReactHookForm',
+  'react-toastify': 'ReactToastify',
+  'wouter': 'Wouter',
+  'yup': 'Yup'
+};
+
 /**
  * Capitalizes the first letter of a string.
  *
@@ -23,6 +56,34 @@ const FRIEREN_MODULE_PREFIX = 'FrierenModule';
  */
 const ucfirst = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+/**
+ * Checks if a module ID should be treated as external (provided by window globals).
+ * Handles react-bootstrap subpath imports like react-bootstrap/Button.
+ *
+ * @param {string} id - The module ID to check.
+ * @return {boolean} Whether the module is external.
+ */
+const isExternal = (id) => (
+    EXTERNAL_DEPS.includes(id) || id.startsWith('react-bootstrap/')
+);
+
+/**
+ * Resolves a module ID to its window global name for UMD builds.
+ * Maps react-bootstrap subpaths to dot notation (e.g., react-bootstrap/Button → ReactBootstrap.Button).
+ *
+ * @param {string} id - The module ID to resolve.
+ * @return {string} The global variable name.
+ */
+const resolveGlobal = (id) => {
+  if (GLOBALS_MAP[id]) {
+    return GLOBALS_MAP[id];
+  }
+
+  if (id.startsWith('react-bootstrap/')) {
+    return `ReactBootstrap.${id.replace('react-bootstrap/', '')}`;
+  }
 };
 
 export default defineConfig(({ mode }) => {
@@ -37,16 +98,6 @@ export default defineConfig(({ mode }) => {
   const config = {
     plugins: [
       react(),
-      replace({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-        preventAssignment: true,
-      }),
-      alias({
-        entries: [
-          { find: 'react-bootstrap', replacement: path.resolve(__dirname, 'node_modules/react-bootstrap') },
-          { find: 'prop-types', replacement: path.resolve(__dirname, 'node_modules/prop-types') },
-        ]
-      }),
     ],
     resolve: {
       alias: {
@@ -54,7 +105,6 @@ export default defineConfig(({ mode }) => {
         '@src': path.resolve(__dirname, COMMON_ALIAS),
         '@common': path.resolve(__dirname, COMMON_ALIAS),
       },
-      dedupe: []
     },
     build: {
       lib: {
@@ -64,35 +114,9 @@ export default defineConfig(({ mode }) => {
         entry: 'src/entry.jsx',
       },
       rollupOptions: {
-        external: [
-          '@hookform/resolvers',
-          '@hookform/resolvers/yup',
-          '@tanstack/react-query',
-          'jotai',
-          'jotai/utils',
-          'react',
-          'react-dom',
-          'react/jsx-runtime',
-          'react-hook-form',
-          'react-toastify',
-          'wouter',
-          'yup'
-        ],
+        external: isExternal,
         output: {
-          globals: {
-            '@hookform/resolvers': 'HookformResolvers',
-            '@hookform/resolvers/yup': 'HookformResolversYup',
-            '@tanstack/react-query': 'ReactQuery',
-            'jotai': 'Jotai',
-            'jotai/utils': 'JotaiUtils',
-            'react': 'React',
-            'react-dom': 'ReactDOM',
-            'react/jsx-runtime': 'jsxRuntime',
-            'react-hook-form': 'ReactHookForm',
-            'react-toastify': 'ReactToastify',
-            'wouter': 'Wouter',
-            'yup': 'Yup'
-          }
+          globals: resolveGlobal,
         }
       }
     }
