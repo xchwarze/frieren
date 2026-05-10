@@ -145,7 +145,8 @@ class ModuleOpenWrtHelper {
 | modules | getModuleList, getAvailableModules, getInstalledModules, downloadModule, downloadStatus, installModule, installStatus, checkDestination, removeModule, pinModule | Module management |
 | settings | getSectionData, setHostname, setTimezone, setDatetimeFromBrowser, setUserPassword, setPanelTheme | System config |
 | terminal | startTerminal, stopTerminal, getStatus | ttyd on port 1477 |
-| wireless | getWirelessInterfaces, getManagementConfig, setManagementConfig, scanForNetworks, getClientConfig, setClientConfig, disableWwanInterface | WiFi management |
+| packages | updateLists, getUpdateStatus, getInstalledPackages, getInstalledPackagesStatus, getAvailablePackages, getAvailablePackagesStatus, installPackage, getInstallStatus, removePackage, getRemoveStatus | Package management (opkg) |
+| wireless | scanForNetworks, getWirelessOverview, getRadioConfig, setRadioConfig, getAssociationList, addInterface, removeInterface, toggleInterface, getInterfaceConfig, setInterfaceConfig, getRawWirelessConfig, setRawWirelessConfig, resetWirelessConfig | WiFi management |
 
 ### Module Manifest (`manifest.json`)
 ```json

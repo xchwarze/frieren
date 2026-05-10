@@ -4,22 +4,22 @@
 
 ## Description
 
-Frieren is an advanced micro-framework and application stack crafted for developing security gadgets and tools on routers and Single Board Computers (SBCs). It integrates a lightweight PHP backend with a responsive React frontend, aiming to offer an efficient, modular, and easily adaptable framework for security-focused applications. <br/>
-The project also features a scaffolding tool for developing new modules with UMD libraries, further enhancing the Frieren ecosystem.
+Frieren is a framework for running security tools on OpenWrt routers and Single Board Computers (SBCs). It provides a web panel with WiFi management, installable modules, an integrated terminal, and a package manager. The stack is a PHP backend API with a React frontend, designed to be lightweight enough for embedded devices while remaining extensible through third-party modules.
+
+## Features
+
+- **WiFi Management** — Create, edit, and remove wireless interfaces. Scan for networks, configure radios, edit raw UCI config.
+- **Module System** — Install, remove, and pin third-party modules from a remote repository. Modules load dynamically as UMD bundles.
+- **Package Manager** — Install and remove opkg packages directly from the web panel.
+- **Integrated Terminal** — Web-based terminal (ttyd) accessible from the panel.
+- **System Tools** — Dashboard with system stats, USB device listing, filesystem usage, syslog viewer, diagnostics.
+- **Extensible** — Scaffold new modules with `frieren-module-template`. PHP controller + React frontend per module.
 
 ## Components
 
-- **Frieren API Backend**: A PHP micro-framework that excels in performance, offering features like a mini ORM, CORS configuration, session management, and more.
-- **Frieren Web Frontend**: Utilizes modern web technologies for a responsive and intuitive user interface, integrating seamlessly with the Frieren backend services.
-- **Frieren Module Template**: Facilitates the creation of new modules, extending the capabilities of the Frieren project with reusable and distributable components.
-
-## Features Across the Ecosystem
-
-- Efficient database interactions and robust session management.
-- Pre-configured CORS setup for hassle-free cross-origin requests.
-- Modular design for easy maintenance and scalability.
-- Optimized React stack for a minimal footprint and enhanced performance.
-- Support for third-party modules, fostering an extendable ecosystem.
+- **[frieren-back](frieren-back/)** — PHP micro-framework. JSON POST API with session auth, CSRF, UCI config integration, and a mini ORM.
+- **[frieren-front](frieren-front/)** — React SPA (Vite, Wouter, Jotai, React Query). Supports dynamic UMD module loading.
+- **[frieren-module-template](frieren-module-template/)** — Scaffolding tool for developing third-party modules with shared dependencies via window globals.
 
 ## Related Repositories
 
@@ -28,7 +28,7 @@ The project also features a scaffolding tool for developing new modules with UMD
 
 ## Installation
 
-Frieren can be installed quickly using an automated script or compiled manually for more control over the installation process. Frieren is currently fully supported only on OpenWRT platforms (official OpenWrt and not any of its forks).
+Frieren runs on OpenWrt (official builds, not forks). It can be installed via an automated script or compiled manually.
 
 ### Quick Installation
 
@@ -44,24 +44,23 @@ Each component within the Frieren project (`frieren-back`, `frieren-front` and `
 
 ### Module Development
 
-The `frieren-module-template` serves as a comprehensive scaffolding tool, specifically designed to streamline the development of UMD modules fully integrated within the Frieren ecosystem. This template simplifies the process of creating and integrating modular features, which are both reusable and distributable, thus significantly enhancing the project ecosystem.
+Use `frieren-module-template` to scaffold new modules. Run `yarn wizard` to set up a new module, develop your feature, then `yarn build` to compile a UMD bundle. See the [module template README](frieren-module-template/README.md) for details.
 
 ## License
 
-The Frieren project is licensed under the LGPL-3.0-only License, emphasizing open-source collaboration and distribution.
+This project is licensed under LGPL-3.0-only. See the LICENSE file for details.
 
 ## Contributing
 
-The Frieren project welcomes contributions. Your input helps enhance the project, whether through new features, improvements to the frontend experience, or the development of modules.
+Contributions welcome — new features, bug fixes, or modules. See each component's README for build instructions.
 
-## Authors, Acknowledgments, and Contact
+## Authors
 
 - **Lead Developer**: DSR! - xchwarze@gmail.com
-- **Contributors**: A heartfelt thank you to all contributors for supporting and growing the Frieren project.
 
 ## Support the Development
 
-We're constantly working on new features and improvements for Frieren, and your support can make a big difference! If you find value in Frieren and want to help us continue innovating, consider making a donation. Your contributions will directly fund the acquisition of testing hardware and support the ongoing development of robust security solutions. Send your donation via Binance or for a more engaged experience, where you can receive exclusive updates and builds, join us on [Patreon](https://www.patreon.com/xchwarze).
+If you find Frieren useful, consider supporting development. Donations fund testing hardware and ongoing work. Send via Binance or join [Patreon](https://www.patreon.com/xchwarze) for exclusive updates and builds.
 
 [![patreon](assets/patreon.png)](https://www.patreon.com/xchwarze)
 ![binance-qr](assets/binance-qr.png)

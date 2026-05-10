@@ -5,7 +5,7 @@ React SPA for Frieren security gadget framework. Runs on OpenWrt routers/SBCs. C
 ## Tech Stack
 
 - **React 18** (JSX, hooks, no TypeScript)
-- **Vite 5** (build + dev server)
+- **Vite 7** (build + dev server)
 - **Wouter** — lightweight hash-based routing
 - **Jotai** — atomic state management (`atom`, `atomWithStorage`)
 - **@tanstack/react-query v5** — server state, caching, mutations
@@ -96,7 +96,7 @@ features/{name}/
 └── helpers/queryKeys.js          # Query key constants
 ```
 
-**Built-in features:** dashboard, login, modules, hardware, settings, terminal, wireless
+**Built-in features:** dashboard, login, modules, packages, hardware, settings, terminal, wireless
 
 ### Routes (hash-based)
 
@@ -153,7 +153,7 @@ const schema = yup.object({
 </FormProvider>
 ```
 
-Form components: `FormProvider`, `InputField`, `SelectField`, `TextAreaField`, `CheckboxField`, `SwitchField`, `SubmitButton`
+Form components: `FormProvider`, `InputField`, `PasswordHelper`, `SelectField`, `TextAreaField`, `CheckboxField`, `SwitchField`, `SubmitButton`
 
 ### State Management
 
@@ -169,7 +169,7 @@ External modules loaded dynamically:
 2. Route `/:moduleName` renders `<DynamicModule />`
 3. `useScript()` loads `/{VITE_WEB_MODULES_FOLDER}/{name}/module.umd.js`
 4. Module must export `window.FrierenModule{Name}()` function
-5. Shared libs exposed via `window.*` (React, Jotai, ReactQuery, etc.)
+5. Shared libs exposed via `window.*` (React, ReactDOM, ReactQuery, Jotai, JotaiUtils, ReactHookForm, HookformResolvers, HookformResolversYup, ReactToastify, ReactBootstrap, PropTypes, Wouter, Yup)
 
 ### Theme
 
@@ -210,6 +210,8 @@ All requests: `POST {apiPath}` with JSON body `{ module, action, ...params }`.
 | header | shutDownHardware | Shutdown device |
 | header | resetHardware | Reboot device |
 | header | serverPing | Connectivity check |
+| header | installModuleDependencies | Install module deps |
+| header | getDependencyInstallationStatus | Poll dep install status |
 | hardware | getUsbDevices | List USB devices |
 | hardware | getFileSystemUsage | Disk usage |
 | hardware | getSystemLogs | Syslog (optional search) |
@@ -220,24 +222,43 @@ All requests: `POST {apiPath}` with JSON body `{ module, action, ...params }`.
 | modules | getAvailableModules | Remote module catalog |
 | modules | getInstalledModules | Installed with sizes |
 | modules | downloadModule | Download from remote |
+| modules | downloadStatus | Poll download progress |
 | modules | installModule | Install (SHA256 verify) |
+| modules | installStatus | Poll install progress |
+| modules | checkDestination | Check install destination |
 | modules | removeModule | Delete module |
 | modules | pinModule | Toggle sidebar pin |
+| packages | getAvailablePackagesStatus | Check if package list ready |
+| packages | getAvailablePackages | List available packages |
+| packages | getInstalledPackages | List installed packages |
+| packages | installPackage | Install a package |
+| packages | getInstallStatus | Poll install progress |
+| packages | removePackage | Remove a package |
+| packages | getRemoveStatus | Poll remove progress |
+| packages | updateLists | Refresh package lists |
+| packages | getUpdateStatus | Poll update progress |
 | settings | getSectionData | Read config section |
 | settings | setHostname | Change hostname |
 | settings | setTimezone | Change timezone |
+| settings | setDatetimeFromBrowser | Sync device time from browser |
 | settings | setUserPassword | Change password |
 | settings | setPanelTheme | Change UI theme |
 | terminal | startTerminal | Start ttyd on port 1477 |
 | terminal | stopTerminal | Kill ttyd |
 | terminal | getStatus | Check ttyd running |
-| wireless | getWirelessInterfaces | List interfaces |
-| wireless | getManagementConfig | AP configuration |
-| wireless | setManagementConfig | Update AP config |
+| wireless | getWirelessOverview | Radios + interfaces overview |
+| wireless | getInterfaceConfig | Single interface config |
+| wireless | setInterfaceConfig | Update interface config |
+| wireless | addInterface | Create new interface |
+| wireless | removeInterface | Delete interface |
+| wireless | toggleInterface | Enable/disable interface |
 | wireless | scanForNetworks | WiFi scan |
-| wireless | getClientConfig | Client/WWAN config |
-| wireless | setClientConfig | Connect to AP |
-| wireless | disableWwanInterface | Disable WWAN |
+| wireless | getRadioConfig | Radio hardware config |
+| wireless | setRadioConfig | Update radio config |
+| wireless | getRawWirelessConfig | Raw UCI wireless file |
+| wireless | setRawWirelessConfig | Write raw UCI wireless |
+| wireless | resetWirelessConfig | Reset wireless to defaults |
+| wireless | getAssociationList | Connected stations list |
 
 ## Conventions
 

@@ -52,7 +52,7 @@ The frontend is designed to work seamlessly with the Frieren backend. Ensure the
 
 ## Requirements
 
-- Node.js 20 or higher
+- Node.js 22 or higher
 - Yarn package manager
 - A running instance of the Frieren backend
 

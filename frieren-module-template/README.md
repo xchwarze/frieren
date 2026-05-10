@@ -25,6 +25,8 @@ This template comes equipped with various scripts to aid in your module developm
 - `build`: Compiles your module into a distributable format.
 - `wizard`: A guided setup to scaffold your module.
 - `validate`: Ensures your module meets the required specifications.
+- `update-module`: Syncs a module's dependencies and config files with this template. Supports `--force`, `--no-files`, `--no-install`, and `--build` flags.
+- `version-bump`: Bumps the module version in package.json and manifest.json.
 
 ## Advanced Examples for Reference
 
