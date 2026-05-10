@@ -5,7 +5,6 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { defineConfig, loadEnv } from 'vite';
-import replace from '@rollup/plugin-replace';
 import react from '@vitejs/plugin-react';
 import { compression } from 'vite-plugin-compression2';
 import { analyzer } from 'vite-bundle-analyzer';
