@@ -243,6 +243,7 @@ All requests: `POST {apiPath}` with JSON body `{ module, action, ...params }`.
 
 - JSX files use `.jsx` extension, plain JS use `.js`
 - Components export default from `index.jsx`
+- When a component uses internal sub-components, place them as sibling files in the same folder (e.g., `InterfaceFormModal/index.jsx`, `InterfaceFormModal/ModeAwareFields.jsx`, `InterfaceFormModal/InterfaceForm.jsx`). The `index.jsx` remains the public entry point; sub-components are private to the folder.
 - Feature isolation: each feature owns its hooks, atoms, components
 - Query keys defined as constants in `helpers/queryKeys.js` per feature
 - All API calls go through `fetchPost()` from `services/fetchService.js`

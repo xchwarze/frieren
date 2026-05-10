@@ -23,7 +23,7 @@ const useSetInterfaceConfig = () => {
     const queryClient = useQueryClient();
 
     return useAuthenticatedMutation({
-        mutationFn: ({ section, ssid, encryption, key, mode, network, hidden, disabled }) => fetchPost({
+        mutationFn: ({ section, ssid, encryption, key, mode, network, hidden, disabled, isManagement, isRecon }) => fetchPost({
             module: 'wireless',
             action: 'setInterfaceConfig',
             section,
@@ -34,6 +34,8 @@ const useSetInterfaceConfig = () => {
             network,
             hidden,
             disabled,
+            isManagement,
+            isRecon,
         }),
         onSuccess: async (data, { section }) => {
             await sleep(1500);
