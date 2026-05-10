@@ -45,7 +45,6 @@ export default defineConfig(({ mode }) => {
         entries: [
           { find: 'react-bootstrap', replacement: path.resolve(__dirname, 'node_modules/react-bootstrap') },
           { find: 'prop-types', replacement: path.resolve(__dirname, 'node_modules/prop-types') },
-          { find: 'react-toastify', replacement: path.resolve(__dirname, 'node_modules/react-toastify') },
         ]
       }),
     ],
@@ -55,10 +54,7 @@ export default defineConfig(({ mode }) => {
         '@src': path.resolve(__dirname, COMMON_ALIAS),
         '@common': path.resolve(__dirname, COMMON_ALIAS),
       },
-      dedupe: [
-        // fix react-toastify duplication in build
-        'react-toastify'
-      ]
+      dedupe: []
     },
     build: {
       lib: {
@@ -78,6 +74,7 @@ export default defineConfig(({ mode }) => {
           'react-dom',
           'react/jsx-runtime',
           'react-hook-form',
+          'react-toastify',
           'wouter',
           'yup'
         ],
@@ -92,6 +89,7 @@ export default defineConfig(({ mode }) => {
             'react-dom': 'ReactDOM',
             'react/jsx-runtime': 'jsxRuntime',
             'react-hook-form': 'ReactHookForm',
+            'react-toastify': 'ReactToastify',
             'wouter': 'Wouter',
             'yup': 'Yup'
           }

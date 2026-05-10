@@ -35,9 +35,10 @@ const PRESERVED_KEYS = [
  * These are project-wide config files that must stay in sync.
  */
 const SYNCED_FILES = [
-    '.gitignore',
-    'vite.config.js',
     '.eslintrc.cjs',
+    '.gitignore',
+    '.yarnrc.yml',
+    'vite.config.js',
     'bin/update-module.js',
     'bin/validate.js',
     'bin/version-bump.js',

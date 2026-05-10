@@ -11,7 +11,7 @@ namespace frieren\modules\demo;
 class DemoController extends \frieren\core\Controller
 {
     public $endpointRoutes = [
-        'getSystemStats'
+        'getSystemStats' => true,
     ];
 
     public function getSystemStats()

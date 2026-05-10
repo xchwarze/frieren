@@ -24,7 +24,7 @@ class ModuleOpenWrtHelper
      */
     public static function getUbusSystemInfo()
     {
-        $resume = \frieren\helper\OpenWrtHelper::execUbusCall('system info');
+        $resume = \frieren\helper\OpenWrtHelper::execUbusCall('system', 'info');
         if (!$resume) {
             return false;
         }

@@ -5,33 +5,35 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import SystemStatsCard from '@module/feature/components/SystemStatsCard';
+import FormDemoCard from '@module/feature/components/FormDemoCard';
+import StateDemoCard from '@module/feature/components/StateDemoCard';
 
 /**
- * Renders the Dashboard component, displaying the SystemStatsCard and SystemInfoCard components.
+ * Renders the Demo page exercising all UMD window dependencies:
+ * React, React Query, react-hook-form, @hookform/resolvers/yup, yup,
+ * react-toastify, Jotai, Jotai/utils, and Wouter.
  *
  * @return {ReactElement} The rendered Dashboard component
  */
 const Dashboard = () => (
     <div className="text-center my-5">
         <h1 className="mb-3">Demo Module</h1>
-        <p className="mb-4">This is a JavaScript UMD module that loads at runtime. For more information you can check
-            the documentation and view the source code.</p>
+        <p className="mb-4">
+            UMD module smoke test. Exercises all window dependencies provided by the main application.
+        </p>
 
-        <div className="mx-y">
+        <div className="mb-3">
             <SystemStatsCard />
         </div>
 
-        <div className="ratio ratio-16x9 mx-auto">
-            <iframe
-                className="embed-responsive-item"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=2bDQQE8CqXyS-713"
-                title="YouTube video player" frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin" allowFullScreen
-            />
+        <div className="mb-3">
+            <FormDemoCard />
+        </div>
+
+        <div className="mb-3">
+            <StateDemoCard />
         </div>
     </div>
-)
-;
+);
 
 export default Dashboard;
