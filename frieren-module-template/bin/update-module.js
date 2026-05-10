@@ -157,6 +157,17 @@ const syncFiles = async (templateDir, targetDir) => {
     }
 };
 
+const verifyBuild = (targetDir) => {
+    console.log(chalk.cyan(`\n[*] Verifying build in ${targetDir}...`));
+    try {
+        execSync('yarn build --mode release', { cwd: targetDir, stdio: 'inherit' });
+        console.log(chalk.green(`\n[+] Build OK`));
+    } catch {
+        console.error(chalk.red(`\n[!] Build FAILED`));
+        process.exit(1);
+    }
+};
+
 const reinstallDeps = (targetDir) => {
     const lockPath = path.join(targetDir, 'yarn.lock');
     if (fs.existsSync(lockPath)) {
@@ -226,6 +237,10 @@ const mainAction = async (targetArg, options) => {
     } else {
         console.log(chalk.yellow(`\n[*] Skipped install (omit --no-install to run yarn).`));
     }
+
+    if (options.build) {
+        verifyBuild(targetDir);
+    }
 };
 
 const program = new Command();
@@ -236,6 +251,7 @@ program
     .option('-f, --force', 'Replace the whole package.json, preserving only module metadata')
     .option('--no-files', 'Skip copying config files (.gitignore, vite.config.js, etc)')
     .option('--no-install', 'Skip removing yarn.lock and running yarn install')
+    .option('-b, --build', 'Run build verification after update')
     .action(mainAction);
 
 program.parse(process.argv);
