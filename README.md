@@ -48,7 +48,12 @@ Use `frieren-module-template` to scaffold new modules. Run `yarn wizard` to set 
 
 ## License
 
-This project is licensed under LGPL-3.0-only. See the LICENSE file for details.
+This project is licensed under the PolyForm Noncommercial License 1.0.0.
+
+Non-commercial use is permitted. Commercial use is not permitted under this license.
+Commercial use requires a separate commercial license from the author.
+
+For commercial licensing, contact: xchwarze@gmail.com
 
 ## Contributing
 

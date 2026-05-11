@@ -62,7 +62,12 @@ Contributions are welcome! Please refer to the project's contribution guidelines
 
 ## License
 
-This project is licensed under the LGPL-3.0-only License - see the LICENSE file in the root directory for details.
+This project is licensed under the PolyForm Noncommercial License 1.0.0.
+
+Non-commercial use is permitted. Commercial use is not permitted under this license.
+Commercial use requires a separate commercial license from the author.
+
+For commercial licensing, contact: xchwarze@gmail.com
 
 Image Licensing Information: The images used in this project are subject to their own individual licenses and specific terms. For a detailed explanation of these licenses and any applicable notes, please review our [Image Licensing Document](../assets/ASSETS_CREDITS.md).
 
