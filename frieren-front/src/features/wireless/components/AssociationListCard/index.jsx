@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Table, Form, Badge } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
@@ -12,9 +12,25 @@ import { getSignalVariant } from '@src/features/wireless/helpers/signalHelper.js
 import useGetWirelessOverview from '@src/features/wireless/hooks/useGetWirelessOverview.js';
 import useGetAssociationList from '@src/features/wireless/hooks/useGetAssociationList.js';
 
+const parseRate = (rate) => parseFloat(rate) || 0;
+
+const SORT_FIELDS = {
+    mac: (a, b) => a.mac.localeCompare(b.mac),
+    signal: (a, b) => b.signal - a.signal,
+    noise: (a, b) => b.noise - a.noise,
+    rx_rate: (a, b) => parseRate(b.rx_rate) - parseRate(a.rx_rate),
+    tx_rate: (a, b) => parseRate(b.tx_rate) - parseRate(a.tx_rate),
+};
+
+/**
+ * Displays associated stations for a selected AP interface with sortable columns.
+ *
+ * @return {ReactElement} The AssociationListCard component.
+ */
 const AssociationListCard = () => {
     const { data: overview } = useGetWirelessOverview();
     const [selectedInterface, setSelectedInterface] = useState('');
+    const [sortField, setSortField] = useState('signal');
 
     const allInterfaces = Object.values(overview ?? {}).flatMap(
         radio => (radio.interfaces ?? [])
@@ -25,6 +41,16 @@ const AssociationListCard = () => {
     const actualInterface = selectedInterface || allInterfaces[0] || '';
     const { data: clients, refetch, isFetching } = useGetAssociationList(actualInterface);
     const clientList = clients ?? [];
+
+    const sorted = useMemo(() => (
+        [...clientList].sort(SORT_FIELDS[sortField])
+    ), [clientList, sortField]);
+
+    const renderSortHeader = (field, label) => (
+        <th role={'button'} onClick={() => setSortField(field)}>
+            {label} {sortField === field && '▼'}
+        </th>
+    );
 
     return (
         <PanelCard
@@ -43,19 +69,19 @@ const AssociationListCard = () => {
                     </Form.Select>
                 </Form.Group>
             )}
-            {clientList.length > 0 ? (
-                <Table size={'sm'} striped bordered hover>
+            {sorted.length > 0 ? (
+                <Table striped hover responsive>
                     <thead>
                         <tr>
-                            <th>MAC Address</th>
-                            <th>Signal</th>
-                            <th>Noise</th>
-                            <th>RX Rate</th>
-                            <th>TX Rate</th>
+                            {renderSortHeader('mac', 'MAC Address')}
+                            {renderSortHeader('signal', 'Signal')}
+                            {renderSortHeader('noise', 'Noise')}
+                            {renderSortHeader('rx_rate', 'RX Rate')}
+                            {renderSortHeader('tx_rate', 'TX Rate')}
                         </tr>
                     </thead>
                     <tbody>
-                        {clientList.map((client, idx) => (
+                        {sorted.map((client, idx) => (
                             <tr key={idx}>
                                 <td><code>{client.mac}</code></td>
                                 <td>
