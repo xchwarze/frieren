@@ -140,6 +140,31 @@ class ModuleOpenWrtHelper
 
 
     /**
+     * Retrieves the terminal autologin setting.
+     *
+     * @return bool Whether terminal autologin is enabled.
+     */
+    public static function getTerminalAutologin()
+    {
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_autologin') === '1';
+    }
+
+    /**
+     * Sets the terminal autologin setting.
+     *
+     * @param bool $enabled Whether to enable autologin.
+     * @return bool Whether the setting was successfully saved.
+     */
+    public static function setTerminalAutologin($enabled)
+    {
+        $value = $enabled ? '1' : '0';
+        OpenWrtHelper::uciSet('frieren.@settings[0].terminal_autologin', $value);
+
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_autologin') === $value;
+    }
+
+
+    /**
      * Retrieves the section data for the current settings.
      *
      * This function returns an array containing the following data:
@@ -155,6 +180,7 @@ class ModuleOpenWrtHelper
             'hostname' => gethostname(),
             'timezone' => self::getSystemTimeZone(),
             'theme' => OpenWrtHelper::uciGet('frieren.@settings[0].theme'),
+            'terminalAutologin' => self::getTerminalAutologin(),
         ];
     }
 }

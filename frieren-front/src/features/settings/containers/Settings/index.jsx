@@ -12,6 +12,7 @@ import TimezoneCard from '@src/features/settings/components/TimezoneCard';
 import HostnameCard from '@src/features/settings/components/HostnameCard';
 import UpdateUserPasswordCard from '@src/features/settings/components/UpdateUserPasswordCard';
 import PanelThemeCard from '@src/features/settings/components/PanelThemeCard';
+import TerminalSettingsCard from '@src/features/settings/components/TerminalSettingsCard';
 
 /**
  * Generates the Settings component with various cards for managing user settings.
@@ -37,6 +38,11 @@ const Settings = () => {
                 </Col>
                 <Col md={6}>
                     <UpdateUserPasswordCard />
+                </Col>
+            </Row>
+            <Row className={'g-3'}>
+                <Col md={6}>
+                    <TerminalSettingsCard query={query} />
                 </Col>
             </Row>
         </>

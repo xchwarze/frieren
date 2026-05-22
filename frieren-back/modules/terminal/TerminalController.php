@@ -9,6 +9,7 @@
 namespace frieren\modules\terminal;
 
 use frieren\helper\OpenWrtHelper;
+use frieren\modules\settings\ModuleOpenWrtHelper as SettingsHelper;
 
 class TerminalController extends \frieren\core\Controller
 {
@@ -42,7 +43,8 @@ class TerminalController extends \frieren\core\Controller
         $terminal = $this->getTerminalPath();
         $status = OpenWrtHelper::checkRunning($terminal);
         if (!$status) {
-            $command = "{$terminal} -p 1477 -i br-lan /bin/login";
+            $shell = SettingsHelper::getTerminalAutologin() ? '/bin/ash' : '/bin/login';
+            $command = "{$terminal} -p 1477 -i br-lan {$shell}";
             OpenWrtHelper::execBackground($command);
             $status = OpenWrtHelper::checkRunning($terminal);
             if (!$status) {
