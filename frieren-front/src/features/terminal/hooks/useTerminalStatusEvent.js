@@ -10,41 +10,24 @@ import { useSetAtom } from 'jotai';
 import socketStatusAtom from '@src/features/terminal/atoms/socketStatusAtom.js'
 
 /**
- * Hook that listens for the 'ws-terminal' event on the iframe's contentWindow and updates the socketStatusAtom with the received status.
+ * Hook that listens for 'ws-terminal' events dispatched by FrierenTerminal and updates the socketStatusAtom.
  *
- * @param {React.RefObject<HTMLIFrameElement>} iframeRef - Reference to the iframe element.
- * @param {String} terminalStatus - Current terminal status.
- * @return {void} This hook does not return anything.
+ * @return {void}
  */
-const useTerminalStatusEvent = (iframeRef, terminalStatus) => {
+const useTerminalStatusEvent = () => {
     const setSocketStatus = useSetAtom(socketStatusAtom);
 
     useEffect(() => {
-        const iframe = iframeRef.current;
-        if (!iframe) {
-            return;
-        }
-
         const handleEvent = (event) => {
             setSocketStatus(event.detail.status);
         };
 
-        const attachListener = () => {
-            if (iframe.contentWindow && 'addEventListener' in iframe.contentWindow) {
-                iframe.contentWindow.addEventListener('ws-terminal', handleEvent);
-            }
-        };
-
-        attachListener();
-        iframe.addEventListener('load', attachListener);
+        window.addEventListener('ws-terminal', handleEvent);
 
         return () => {
-            iframe.removeEventListener('load', attachListener);
-            if (iframe.contentWindow) {
-                iframe.contentWindow.removeEventListener('ws-terminal', handleEvent);
-            }
+            window.removeEventListener('ws-terminal', handleEvent);
         };
-    }, [iframeRef, terminalStatus, setSocketStatus]);
+    }, [setSocketStatus]);
 };
 
 export default useTerminalStatusEvent;

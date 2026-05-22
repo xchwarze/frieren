@@ -27,6 +27,8 @@ export default defineConfig(({ mode }) => {
         '@src': path.resolve(__dirname, './src'),
         // eslint-disable-next-line no-undef
         '@module': path.resolve(__dirname, './src'),
+        // eslint-disable-next-line no-undef
+        '@frieren/terminal-core': path.resolve(__dirname, '../frieren-terminal/dist'),
       }
     },
 
