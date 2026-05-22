@@ -14,6 +14,8 @@ import { DASHBOARD_GET_NEWS } from '@src/features/dashboard/helpers/queryKeys.js
  * @param {Object} options - Optional configuration options for the query hook.
  * @return {Object} The result of the query.
  */
+const newsCacheTTL = 6 * 60 * 60 * 1000;
+
 const useNews = (options = {}) => (
     useAuthenticatedQuery({
         queryKey: [DASHBOARD_GET_NEWS],
@@ -21,6 +23,8 @@ const useNews = (options = {}) => (
             module: 'dashboard',
             action: 'getNews',
         }),
+        staleTime: newsCacheTTL,
+        gcTime: newsCacheTTL,
         ...options,
     })
 );

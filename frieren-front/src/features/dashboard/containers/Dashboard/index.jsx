@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
+import UpdateAlert from '@src/features/dashboard/components/UpdateAlert';
 import SystemStatsCard from '@src/features/dashboard/components/SystemStatsCard';
 import SystemInfoCard from '@src/features/dashboard/components/SystemInfoCard';
 import NewsCard from '@src/features/dashboard/components/NewsCard';
@@ -15,6 +16,7 @@ import NewsCard from '@src/features/dashboard/components/NewsCard';
  */
 const Dashboard = () => (
     <>
+        <UpdateAlert />
         <SystemStatsCard />
         <SystemInfoCard />
         <NewsCard />
