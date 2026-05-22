@@ -2,7 +2,7 @@
 #
 # Deploy frieren to device via SSH/SCP
 # Usage: ./deploy.sh <service> [host] [password]
-#   service  - "back" or "front"
+#   service  - "back", "front" or "terminal"
 #   host     - default: 192.168.7.1
 #   password - default: root
 
@@ -14,9 +14,10 @@ REMOTE_PATH="/usr/share/frieren"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACK_PATH="$(cd "${SCRIPT_DIR}/../frieren-back" && pwd)"
 FRONT_PATH="$(cd "${SCRIPT_DIR}/../frieren-front" && pwd)"
+TERMINAL_PATH="$(cd "${SCRIPT_DIR}/../frieren-terminal" && pwd)"
 
-if [ -z "$SERVICE" ] || { [ "$SERVICE" != "back" ] && [ "$SERVICE" != "front" ]; }; then
-    echo "Usage: $0 <back|front> [host] [password]"
+if [ -z "$SERVICE" ] || { [ "$SERVICE" != "back" ] && [ "$SERVICE" != "front" ] && [ "$SERVICE" != "terminal" ]; }; then
+    echo "Usage: $0 <back|front|terminal> [host] [password]"
     exit 1
 fi
 
@@ -52,17 +53,19 @@ deploy_back() {
     echo "Backend deployed."
 }
 
+build_terminal() {
+    echo "Building terminal library..."
+    cd "${TERMINAL_PATH}"
+    yarn build
+    echo "Terminal library built."
+}
+
 deploy_front() {
+    build_terminal
+
     echo "Building frontend..."
     cd "${FRONT_PATH}"
-    cp config/.env.prod .env
-    yarn build
-
-    echo "Preparing compressed assets..."
-    cd "${FRONT_PATH}/dist/assets"
-    rm -f *.js *.css
-    mv index.js.gz index.js
-    mv index.css.gz index.css
+    yarn build --mode release
 
     echo "Deploying frontend -> ${USER}@${HOST}:${REMOTE_PATH}"
     scp_with_pass "${PASS}" -r "${FRONT_PATH}/dist/"* "${USER}@${HOST}:${REMOTE_PATH}/"
@@ -70,8 +73,8 @@ deploy_front() {
     echo "Frontend deployed."
 }
 
-if [ "$SERVICE" = "back" ]; then
-    deploy_back
-else
-    deploy_front
-fi
+case "$SERVICE" in
+    back)     deploy_back ;;
+    front)    deploy_front ;;
+    terminal) build_terminal ;;
+esac

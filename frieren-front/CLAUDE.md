@@ -261,6 +261,23 @@ All requests: `POST {apiPath}` with JSON body `{ module, action, ...params }`.
 | wireless | resetWirelessConfig | Reset wireless to defaults |
 | wireless | getAssociationList | Connected stations list |
 
+## Code Quality
+
+- Write clean, senior-level code. No junior patterns.
+- Name variables/constants by purpose, not value (`cacheTTL` not `SIX_HOURS`)
+- Extract `import.meta.env.*` to descriptive module-scope variables
+- Follow existing codebase patterns — study neighbors before writing new code
+- Guard clauses and early returns over deep nesting
+- Destructure where it improves clarity, don't over-destructure
+- No magic strings/numbers — named constants with semantic names
+- Small focused functions — if it needs a comment explaining what it does, split it
+- No dead code, no commented-out code, no TODO placeholders
+- DRY without over-abstracting — duplicate is better than wrong abstraction
+- Consistent with existing project conventions (hooks pattern, query pattern, component structure)
+- Think about edge cases: loading, error, empty states
+- Keep components lean — extract logic to hooks, extract sub-renders to components when complex
+- Prefer composition over conditional spaghetti
+
 ## Conventions
 
 - JSX files use `.jsx` extension, plain JS use `.js`
