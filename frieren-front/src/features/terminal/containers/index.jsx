@@ -14,6 +14,10 @@ import collapseStatusAtom from '@src/features/terminal/atoms/collapseStatusAtom.
 import useTerminalStatusEvent from '@src/features/terminal/hooks/useTerminalStatusEvent.js';
 import TerminalHeader from '@src/features/terminal/components/TerminalHeader';
 
+const modulesFolder = import.meta.env.VITE_WEB_MODULES_FOLDER;
+const terminalIframeSrc = `${window.location.origin}/${modulesFolder}/terminal/inline.html`;
+const defaultHeight = 200;
+
 /**
  * Terminal component with collapsible and iframe functionality.
  *
@@ -23,10 +27,6 @@ const Terminal = () => {
     const collapseStatus = useAtomValue(collapseStatusAtom);
     const terminalStatus = useAtomValue(terminalStatusAtom)
     const iframeRef = useRef(null);
-
-    const modulesFolder = import.meta.env.VITE_WEB_MODULES_FOLDER;
-    const iframeSrc = `${window.location.origin}/${modulesFolder}/terminal/inline.html`;
-    const defaultHeight = 200;
 
     useTerminalStatusEvent(iframeRef, terminalStatus);
 
@@ -60,7 +60,7 @@ const Terminal = () => {
                         >
                             <iframe
                                 ref={iframeRef}
-                                src={iframeSrc}
+                                src={terminalIframeSrc}
                                 style={{
                                     width: '100%',
                                     height: defaultHeight,

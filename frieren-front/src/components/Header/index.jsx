@@ -14,6 +14,8 @@ import useOpenTerminalMutation from '@src/features/terminal/hooks/useOpenTermina
 import SystemActionsDropdown from '@src/components/SystemActionsDropdown';
 import Icon from '@src/components/Icon';
 
+const enableTerminal = import.meta.env.VITE_ENABLE_TERMINAL === 'true';
+
 /**
  * Generate the header component with logo and other tools.
  *
@@ -22,7 +24,6 @@ import Icon from '@src/components/Icon';
 const Header = () => {
     const { mutate: openTerminalMutation } = useOpenTerminalMutation();
     const terminalStatus = useAtomValue(terminalStatusAtom);
-    const ENABLE_TERMINAL = import.meta.env.VITE_ENABLE_TERMINAL;
 
     // <Navbar bg="dark" variant="dark" fixed="top" className="px-3">
     return (
@@ -38,7 +39,7 @@ const Header = () => {
                 Frieren
             </Navbar.Brand>
             <div className={'navbar-nav flex-row flex-wrap ms-auto'}>
-                {ENABLE_TERMINAL && (
+                {enableTerminal && (
                     <Button
                         variant={'outline-primary'}
                         className={'btn-icon fs-5'}

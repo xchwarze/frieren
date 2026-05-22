@@ -20,17 +20,27 @@ const useTerminalStatusEvent = (iframeRef, terminalStatus) => {
     const setSocketStatus = useSetAtom(socketStatusAtom);
 
     useEffect(() => {
+        const iframe = iframeRef.current;
+        if (!iframe) {
+            return;
+        }
+
         const handleEvent = (event) => {
             setSocketStatus(event.detail.status);
         };
 
-        const iframe = iframeRef.current;
-        if (iframe && iframe.contentWindow && 'addEventListener' in iframe.contentWindow) {
-            iframe.contentWindow.addEventListener('ws-terminal', handleEvent);
-        }
+        const attachListener = () => {
+            if (iframe.contentWindow && 'addEventListener' in iframe.contentWindow) {
+                iframe.contentWindow.addEventListener('ws-terminal', handleEvent);
+            }
+        };
+
+        attachListener();
+        iframe.addEventListener('load', attachListener);
 
         return () => {
-            if (iframe && iframe.contentWindow) {
+            iframe.removeEventListener('load', attachListener);
+            if (iframe.contentWindow) {
                 iframe.contentWindow.removeEventListener('ws-terminal', handleEvent);
             }
         };
