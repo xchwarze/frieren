@@ -10,7 +10,7 @@ import Collapse from 'react-bootstrap/Collapse';
 import { useAtomValue } from 'jotai'
 
 import terminalStatusAtom from '@src/features/terminal/atoms/terminalStatusAtom.js';
-import terminalThemeAtom from '@src/features/terminal/atoms/terminalThemeAtom.js';
+import terminalSettingsAtom from '@src/features/terminal/atoms/terminalSettingsAtom.js';
 import collapseStatusAtom from '@src/features/terminal/atoms/collapseStatusAtom.js';
 import { TERMINAL_THEMES } from '@src/features/terminal/helpers/terminalThemes.js';
 import useTerminal from '@src/features/terminal/hooks/useTerminal.js';
@@ -27,14 +27,14 @@ const DEFAULT_HEIGHT = 200;
  */
 const TerminalPanel = () => {
     const collapseStatus = useAtomValue(collapseStatusAtom);
-    const themeName = useAtomValue(terminalThemeAtom);
+    const { terminalTheme } = useAtomValue(terminalSettingsAtom);
     const containerRef = useRef(null);
 
     useTerminal(containerRef);
 
     const terminalBg = useMemo(
-        () => (TERMINAL_THEMES[themeName] ?? TERMINAL_THEMES.default).background,
-        [themeName],
+        () => (TERMINAL_THEMES[terminalTheme] ?? TERMINAL_THEMES.default).background,
+        [terminalTheme],
     );
 
     return (

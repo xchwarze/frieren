@@ -118,6 +118,22 @@ export class FrierenTerminal {
         this.terminal.options.theme = theme;
     }
 
+    setOptions(options: Partial<ITerminalOptions>) {
+        const { terminal, fitAddon } = this;
+        let needsFit = false;
+
+        for (const [key, value] of Object.entries(options)) {
+            (terminal.options as Record<string, unknown>)[key] = value;
+            if (key.startsWith('font')) {
+                needsFit = true;
+            }
+        }
+
+        if (needsFit) {
+            fitAddon.fit();
+        }
+    }
+
     dispose() {
         this.doReconnect = false;
         this.socket?.close(1000);

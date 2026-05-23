@@ -188,6 +188,82 @@ class ModuleOpenWrtHelper
     }
 
     /**
+     * Retrieves the terminal font size.
+     *
+     * @return int The font size value.
+     */
+    public static function getTerminalFontSize()
+    {
+        return (int) OpenWrtHelper::uciGet('frieren.@settings[0].terminal_font_size');
+    }
+
+    /**
+     * Sets the terminal font size.
+     *
+     * @param int $size The font size to set.
+     * @return bool Whether the setting was successfully saved.
+     */
+    public static function setTerminalFontSize($size)
+    {
+        $value = (string) max(8, min(32, (int) $size));
+        OpenWrtHelper::uciSet('frieren.@settings[0].terminal_font_size', $value);
+
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_font_size') === $value;
+    }
+
+    /**
+     * Retrieves the terminal cursor style.
+     *
+     * @return string The cursor style (block, underline, bar).
+     */
+    public static function getTerminalCursorStyle()
+    {
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_style');
+    }
+
+    /**
+     * Sets the terminal cursor style.
+     *
+     * @param string $style The cursor style to set.
+     * @return bool Whether the setting was successfully saved.
+     */
+    public static function setTerminalCursorStyle($style)
+    {
+        $allowed = ['block', 'underline', 'bar'];
+        if (!in_array($style, $allowed, true)) {
+            return false;
+        }
+
+        OpenWrtHelper::uciSet('frieren.@settings[0].terminal_cursor_style', $style);
+
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_style') === $style;
+    }
+
+    /**
+     * Retrieves the terminal cursor blink setting.
+     *
+     * @return bool Whether cursor blink is enabled.
+     */
+    public static function getTerminalCursorBlink()
+    {
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_blink') === '1';
+    }
+
+    /**
+     * Sets the terminal cursor blink setting.
+     *
+     * @param bool $enabled Whether to enable cursor blink.
+     * @return bool Whether the setting was successfully saved.
+     */
+    public static function setTerminalCursorBlink($enabled)
+    {
+        $value = $enabled ? '1' : '0';
+        OpenWrtHelper::uciSet('frieren.@settings[0].terminal_cursor_blink', $value);
+
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_blink') === $value;
+    }
+
+    /**
      * Retrieves the section data for the current settings.
      *
      * This function returns an array containing the following data:
@@ -205,6 +281,9 @@ class ModuleOpenWrtHelper
             'theme' => OpenWrtHelper::uciGet('frieren.@settings[0].theme'),
             'terminalAutologin' => self::getTerminalAutologin(),
             'terminalTheme' => self::getTerminalTheme(),
+            'fontSize' => self::getTerminalFontSize(),
+            'cursorStyle' => self::getTerminalCursorStyle(),
+            'cursorBlink' => self::getTerminalCursorBlink(),
         ];
     }
 }

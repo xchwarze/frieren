@@ -6,6 +6,11 @@
  */
 import { atomWithStorage } from 'jotai/utils';
 
-const terminalThemeAtom = atomWithStorage('terminal-theme', 'default');
+const terminalSettingsAtom = atomWithStorage('terminal-settings', {
+    terminalTheme: 'default',
+    fontSize: 13,
+    cursorStyle: 'block',
+    cursorBlink: false,
+});
 
-export default terminalThemeAtom;
+export default terminalSettingsAtom;

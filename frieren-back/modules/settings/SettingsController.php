@@ -74,10 +74,15 @@ class SettingsController extends \frieren\core\Controller
     public function setTerminalSettings()
     {
         $helper = self::setupModuleHelper();
-        $themeOk = $helper::setTerminalTheme($this->request['terminalTheme']);
-        $autologinOk = $helper::setTerminalAutologin($this->request['terminalAutologin']);
+        $results = [
+            $helper::setTerminalTheme($this->request['terminalTheme']),
+            $helper::setTerminalFontSize($this->request['fontSize']),
+            $helper::setTerminalCursorStyle($this->request['cursorStyle']),
+            $helper::setTerminalCursorBlink($this->request['cursorBlink']),
+            $helper::setTerminalAutologin($this->request['terminalAutologin']),
+        ];
 
-        if ($themeOk && $autologinOk) {
+        if (!in_array(false, $results, true)) {
             return self::setSuccess();
         }
 

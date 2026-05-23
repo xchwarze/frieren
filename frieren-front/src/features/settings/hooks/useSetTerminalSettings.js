@@ -7,29 +7,32 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 
-import terminalThemeAtom from '@src/features/terminal/atoms/terminalThemeAtom.js';
+import terminalSettingsAtom from '@src/features/terminal/atoms/terminalSettingsAtom.js';
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
 import { SETTINGS_GET_FORM_VALUES } from '@src/features/settings/helpers/queryKeys.js';
 
 /**
- * Hook to save terminal settings (theme + autologin) in a single request.
+ * Hook to save all terminal settings in a single request.
  *
  * @return {Function} The mutation hook.
  */
 const useSetTerminalSettings = () => {
     const queryClient = useQueryClient();
-    const setTerminalTheme = useSetAtom(terminalThemeAtom);
+    const setTerminalSettings = useSetAtom(terminalSettingsAtom);
 
     return useAuthenticatedMutation({
-        mutationFn: ({ terminalTheme, terminalAutologin }) => fetchPost({
+        mutationFn: ({ terminalTheme, fontSize, cursorStyle, cursorBlink, terminalAutologin }) => fetchPost({
             module: 'settings',
             action: 'setTerminalSettings',
             terminalTheme,
+            fontSize,
+            cursorStyle,
+            cursorBlink,
             terminalAutologin,
         }),
-        onSuccess: (data, { terminalTheme }) => {
-            setTerminalTheme(terminalTheme);
+        onSuccess: (data, { terminalTheme, fontSize, cursorStyle, cursorBlink }) => {
+            setTerminalSettings({ terminalTheme, fontSize, cursorStyle, cursorBlink });
             queryClient.invalidateQueries({
                 queryKey: [SETTINGS_GET_FORM_VALUES],
             });

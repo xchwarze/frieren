@@ -11,12 +11,22 @@ import { TERMINAL_THEME_OPTIONS } from '@src/features/terminal/helpers/terminalT
 import useSetTerminalSettings from '@src/features/settings/hooks/useSetTerminalSettings.js';
 import PanelCard from '@src/components/PanelCard';
 import FormProvider from '@src/components/Form/FormProvider';
+import InputField from '@src/components/Form/InputField';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
 import SubmitButton from '@src/components/Form/SubmitButton';
 
+const CURSOR_STYLE_OPTIONS = [
+    { value: 'block', label: 'Block' },
+    { value: 'underline', label: 'Underline' },
+    { value: 'bar', label: 'Bar' },
+];
+
 const terminalSettingsSchema = yup.object({
     terminalTheme: yup.string().required('Theme selection is mandatory'),
+    fontSize: yup.number().min(8, 'Minimum 8').max(32, 'Maximum 32').required('Font size is required'),
+    cursorStyle: yup.string().oneOf(['block', 'underline', 'bar']).required(),
+    cursorBlink: yup.boolean(),
     terminalAutologin: yup.boolean(),
 }).required();
 
@@ -31,6 +41,9 @@ const TerminalSettingsCard = ({ query }) => {
 
     const defaultValues = {
         terminalTheme: query?.data?.terminalTheme ?? 'default',
+        fontSize: query?.data?.fontSize ?? 13,
+        cursorStyle: query?.data?.cursorStyle ?? 'block',
+        cursorBlink: query?.data?.cursorBlink ?? false,
         terminalAutologin: query?.data?.terminalAutologin ?? false,
     };
 
@@ -45,6 +58,22 @@ const TerminalSettingsCard = ({ query }) => {
                     name={'terminalTheme'}
                     label={'Terminal Theme'}
                     options={TERMINAL_THEME_OPTIONS}
+                />
+                <InputField
+                    name={'fontSize'}
+                    label={'Font Size'}
+                    type={'number'}
+                    min={8}
+                    max={32}
+                />
+                <SelectField
+                    name={'cursorStyle'}
+                    label={'Cursor Style'}
+                    options={CURSOR_STYLE_OPTIONS}
+                />
+                <SwitchField
+                    name={'cursorBlink'}
+                    label={'Cursor Blink'}
                 />
                 <SwitchField
                     name={'terminalAutologin'}

@@ -9,7 +9,7 @@ import { useAtomValue } from 'jotai';
 import { FrierenTerminal } from '@frieren/terminal-core';
 import '@frieren/terminal-core/index.css';
 
-import terminalThemeAtom from '@src/features/terminal/atoms/terminalThemeAtom.js';
+import terminalSettingsAtom from '@src/features/terminal/atoms/terminalSettingsAtom.js';
 import { TERMINAL_THEMES } from '@src/features/terminal/helpers/terminalThemes.js';
 
 const WS_PORT = 1477;
@@ -22,14 +22,15 @@ const buildWsUrl = () => {
 /**
  * Hook that creates and manages a FrierenTerminal instance attached to a container element.
  * Handles terminal lifecycle (open, connect, dispose) and auto-fits on container resize.
- * Applies the selected terminal theme and updates it live when changed.
+ * Applies terminal settings (theme, font size, cursor) and updates them live when changed.
  *
  * @param {React.RefObject<HTMLDivElement>} containerRef - Reference to the container element.
  * @return {React.RefObject<FrierenTerminal>} Reference to the terminal instance.
  */
 const useTerminal = (containerRef) => {
     const terminalRef = useRef(null);
-    const themeName = useAtomValue(terminalThemeAtom);
+    const settings = useAtomValue(terminalSettingsAtom);
+    const { terminalTheme, fontSize, cursorStyle, cursorBlink } = settings;
 
     useEffect(() => {
         const container = containerRef.current;
@@ -37,10 +38,10 @@ const useTerminal = (containerRef) => {
             return;
         }
 
-        const theme = TERMINAL_THEMES[themeName] ?? TERMINAL_THEMES.default;
+        const theme = TERMINAL_THEMES[terminalTheme] ?? TERMINAL_THEMES.default;
         const term = new FrierenTerminal({
             wsUrl: buildWsUrl(),
-            termOptions: { theme },
+            termOptions: { theme, fontSize, cursorStyle, cursorBlink },
         });
 
         term.open(container);
@@ -72,9 +73,10 @@ const useTerminal = (containerRef) => {
             return;
         }
 
-        const theme = TERMINAL_THEMES[themeName] ?? TERMINAL_THEMES.default;
+        const theme = TERMINAL_THEMES[terminalTheme] ?? TERMINAL_THEMES.default;
         term.setTheme(theme);
-    }, [themeName]);
+        term.setOptions({ fontSize, cursorStyle, cursorBlink });
+    }, [terminalTheme, fontSize, cursorStyle, cursorBlink]);
 
     return terminalRef;
 };
