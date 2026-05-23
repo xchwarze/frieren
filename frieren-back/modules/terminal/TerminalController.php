@@ -33,11 +33,6 @@ class TerminalController extends \frieren\core\Controller
 
     public function startTerminal()
     {
-        /*if (!OpenWrtHelper::uciGet("ttyd.@ttyd[0].port")) {
-            OpenWrtHelper::uciSet("ttyd.@ttyd[0].port", "1477");
-            //$this->uciSet("ttyd.@ttyd[0].index", "/pineapple/modules/Terminal/ttyd/iframe.html");
-            exec("/etc/init.d/ttyd disable");
-        }*/
         exec("/etc/init.d/ttyd disable");
 
         $terminal = $this->getTerminalPath();
