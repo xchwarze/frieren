@@ -61,8 +61,6 @@ export class FrierenTerminal {
 
     private socket?: WebSocket;
     private opened = false;
-    private title?: string;
-    private titleFixed?: string;
     private resizeOverlay = true;
     private reconnect = true;
     private doReconnect = true;
@@ -208,8 +206,6 @@ export class FrierenTerminal {
                 this.writeFunc(data);
                 break;
             case ServerCommand.SET_WINDOW_TITLE:
-                this.title = textDecoder.decode(data);
-                document.title = this.title;
                 break;
             case ServerCommand.SET_PREFERENCES:
                 this.applyPreferences({
@@ -225,20 +221,13 @@ export class FrierenTerminal {
 
     private initListeners = () => {
         const { terminal, fitAddon, overlayAddon, register } = this;
-        register(
-            terminal.onTitleChange(data => {
-                if (data && data !== '' && !this.titleFixed) {
-                    document.title = data + ' | ' + this.title;
-                }
-            })
-        );
         register(terminal.onData(data => this.sendData(data)));
         register(terminal.onBinary(data => this.sendData(Uint8Array.from(data, v => v.charCodeAt(0)))));
         register(
             terminal.onResize(({ cols, rows }) => {
                 const msg = JSON.stringify({ columns: cols, rows: rows });
                 this.socket?.send(this.textEncoder.encode(ClientCommand.RESIZE_TERMINAL + msg));
-                if (this.resizeOverlay) overlayAddon.showOverlay(`${cols}x${rows}`, 300);
+                if (this.resizeOverlay) this.overlayAddon?.showOverlay(`${cols}x${rows}`, 300);
             })
         );
         register(
@@ -349,9 +338,6 @@ export class FrierenTerminal {
                 case 'isWindows':
                     break;
                 case 'titleFixed':
-                    if (!value || value === '') return;
-                    this.titleFixed = value as string;
-                    document.title = value as string;
                     break;
                 case 'unicodeVersion':
                     if (value === 11 || value === '11') {
