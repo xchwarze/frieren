@@ -36,7 +36,6 @@ export const DEFAULT_CLIENT_OPTIONS: ClientOptions = {
     disableResizeOverlay: false,
     enableZmodem: false,
     enableTrzsz: false,
-    enableSixel: false,
     isWindows: false,
     trzszDragInitTimeout: 0,
     unicodeVersion: '11',

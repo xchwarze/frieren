@@ -11,9 +11,7 @@
   },
   "dependencies": {
     "ttyd": "https://github.com/tsl0922/ttyd.git#1.7.7",
-    "@xterm/addon-canvas": "^0.6.0",
     "@xterm/addon-fit": "^0.9.0",
-    "@xterm/addon-image": "^0.7.0",
     "@xterm/addon-unicode11": "^0.7.0",
     "@xterm/addon-web-links": "^0.10.0",
     "@xterm/addon-webgl": "^0.17.0",

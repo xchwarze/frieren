@@ -1,10 +1,8 @@
 import type { IDisposable, ITerminalOptions, ITheme } from '@xterm/xterm';
 import { Terminal } from '@xterm/xterm';
-import { CanvasAddon } from '@xterm/addon-canvas';
 import { WebglAddon } from '@xterm/addon-webgl';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
-import { ImageAddon } from '@xterm/addon-image';
 import { Unicode11Addon } from '@xterm/addon-unicode11';
 import { OverlayAddon } from 'ttyd/html/src/components/terminal/xterm/addons/overlay';
 import { ZmodemAddon } from 'ttyd/html/src/components/terminal/xterm/addons/zmodem';
@@ -59,7 +57,6 @@ export class FrierenTerminal {
     private fitAddon = new FitAddon();
     private overlayAddon = new OverlayAddon();
     private webglAddon?: WebglAddon;
-    private canvasAddon?: CanvasAddon;
     private zmodemAddon?: ZmodemAddon;
 
     private socket?: WebSocket;
@@ -351,11 +348,6 @@ export class FrierenTerminal {
                 case 'trzszDragInitTimeout':
                 case 'isWindows':
                     break;
-                case 'enableSixel':
-                    if (value) {
-                        terminal.loadAddon(register(new ImageAddon()));
-                    }
-                    break;
                 case 'titleFixed':
                     if (!value || value === '') return;
                     this.titleFixed = value as string;
@@ -382,43 +374,26 @@ export class FrierenTerminal {
 
     private setRendererType(value: RendererType) {
         const { terminal } = this;
-        const disposeCanvas = () => {
-            try { this.canvasAddon?.dispose(); } catch { /* ignore */ }
-            this.canvasAddon = undefined;
-        };
         const disposeWebgl = () => {
             try { this.webglAddon?.dispose(); } catch { /* ignore */ }
             this.webglAddon = undefined;
         };
-        const enableCanvas = () => {
-            if (this.canvasAddon) return;
-            this.canvasAddon = new CanvasAddon();
-            disposeWebgl();
-            try {
-                terminal.loadAddon(this.canvasAddon);
-            } catch {
-                disposeCanvas();
-            }
-        };
         const enableWebgl = () => {
             if (this.webglAddon) return;
             this.webglAddon = new WebglAddon();
-            disposeCanvas();
             try {
                 this.webglAddon.onContextLoss(() => this.webglAddon?.dispose());
                 terminal.loadAddon(this.webglAddon);
             } catch {
                 disposeWebgl();
-                enableCanvas();
             }
         };
 
         switch (value) {
-            case 'canvas': enableCanvas(); break;
+            case 'canvas':
             case 'webgl': enableWebgl(); break;
             case 'dom':
                 disposeWebgl();
-                disposeCanvas();
                 break;
         }
     }

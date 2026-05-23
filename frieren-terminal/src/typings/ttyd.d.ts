@@ -39,7 +39,6 @@ declare module 'ttyd/html/src/components/terminal/xterm' {
         disableResizeOverlay: boolean;
         enableZmodem: boolean;
         enableTrzsz: boolean;
-        enableSixel: boolean;
         isWindows: boolean;
         trzszDragInitTimeout: number;
         unicodeVersion: string;

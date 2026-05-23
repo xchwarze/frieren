@@ -35,6 +35,13 @@ src/
     └── ttyd.d.ts     # Type declarations for ttyd dependency imports
 ```
 
+## Disabled features
+
+The following ttyd features are disabled to reduce bundle size:
+
+- **Sixel image rendering** (`@xterm/addon-image`) — inline image display in terminal
+- **Canvas renderer** (`@xterm/addon-canvas`) — falls back to DOM renderer if WebGL is unavailable
+
 ## Development
 
 ```bash
