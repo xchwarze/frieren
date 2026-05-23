@@ -70,7 +70,7 @@ const TerminalPanel = () => {
                         width: '100%',
                         height: DEFAULT_HEIGHT,
                     }}
-                    className={'pt-2 px-2 pb-4'}
+                    className={'p-2'}
                 />
             </Resizable>
         </Collapse>
