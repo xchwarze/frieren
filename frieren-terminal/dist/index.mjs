@@ -8353,47 +8353,17 @@ function requireDecko() {
   return decko;
 }
 var deckoExports = requireDecko();
-var __create$1 = Object.create;
-var __defProp$1 = Object.defineProperty;
-var __getOwnPropDesc$1 = Object.getOwnPropertyDescriptor;
-var __knownSymbol$1 = (name2, symbol) => (symbol = Symbol[name2]) ? symbol : /* @__PURE__ */ Symbol.for("Symbol." + name2);
-var __typeError$1 = (msg) => {
-  throw TypeError(msg);
-};
-var __defNormalProp$1 = (obj, key, value) => key in obj ? __defProp$1(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __decoratorStart$1 = (base) => [, , , __create$1(null)];
-var __decoratorStrings$1 = ["class", "method", "getter", "setter", "accessor", "field", "value", "get", "set"];
-var __expectFn$1 = (fn) => fn !== void 0 && typeof fn !== "function" ? __typeError$1("Function expected") : fn;
-var __decoratorContext$1 = (kind, name2, done, metadata, fns) => ({ kind: __decoratorStrings$1[kind], name: name2, metadata, addInitializer: (fn) => done._ ? __typeError$1("Already initialized") : fns.push(__expectFn$1(fn || null)) });
-var __decoratorMetadata$1 = (array, target) => __defNormalProp$1(target, __knownSymbol$1("metadata"), array[3]);
-var __runInitializers$1 = (array, flags, self2, value) => {
-  for (var i2 = 0, fns = array[flags >> 1], n2 = fns && fns.length; i2 < n2; i2++) fns[i2].call(self2);
-  return value;
-};
-var __decorateElement$1 = (array, flags, name2, decorators, target, extra) => {
-  var it2, done, ctx, access, k2 = flags & 7, s2 = false, p2 = false;
-  var j2 = 2, key = __decoratorStrings$1[k2 + 5];
-  var extraInitializers = array[j2] || (array[j2] = []);
-  var desc = (target = target.prototype, __getOwnPropDesc$1(target, name2));
-  for (var i2 = decorators.length - 1; i2 >= 0; i2--) {
-    ctx = __decoratorContext$1(k2, name2, done = {}, array[3], extraInitializers);
-    {
-      ctx.static = s2, ctx.private = p2, access = ctx.access = { has: (x2) => name2 in x2 };
-      access.get = (x2) => x2[name2];
-    }
-    it2 = (0, decorators[i2])(desc[key], ctx), done._ = 1;
-    __expectFn$1(it2) && (desc[key] = it2);
-  }
-  return desc && __defProp$1(target, name2, desc), target;
-};
-var _showOverlay_dec, _init$1;
-_showOverlay_dec = [deckoExports.bind];
-class OverlayAddon {
+var _class$1;
+function _applyDecoratedDescriptor$1(i2, e2, r2, n2, l2) {
+  var a2 = {};
+  return Object.keys(n2).forEach(function(i22) {
+    a2[i22] = n2[i22];
+  }), a2.enumerable = !!a2.enumerable, a2.configurable = !!a2.configurable, ("value" in a2 || a2.initializer) && (a2.writable = true), a2 = r2.slice().reverse().reduce(function(r22, n22) {
+    return n22(i2, e2, r22) || r22;
+  }, a2), l2 && void 0 !== a2.initializer && (a2.value = a2.initializer ? a2.initializer.call(l2) : void 0, a2.initializer = void 0), void 0 === a2.initializer ? (Object.defineProperty(i2, e2, a2), null) : a2;
+}
+let OverlayAddon = (_class$1 = class OverlayAddon2 {
   constructor() {
-    __runInitializers$1(_init$1, 5, this);
-    this.terminal = void 0;
-    this.overlayNode = void 0;
-    this.overlayTimeout = void 0;
     this.overlayNode = document.createElement("div");
     this.overlayNode.style.cssText = `border-radius: 15px;
 font-size: xx-large;
@@ -8404,14 +8374,10 @@ position: absolute;
 -webkit-transition: opacity 180ms ease-in;
 -moz-user-select: none;
 -moz-transition: opacity 180ms ease-in;`;
-    this.overlayNode.addEventListener(
-      "mousedown",
-      (e2) => {
-        e2.preventDefault();
-        e2.stopPropagation();
-      },
-      true
-    );
+    this.overlayNode.addEventListener("mousedown", (e2) => {
+      e2.preventDefault();
+      e2.stopPropagation();
+    }, true);
   }
   activate(terminal) {
     this.terminal = terminal;
@@ -8419,7 +8385,10 @@ position: absolute;
   dispose() {
   }
   showOverlay(msg, timeout) {
-    const { terminal, overlayNode } = this;
+    const {
+      terminal,
+      overlayNode
+    } = this;
     if (!terminal.element) return;
     overlayNode.style.color = "#101010";
     overlayNode.style.backgroundColor = "#f0f0f0";
@@ -8445,10 +8414,7 @@ position: absolute;
       }, 200);
     }, timeout || 1500);
   }
-}
-_init$1 = __decoratorStart$1();
-__decorateElement$1(_init$1, 1, "showOverlay", _showOverlay_dec, OverlayAddon);
-__decoratorMetadata$1(_init$1, OverlayAddon);
+}, _applyDecoratedDescriptor$1(_class$1.prototype, "showOverlay", [deckoExports.bind], Object.getOwnPropertyDescriptor(_class$1.prototype, "showOverlay"), _class$1.prototype), _class$1);
 var FileSaver_min$1 = { exports: {} };
 var FileSaver_min = FileSaver_min$1.exports;
 var hasRequiredFileSaver_min;
@@ -14119,51 +14085,19 @@ class fr {
     });
   }
 }
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __knownSymbol = (name2, symbol) => (symbol = Symbol[name2]) ? symbol : /* @__PURE__ */ Symbol.for("Symbol." + name2);
-var __typeError = (msg) => {
-  throw TypeError(msg);
-};
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __decoratorStart = (base) => [, , , __create(null)];
-var __decoratorStrings = ["class", "method", "getter", "setter", "accessor", "field", "value", "get", "set"];
-var __expectFn = (fn) => fn !== void 0 && typeof fn !== "function" ? __typeError("Function expected") : fn;
-var __decoratorContext = (kind, name2, done, metadata, fns) => ({ kind: __decoratorStrings[kind], name: name2, metadata, addInitializer: (fn) => done._ ? __typeError("Already initialized") : fns.push(__expectFn(fn || null)) });
-var __decoratorMetadata = (array, target) => __defNormalProp(target, __knownSymbol("metadata"), array[3]);
-var __runInitializers = (array, flags, self2, value) => {
-  for (var i2 = 0, fns = array[flags >> 1], n2 = fns && fns.length; i2 < n2; i2++) fns[i2].call(self2);
-  return value;
-};
-var __decorateElement = (array, flags, name2, decorators, target, extra) => {
-  var it2, done, ctx, access, k2 = flags & 7, s2 = false, p2 = false;
-  var j2 = 2, key = __decoratorStrings[k2 + 5];
-  var extraInitializers = array[j2] || (array[j2] = []);
-  var desc = (target = target.prototype, __getOwnPropDesc(target, name2));
-  for (var i2 = decorators.length - 1; i2 >= 0; i2--) {
-    ctx = __decoratorContext(k2, name2, done = {}, array[3], extraInitializers);
-    {
-      ctx.static = s2, ctx.private = p2, access = ctx.access = { has: (x2) => name2 in x2 };
-      access.get = (x2) => x2[name2];
-    }
-    it2 = (0, decorators[i2])(desc[key], ctx), done._ = 1;
-    __expectFn(it2) && (desc[key] = it2);
-  }
-  return desc && __defProp(target, name2, desc), target;
-};
-var _writeProgress_dec, _receiveFile_dec, _sendFile_dec, _zmodemDetect_dec, _zmodemInit_dec, _trzszInit_dec, _reset_dec, _init;
-_reset_dec = [deckoExports.bind], _trzszInit_dec = [deckoExports.bind], _zmodemInit_dec = [deckoExports.bind], _zmodemDetect_dec = [deckoExports.bind], _sendFile_dec = [deckoExports.bind], _receiveFile_dec = [deckoExports.bind], _writeProgress_dec = [deckoExports.bind];
-class ZmodemAddon {
+var _class;
+function _applyDecoratedDescriptor(i2, e2, r2, n2, l2) {
+  var a2 = {};
+  return Object.keys(n2).forEach(function(i22) {
+    a2[i22] = n2[i22];
+  }), a2.enumerable = !!a2.enumerable, a2.configurable = !!a2.configurable, ("value" in a2 || a2.initializer) && (a2.writable = true), a2 = r2.slice().reverse().reduce(function(r22, n22) {
+    return n22(i2, e2, r22) || r22;
+  }, a2), l2 && void 0 !== a2.initializer && (a2.value = a2.initializer ? a2.initializer.call(l2) : void 0, a2.initializer = void 0), void 0 === a2.initializer ? (Object.defineProperty(i2, e2, a2), null) : a2;
+}
+let ZmodemAddon = (_class = class ZmodemAddon2 {
   constructor(options) {
-    this.options = options;
-    __runInitializers(_init, 5, this);
     this.disposables = [];
-    this.terminal = void 0;
-    this.sentry = void 0;
-    this.session = void 0;
-    this.denier = void 0;
-    this.trzszFilter = void 0;
+    this.options = options;
   }
   activate(terminal) {
     this.terminal = terminal;
@@ -14194,11 +14128,19 @@ class ZmodemAddon {
   }
   addDisposableListener(target, type, listener) {
     target.addEventListener(type, listener);
-    this.disposables.push({ dispose: () => target.removeEventListener(type, listener) });
+    this.disposables.push({
+      dispose: () => target.removeEventListener(type, listener)
+    });
   }
   trzszInit() {
-    const { terminal } = this;
-    const { sender, writer, zmodem: zmodem2 } = this.options;
+    const {
+      terminal
+    } = this;
+    const {
+      sender,
+      writer,
+      zmodem: zmodem2
+    } = this.options;
     this.trzszFilter = new fr({
       writeToTerminal: (data) => {
         if (!this.trzszFilter.isTransferringFiles() && zmodem2) {
@@ -14221,8 +14163,15 @@ class ZmodemAddon {
     this.disposables.push(terminal.onResize((size) => this.trzszFilter.setTerminalColumns(size.cols)));
   }
   zmodemInit() {
-    const { sender, writer } = this.options;
-    const { terminal, reset, zmodemDetect } = this;
+    const {
+      sender,
+      writer
+    } = this.options;
+    const {
+      terminal,
+      reset,
+      zmodemDetect
+    } = this;
     this.session = null;
     this.sentry = new zmodem_browserExports.Sentry({
       to_terminal: (octets) => writer(new Uint8Array(octets)),
@@ -14230,17 +14179,18 @@ class ZmodemAddon {
       on_retract: () => reset(),
       on_detect: (detection) => zmodemDetect(detection)
     });
-    this.disposables.push(
-      terminal.onKey((e2) => {
-        const event = e2.domEvent;
-        if (event.ctrlKey && event.key === "c") {
-          if (this.denier) this.denier();
-        }
-      })
-    );
+    this.disposables.push(terminal.onKey((e2) => {
+      const event = e2.domEvent;
+      if (event.ctrlKey && event.key === "c") {
+        if (this.denier) this.denier();
+      }
+    }));
   }
   zmodemDetect(detection) {
-    const { terminal, receiveFile } = this;
+    const {
+      terminal,
+      receiveFile
+    } = this;
     terminal.options.disableStdin = true;
     this.denier = () => detection.deny();
     this.session = detection.confirm();
@@ -14252,24 +14202,34 @@ class ZmodemAddon {
     }
   }
   sendFile(files) {
-    const { session, writeProgress } = this;
+    const {
+      session,
+      writeProgress
+    } = this;
     zmodem_browserExports.Browser.send_files(session, files, {
       on_progress: (_2, offer) => writeProgress(offer)
     }).then(() => session.close()).catch(() => this.reset());
   }
   receiveFile() {
-    const { session, writeProgress } = this;
+    const {
+      session,
+      writeProgress
+    } = this;
     session.on("offer", (offer) => {
       offer.on("input", () => writeProgress(offer));
       offer.accept().then((payloads) => {
-        const blob = new Blob(payloads, { type: "application/octet-stream" });
+        const blob = new Blob(payloads, {
+          type: "application/octet-stream"
+        });
         FileSaver_minExports.saveAs(blob, offer.get_details().name);
       }).catch(() => this.reset());
     });
     session.start();
   }
   writeProgress(offer) {
-    const { bytesHuman } = this;
+    const {
+      bytesHuman
+    } = this;
     const file = offer.get_details();
     const name2 = file.name;
     const size = file.size;
@@ -14289,16 +14249,7 @@ class ZmodemAddon {
     const value = (bytes / Math.pow(1024, Math.floor(num))).toFixed(precision);
     return `${value} ${units[num]}`;
   }
-}
-_init = __decoratorStart();
-__decorateElement(_init, 1, "reset", _reset_dec, ZmodemAddon);
-__decorateElement(_init, 1, "trzszInit", _trzszInit_dec, ZmodemAddon);
-__decorateElement(_init, 1, "zmodemInit", _zmodemInit_dec, ZmodemAddon);
-__decorateElement(_init, 1, "zmodemDetect", _zmodemDetect_dec, ZmodemAddon);
-__decorateElement(_init, 1, "sendFile", _sendFile_dec, ZmodemAddon);
-__decorateElement(_init, 1, "receiveFile", _receiveFile_dec, ZmodemAddon);
-__decorateElement(_init, 1, "writeProgress", _writeProgress_dec, ZmodemAddon);
-__decoratorMetadata(_init, ZmodemAddon);
+}, _applyDecoratedDescriptor(_class.prototype, "reset", [deckoExports.bind], Object.getOwnPropertyDescriptor(_class.prototype, "reset"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "trzszInit", [deckoExports.bind], Object.getOwnPropertyDescriptor(_class.prototype, "trzszInit"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "zmodemInit", [deckoExports.bind], Object.getOwnPropertyDescriptor(_class.prototype, "zmodemInit"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "zmodemDetect", [deckoExports.bind], Object.getOwnPropertyDescriptor(_class.prototype, "zmodemDetect"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "sendFile", [deckoExports.bind], Object.getOwnPropertyDescriptor(_class.prototype, "sendFile"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "receiveFile", [deckoExports.bind], Object.getOwnPropertyDescriptor(_class.prototype, "receiveFile"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "writeProgress", [deckoExports.bind], Object.getOwnPropertyDescriptor(_class.prototype, "writeProgress"), _class.prototype), _class);
 const DEFAULT_THEME = {
   foreground: "#d2d2d2",
   background: "#2b2b2b",
