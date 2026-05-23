@@ -51,20 +51,7 @@ const useTerminal = (containerRef) => {
         term.connect();
         terminalRef.current = term;
 
-        let rafId = null;
-        const resizeObserver = new ResizeObserver(() => {
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-            }
-            rafId = requestAnimationFrame(() => term.fit());
-        });
-        resizeObserver.observe(container);
-
         return () => {
-            resizeObserver.disconnect();
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-            }
             term.dispose();
             container.innerHTML = '';
             terminalRef.current = null;

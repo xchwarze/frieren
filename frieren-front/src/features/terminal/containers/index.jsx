@@ -31,7 +31,7 @@ const TerminalPanel = () => {
     const { terminalTheme } = useAtomValue(terminalSettingsAtom);
     const containerRef = useRef(null);
 
-    useTerminal(containerRef);
+    const terminalRef = useTerminal(containerRef);
 
     const terminalBg = useMemo(
         () => (TERMINAL_THEMES[terminalTheme] ?? TERMINAL_THEMES.default).background,
@@ -41,6 +41,9 @@ const TerminalPanel = () => {
     return (
         <Collapse in={collapseStatus}>
             <Resizable
+                style={{
+                    backgroundColor: terminalBg,
+                }}
                 defaultSize={{
                     width: '100%',
                     height: DEFAULT_HEIGHT,
@@ -52,13 +55,20 @@ const TerminalPanel = () => {
 
                 // fix shitty bug with width calculation
                 maxWidth={'100%'}
+                onResizeStop={(event, direction, elementRef, delta) => {
+                    // update panel height
+                    const currentHeight = parseInt(containerRef.current.style.height);
+                    containerRef.current.style.height = `${currentHeight + delta.height}px`;
+
+                    // force fit terminal content
+                    requestAnimationFrame(() => terminalRef.current?.fit());
+                }}
             >
                 <div
                     ref={containerRef}
                     style={{
                         width: '100%',
-                        height: '100%',
-                        backgroundColor: terminalBg,
+                        height: DEFAULT_HEIGHT,
                     }}
                     className={'pt-2 px-2 pb-4'}
                 />
