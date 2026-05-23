@@ -6,6 +6,7 @@
  */
 import { atomWithStorage } from 'jotai/utils';
 
+// Defaults here are only used on first-ever load before startTerminal seeds from UCI config
 const terminalSettingsAtom = atomWithStorage('terminal-settings', {
     terminalTheme: 'default',
     fontSize: 13,

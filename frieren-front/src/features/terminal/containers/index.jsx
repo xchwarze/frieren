@@ -21,7 +21,8 @@ const DEFAULT_HEIGHT = 200;
 
 /**
  * Inner terminal panel that mounts the xterm.js instance.
- * Separated so useTerminal only runs when the container div exists in the DOM.
+ * Separated from Terminal so useTerminal only runs when the container div is in the DOM.
+ * This is required because xterm.js needs a mounted element to attach to during open().
  *
  * @return {ReactElement} The terminal panel
  */

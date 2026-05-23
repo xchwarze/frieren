@@ -22,7 +22,10 @@ const buildWsUrl = () => {
 /**
  * Hook that creates and manages a FrierenTerminal instance attached to a container element.
  * Handles terminal lifecycle (open, connect, dispose) and auto-fits on container resize.
- * Applies terminal settings (theme, font size, cursor) and updates them live when changed.
+ *
+ * Settings (theme, fontSize, cursorStyle, cursorBlink) are included as effect dependencies,
+ * so any change fully destroys and recreates the terminal + websocket connection.
+ * This avoids xterm addon lifecycle bugs that occur when mutating options on a live instance.
  *
  * @param {React.RefObject<HTMLDivElement>} containerRef - Reference to the container element.
  * @return {React.RefObject<FrierenTerminal>} Reference to the terminal instance.
@@ -63,20 +66,11 @@ const useTerminal = (containerRef) => {
                 cancelAnimationFrame(rafId);
             }
             term.dispose();
+            container.innerHTML = '';
             terminalRef.current = null;
         };
-    }, [containerRef]);
-
-    useEffect(() => {
-        const term = terminalRef.current;
-        if (!term) {
-            return;
-        }
-
-        const theme = TERMINAL_THEMES[terminalTheme] ?? TERMINAL_THEMES.default;
-        term.setTheme(theme);
-        term.setOptions({ fontSize, cursorStyle, cursorBlink });
-    }, [terminalTheme, fontSize, cursorStyle, cursorBlink]);
+    // Settings deps trigger full terminal teardown + rebuild (see docblock above)
+    }, [containerRef, terminalTheme, fontSize, cursorStyle, cursorBlink]);
 
     return terminalRef;
 };

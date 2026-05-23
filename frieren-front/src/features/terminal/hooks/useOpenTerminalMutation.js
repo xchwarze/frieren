@@ -14,7 +14,8 @@ import { fetchPost } from '@src/services/fetchService.js';
 
 /**
  * Returns a mutation hook for opening a terminal.
- * On success, syncs terminal settings from the backend response into the local atom.
+ * On success, seeds terminalSettingsAtom from the backend response so the terminal
+ * renders with the UCI-persisted config without needing a separate settings fetch.
  *
  * @return {Function} The mutation hook.
  */

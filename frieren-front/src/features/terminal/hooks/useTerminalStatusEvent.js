@@ -10,7 +10,9 @@ import { useSetAtom } from 'jotai';
 import socketStatusAtom from '@src/features/terminal/atoms/socketStatusAtom.js'
 
 /**
- * Hook that listens for 'ws-terminal' events dispatched by FrierenTerminal and updates the socketStatusAtom.
+ * Bridges FrierenTerminal (framework-agnostic) with React state via CustomEvent.
+ * FrierenTerminal dispatches 'ws-terminal' events on window with connection status changes,
+ * and this hook forwards them into socketStatusAtom so React components can react to them.
  *
  * @return {void}
  */
