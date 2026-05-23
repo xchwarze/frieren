@@ -17,7 +17,7 @@ class SettingsController extends \frieren\core\Controller
         'setDatetimeFromBrowser' => true,
         'setUserPassword' => true,
         'setPanelTheme' => true,
-        'setTerminalAutologin' => true,
+        'setTerminalSettings' => true,
     ];
 
     public function getSectionData()
@@ -71,12 +71,16 @@ class SettingsController extends \frieren\core\Controller
         self::setError('Error changing panel theme.');
     }
 
-    public function setTerminalAutologin()
+    public function setTerminalSettings()
     {
-        if (self::setupModuleHelper()::setTerminalAutologin($this->request['terminalAutologin'])) {
+        $helper = self::setupModuleHelper();
+        $themeOk = $helper::setTerminalTheme($this->request['terminalTheme']);
+        $autologinOk = $helper::setTerminalAutologin($this->request['terminalAutologin']);
+
+        if ($themeOk && $autologinOk) {
             return self::setSuccess();
         }
 
-        self::setError('Error setting terminal autologin.');
+        self::setError('Error saving terminal settings.');
     }
 }

@@ -4,18 +4,19 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Resizable } from 're-resizable';
 import Collapse from 'react-bootstrap/Collapse';
 import { useAtomValue } from 'jotai'
 
 import terminalStatusAtom from '@src/features/terminal/atoms/terminalStatusAtom.js';
+import terminalThemeAtom from '@src/features/terminal/atoms/terminalThemeAtom.js';
 import collapseStatusAtom from '@src/features/terminal/atoms/collapseStatusAtom.js';
+import { TERMINAL_THEMES } from '@src/features/terminal/helpers/terminalThemes.js';
 import useTerminal from '@src/features/terminal/hooks/useTerminal.js';
 import useTerminalStatusEvent from '@src/features/terminal/hooks/useTerminalStatusEvent.js';
 import TerminalHeader from '@src/features/terminal/components/TerminalHeader';
 
-const TERMINAL_BG = '#2b2b2b';
 const DEFAULT_HEIGHT = 200;
 
 /**
@@ -26,9 +27,15 @@ const DEFAULT_HEIGHT = 200;
  */
 const TerminalPanel = () => {
     const collapseStatus = useAtomValue(collapseStatusAtom);
+    const themeName = useAtomValue(terminalThemeAtom);
     const containerRef = useRef(null);
 
     useTerminal(containerRef);
+
+    const terminalBg = useMemo(
+        () => (TERMINAL_THEMES[themeName] ?? TERMINAL_THEMES.default).background,
+        [themeName],
+    );
 
     return (
         <Collapse in={collapseStatus}>
@@ -50,9 +57,9 @@ const TerminalPanel = () => {
                     style={{
                         width: '100%',
                         height: '100%',
-                        backgroundColor: TERMINAL_BG,
+                        backgroundColor: terminalBg,
                     }}
-                    className={'p-2'}
+                    className={'pt-2 px-2 pb-4'}
                 />
             </Resizable>
         </Collapse>
@@ -72,7 +79,7 @@ const Terminal = () => {
     return (
         <>
             {terminalStatus && (
-                <div style={{ backgroundColor: TERMINAL_BG }}>
+                <div>
                     <TerminalHeader />
                     <TerminalPanel />
                 </div>

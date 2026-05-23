@@ -7,13 +7,16 @@
 import * as yup from 'yup';
 import PropTypes from 'prop-types';
 
-import useSetTerminalAutologin from '@src/features/settings/hooks/useSetTerminalAutologin.js';
+import { TERMINAL_THEME_OPTIONS } from '@src/features/terminal/helpers/terminalThemes.js';
+import useSetTerminalSettings from '@src/features/settings/hooks/useSetTerminalSettings.js';
 import PanelCard from '@src/components/PanelCard';
 import FormProvider from '@src/components/Form/FormProvider';
+import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
 import SubmitButton from '@src/components/Form/SubmitButton';
 
 const terminalSettingsSchema = yup.object({
+    terminalTheme: yup.string().required('Theme selection is mandatory'),
     terminalAutologin: yup.boolean(),
 }).required();
 
@@ -24,9 +27,10 @@ const terminalSettingsSchema = yup.object({
  * @return {ReactNode} The Terminal Settings Card component.
  */
 const TerminalSettingsCard = ({ query }) => {
-    const { mutateAsync: setTerminalAutologin } = useSetTerminalAutologin();
+    const { mutateAsync: setTerminalSettings } = useSetTerminalSettings();
 
     const defaultValues = {
+        terminalTheme: query?.data?.terminalTheme ?? 'default',
         terminalAutologin: query?.data?.terminalAutologin ?? false,
     };
 
@@ -36,7 +40,12 @@ const TerminalSettingsCard = ({ query }) => {
             query={query}
             showRefresh={false}
         >
-            <FormProvider schema={terminalSettingsSchema} onSubmit={setTerminalAutologin} defaultValues={defaultValues}>
+            <FormProvider schema={terminalSettingsSchema} onSubmit={setTerminalSettings} defaultValues={defaultValues}>
+                <SelectField
+                    name={'terminalTheme'}
+                    label={'Terminal Theme'}
+                    options={TERMINAL_THEME_OPTIONS}
+                />
                 <SwitchField
                     name={'terminalAutologin'}
                     label={'Use Autologin'}

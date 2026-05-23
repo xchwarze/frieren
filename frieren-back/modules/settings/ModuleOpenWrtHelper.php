@@ -150,6 +150,16 @@ class ModuleOpenWrtHelper
     }
 
     /**
+     * Retrieves the terminal theme setting.
+     *
+     * @return string The terminal theme identifier.
+     */
+    public static function getTerminalTheme()
+    {
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_theme');
+    }
+
+    /**
      * Sets the terminal autologin setting.
      *
      * @param bool $enabled Whether to enable autologin.
@@ -163,6 +173,19 @@ class ModuleOpenWrtHelper
         return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_autologin') === $value;
     }
 
+
+    /**
+     * Sets the terminal theme.
+     *
+     * @param string $theme The theme identifier to set.
+     * @return bool Whether the theme was successfully saved.
+     */
+    public static function setTerminalTheme($theme)
+    {
+        OpenWrtHelper::uciSet('frieren.@settings[0].terminal_theme', $theme);
+
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_theme') === $theme;
+    }
 
     /**
      * Retrieves the section data for the current settings.
@@ -181,6 +204,7 @@ class ModuleOpenWrtHelper
             'timezone' => self::getSystemTimeZone(),
             'theme' => OpenWrtHelper::uciGet('frieren.@settings[0].theme'),
             'terminalAutologin' => self::getTerminalAutologin(),
+            'terminalTheme' => self::getTerminalTheme(),
         ];
     }
 }

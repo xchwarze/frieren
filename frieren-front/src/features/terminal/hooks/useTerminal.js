@@ -5,8 +5,12 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useEffect, useRef } from 'react';
+import { useAtomValue } from 'jotai';
 import { FrierenTerminal } from '@frieren/terminal-core';
 import '@frieren/terminal-core/index.css';
+
+import terminalThemeAtom from '@src/features/terminal/atoms/terminalThemeAtom.js';
+import { TERMINAL_THEMES } from '@src/features/terminal/helpers/terminalThemes.js';
 
 const WS_PORT = 1477;
 
@@ -18,12 +22,14 @@ const buildWsUrl = () => {
 /**
  * Hook that creates and manages a FrierenTerminal instance attached to a container element.
  * Handles terminal lifecycle (open, connect, dispose) and auto-fits on container resize.
+ * Applies the selected terminal theme and updates it live when changed.
  *
  * @param {React.RefObject<HTMLDivElement>} containerRef - Reference to the container element.
  * @return {React.RefObject<FrierenTerminal>} Reference to the terminal instance.
  */
 const useTerminal = (containerRef) => {
     const terminalRef = useRef(null);
+    const themeName = useAtomValue(terminalThemeAtom);
 
     useEffect(() => {
         const container = containerRef.current;
@@ -31,8 +37,10 @@ const useTerminal = (containerRef) => {
             return;
         }
 
+        const theme = TERMINAL_THEMES[themeName] ?? TERMINAL_THEMES.default;
         const term = new FrierenTerminal({
             wsUrl: buildWsUrl(),
+            termOptions: { theme },
         });
 
         term.open(container);
@@ -57,6 +65,16 @@ const useTerminal = (containerRef) => {
             terminalRef.current = null;
         };
     }, [containerRef]);
+
+    useEffect(() => {
+        const term = terminalRef.current;
+        if (!term) {
+            return;
+        }
+
+        const theme = TERMINAL_THEMES[themeName] ?? TERMINAL_THEMES.default;
+        term.setTheme(theme);
+    }, [themeName]);
 
     return terminalRef;
 };

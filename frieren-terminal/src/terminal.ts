@@ -1,4 +1,4 @@
-import type { IDisposable, ITerminalOptions } from '@xterm/xterm';
+import type { IDisposable, ITerminalOptions, ITheme } from '@xterm/xterm';
 import { Terminal } from '@xterm/xterm';
 import { CanvasAddon } from '@xterm/addon-canvas';
 import { WebglAddon } from '@xterm/addon-webgl';
@@ -112,6 +112,10 @@ export class FrierenTerminal {
 
     fit() {
         this.fitAddon.fit();
+    }
+
+    setTheme(theme: ITheme) {
+        this.terminal.options.theme = theme;
     }
 
     dispose() {
