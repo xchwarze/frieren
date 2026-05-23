@@ -52,7 +52,7 @@ const TerminalPanel = () => {
                 enable={{
                     top: collapseStatus,
                 }}
-                maxHeight={'80vh'}
+                maxHeight={'70vh'}
 
                 // fix shitty bug with width calculation
                 maxWidth={'100%'}
