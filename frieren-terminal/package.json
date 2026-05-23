@@ -6,11 +6,11 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
+    "postinstall": "patch-package",
     "build": "vite build",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "ttyd": "https://github.com/tsl0922/ttyd.git#1.7.7",
     "@xterm/addon-fit": "^0.9.0",
     "@xterm/addon-unicode11": "^0.7.0",
     "@xterm/addon-web-links": "^0.10.0",
@@ -19,9 +19,12 @@
     "decko": "^1.2.0",
     "file-saver": "^2.0.5",
     "trzsz": "^1.1.5",
+    "ttyd": "https://github.com/tsl0922/ttyd.git#1.7.7",
     "zmodem.js": "^0.1.10"
   },
   "devDependencies": {
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0",
     "typescript": "^5.3.3",
     "vite": "^7.3.3",
     "vite-plugin-dts": "^4.5.4"
