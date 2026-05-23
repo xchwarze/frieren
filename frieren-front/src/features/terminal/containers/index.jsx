@@ -7,7 +7,8 @@
 import { useMemo, useRef } from 'react';
 import { Resizable } from 're-resizable';
 import Collapse from 'react-bootstrap/Collapse';
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai';
+import '@frieren/terminal-core/index.css';
 
 import terminalStatusAtom from '@src/features/terminal/atoms/terminalStatusAtom.js';
 import terminalSettingsAtom from '@src/features/terminal/atoms/terminalSettingsAtom.js';
@@ -62,10 +63,7 @@ const TerminalPanel = () => {
             >
                 <div
                     ref={containerRef}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                    }}
+                    className={'w-100 h-100'}
                 />
             </Resizable>
         </Collapse>
@@ -85,7 +83,7 @@ const Terminal = () => {
     return (
         <>
             {terminalStatus && (
-                <div>
+                <div className={'flex-shrink-0'}>
                     <TerminalHeader />
                     <TerminalPanel />
                 </div>

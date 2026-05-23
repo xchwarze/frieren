@@ -14401,7 +14401,6 @@ class FrierenTerminal {
           this.overlayAddon?.showOverlay("✂", 200);
         })
       );
-      register(addListener(window, "resize", () => fitAddon.fit()));
       register(addListener(window, "beforeunload", this.onWindowUnload));
     };
     this.writeData = (data) => {

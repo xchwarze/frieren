@@ -7,7 +7,6 @@
 import { useEffect, useRef } from 'react';
 import { useAtomValue } from 'jotai';
 import { FrierenTerminal } from '@frieren/terminal-core';
-import '@frieren/terminal-core/index.css';
 
 import terminalSettingsAtom from '@src/features/terminal/atoms/terminalSettingsAtom.js';
 import { TERMINAL_THEMES } from '@src/features/terminal/helpers/terminalThemes.js';
@@ -51,7 +50,11 @@ const useTerminal = (containerRef) => {
         term.connect();
         terminalRef.current = term;
 
+        const handleResize = () => term.fit();
+        window.addEventListener('resize', handleResize);
+
         return () => {
+            window.removeEventListener('resize', handleResize);
             term.dispose();
             container.innerHTML = '';
             terminalRef.current = null;
