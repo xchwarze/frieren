@@ -40,11 +40,11 @@ const TerminalSettingsCard = ({ query }) => {
     const { mutateAsync: setTerminalSettings } = useSetTerminalSettings();
 
     const defaultValues = {
-        terminalTheme: query?.data?.terminalTheme ?? 'default',
-        fontSize: query?.data?.fontSize ?? 13,
-        cursorStyle: query?.data?.cursorStyle ?? 'block',
-        cursorBlink: query?.data?.cursorBlink ?? false,
-        terminalAutologin: query?.data?.terminalAutologin ?? false,
+        terminalTheme: query?.data?.terminalTheme,
+        fontSize: query?.data?.fontSize,
+        cursorStyle: query?.data?.cursorStyle,
+        cursorBlink: query?.data?.cursorBlink,
+        terminalAutologin: query?.data?.terminalAutologin,
     };
 
     return (

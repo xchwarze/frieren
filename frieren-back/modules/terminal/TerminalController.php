@@ -52,7 +52,15 @@ class TerminalController extends \frieren\core\Controller
             }
         }
 
-        self::setSuccess(["success" => $status]);
+        $response = ["success" => $status];
+        if ($status) {
+            $response['terminalTheme'] = SettingsHelper::getTerminalTheme();
+            $response['fontSize'] = SettingsHelper::getTerminalFontSize();
+            $response['cursorStyle'] = SettingsHelper::getTerminalCursorStyle();
+            $response['cursorBlink'] = SettingsHelper::getTerminalCursorBlink();
+        }
+
+        self::setSuccess($response);
     }
 
     public function stopTerminal()
