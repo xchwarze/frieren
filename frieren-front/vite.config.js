@@ -11,7 +11,8 @@ import { analyzer } from 'vite-bundle-analyzer';
 import path from 'path';
 
 export default defineConfig(({ mode }) => {
-  const resolvedMode = mode === 'production' ? 'prod' : mode;
+  const modeMap = { production: 'prod', development: 'dev' };
+  const resolvedMode = modeMap[mode] || mode;
   const env = Object.assign(
       process.env,
       loadEnv(resolvedMode, `${process.cwd()}/config`)
@@ -32,20 +33,6 @@ export default defineConfig(({ mode }) => {
       }
     },
 
-    // for local dev
-    // the idea of this is to run `cd tools && php -S localhost:8000`
-    // and that api-proxy.php redirects calls to the actual hardware
-    server: {
-      proxy: {
-        '^/api/.*': {
-          target: 'http://localhost:8000',
-          rewrite: () => '/api-proxy.php',
-          changeOrigin: true,
-          secure: false,
-        },
-      }
-    },
-
     // for build
     cssCodeSplit: false,
     build: {
@@ -58,6 +45,19 @@ export default defineConfig(({ mode }) => {
       },
     }
   };
+
+  // for local dev
+  if (env.VITE_DEV_PROXY_TARGET) {
+    config.server = {
+      proxy: {
+        '/api': {
+          target: env.VITE_DEV_PROXY_TARGET,
+          changeOrigin: true,
+          secure: false,
+        },
+      }
+    };
+  }
 
   if (env.VITE_COMPRESSION_ENABLE === 'true') {
     const compressOptions = {

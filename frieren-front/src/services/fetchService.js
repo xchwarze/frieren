@@ -95,11 +95,7 @@ export const fetchService = async (url, method, data = null, timeout = 9000) => 
  * @return {Promise} the result of the fetch request
  */
 export const fetchPost = (data) => {
-    const { VITE_FULL_API_ENDPOINT, VITE_RELATIVE_API_PATH } = import.meta.env;
-    let apiUrl = getUrlDetails() + '/' + VITE_RELATIVE_API_PATH;
-    if (VITE_FULL_API_ENDPOINT) {
-        apiUrl = VITE_FULL_API_ENDPOINT;
-    }
+    const apiUrl = getUrlDetails() + '/' + import.meta.env.VITE_RELATIVE_API_PATH;
 
     return fetchService(apiUrl, 'POST', data)
 };

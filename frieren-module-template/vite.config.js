@@ -86,7 +86,8 @@ const resolveGlobal = (id) => {
 };
 
 export default defineConfig(({ mode }) => {
-  const resolvedMode = mode === 'production' ? 'prod' : mode;
+  const modeMap = { production: 'prod', development: 'dev' };
+  const resolvedMode = modeMap[mode] || mode;
   const env = Object.assign(
       process.env,
       loadEnv(resolvedMode, `${process.cwd()}/config`)
