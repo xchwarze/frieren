@@ -42,7 +42,7 @@ const PanelCard = ({
     return (
         <Card {...rest}>
             <Card.Body>
-                <Card.Title className={'card-title'}>
+                <Card.Title className={'panel-card-title'}>
                     {title}
                     {showRefresh && (
                         <Button

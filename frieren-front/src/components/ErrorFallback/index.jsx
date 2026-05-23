@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
+import Card from 'react-bootstrap/Card';
 import PropTypes from 'prop-types';
+
+import Icon from '@src/components/Icon';
 
 /**
  * Renders an error fallback component when a crash occurs.
@@ -13,18 +16,18 @@ import PropTypes from 'prop-types';
  * @return {ReactElement} The rendered error fallback component.
  */
 const ErrorFallback = ({ error }) => (
-    <div className={'card border-danger mb-3'} role={'alert'}>
-        <div className={'card-header bg-danger text-white'}>
+    <Card border={'danger'} className={'mb-3'} role={'alert'}>
+        <Card.Header className={'bg-danger text-white'}>
             <h5>
-                <i className={'bi bi-exclamation-triangle-fill'}></i> Something went wrong!
+                <Icon name={'alert-triangle'} /> Something went wrong!
             </h5>
-        </div>
-        <div className={'card-body'}>
+        </Card.Header>
+        <Card.Body>
             <p>An unexpected error has occurred. Here&amp;apos;s more detail for debugging:</p>
             <p>Error Message: <strong>{error.message}</strong></p>
-            <pre className={'border rounded bg-light text-danger p-2'}>{error.stack}</pre>
-        </div>
-    </div>
+            <pre className={'border rounded bg-body-secondary text-danger p-2'}>{error.stack}</pre>
+        </Card.Body>
+    </Card>
 );
 
 ErrorFallback.propTypes = {

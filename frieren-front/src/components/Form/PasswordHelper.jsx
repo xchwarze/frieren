@@ -27,7 +27,6 @@ const PasswordHelper = ({ children, errorMessage }) => {
             <InputGroup.Text
                 role={'button'}
                 onClick={() => setShowPassword(v => !v)}
-                style={{ cursor: 'pointer' }}
             >
                 <Icon name={showPassword ? 'eye-off' : 'eye'} />
             </InputGroup.Text>

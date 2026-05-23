@@ -33,7 +33,7 @@ const About = () => {
                         <div className={'text-center my-5'}>
                             <img src={MascotImage} alt={'Mascot'} className={'about-image'} />
                         </div>
-                        <ListGroup className={'list-group-flush'}>
+                        <ListGroup variant={'flush'}>
                             <ListGroup.Item><strong>Version:</strong> {appVersion}</ListGroup.Item>
                             <ListGroup.Item><strong>Build ID:</strong> {buildId}</ListGroup.Item>
                         </ListGroup>

@@ -35,7 +35,7 @@ const UpdateUserPasswordCard = () => {
     return (
         <Card>
             <Card.Body>
-                <Card.Title className={'card-title'}>
+                <Card.Title className={'panel-card-title'}>
                     User Management
                 </Card.Title>
                 <FormProvider autoComplete={'off'} schema={updateSchema} onSubmit={updateUserPassword} defaultValues={defaultValues}>

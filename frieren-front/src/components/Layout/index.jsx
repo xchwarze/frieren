@@ -21,7 +21,7 @@ const Layout = ({ children }) => (
         <Header />
         <div className={'d-flex flex-grow-1 overflow-hidden'}>
             <Sidebar />
-            <div className={'d-flex flex-column flex-grow-1 grid gap-3 overflow-auto p-3 main-container'}>
+            <div className={'d-flex flex-column flex-grow-1 gap-3 overflow-auto p-3 main-container'}>
                 {children}
             </div>
         </div>

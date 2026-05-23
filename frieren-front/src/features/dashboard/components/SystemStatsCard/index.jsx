@@ -47,7 +47,7 @@ const SystemStatsCard = () => {
                             swap
                         </span>
                     </div>
-                    <div className={'text-center me-3'}>
+                    <div className={'text-center'}>
                         <p className={'fs-4 mb-0'}>
                             {data?.uptime ?? ''}
                         </p>
