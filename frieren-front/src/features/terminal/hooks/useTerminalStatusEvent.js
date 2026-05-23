@@ -6,12 +6,13 @@
  */
 import { useEffect } from 'react';
 import { useSetAtom } from 'jotai';
+import { TERMINAL_STATUS_EVENT } from '@frieren/terminal-core';
 
 import socketStatusAtom from '@src/features/terminal/atoms/socketStatusAtom.js'
 
 /**
  * Bridges FrierenTerminal (framework-agnostic) with React state via CustomEvent.
- * FrierenTerminal dispatches 'ws-terminal' events on window with connection status changes,
+ * FrierenTerminal dispatches TERMINAL_STATUS_EVENT events on window with connection status changes,
  * and this hook forwards them into socketStatusAtom so React components can react to them.
  *
  * @return {void}
@@ -24,10 +25,10 @@ const useTerminalStatusEvent = () => {
             setSocketStatus(event.detail.status);
         };
 
-        window.addEventListener('ws-terminal', handleEvent);
+        window.addEventListener(TERMINAL_STATUS_EVENT, handleEvent);
 
         return () => {
-            window.removeEventListener('ws-terminal', handleEvent);
+            window.removeEventListener(TERMINAL_STATUS_EVENT, handleEvent);
         };
     }, [setSocketStatus]);
 };

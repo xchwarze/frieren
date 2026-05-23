@@ -32,12 +32,14 @@ export declare class FrierenTerminal {
     private clientOptions;
     private flowControl;
     private sendCb;
+    private statusCb;
     constructor(options: FrierenTerminalOptions);
     open(parent: HTMLElement): void;
     connect(): void;
     fit(): void;
     setTheme(theme: ITheme): void;
     setOptions(options: Partial<ITerminalOptions>): void;
+    close(): void;
     dispose(): void;
     sendFile(files: FileList): void;
     private register;
@@ -59,9 +61,12 @@ export declare interface FrierenTerminalOptions {
     clientOptions?: Partial<ClientOptions>;
     flowControl?: Partial<FlowControl>;
     onSendFile?: () => void;
+    onStatusChange?: (status: TerminalStatus) => void;
 }
 
 export { ITheme }
+
+export declare const TERMINAL_STATUS_EVENT = "ws-terminal";
 
 export declare type TerminalStatus = 'initializing' | 'connected' | 'reconnected' | 'disconnected' | 'reconnecting';
 

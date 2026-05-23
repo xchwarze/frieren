@@ -14,12 +14,15 @@ import { DEFAULT_TERM_OPTIONS, DEFAULT_CLIENT_OPTIONS, DEFAULT_FLOW_CONTROL } fr
 
 export type TerminalStatus = 'initializing' | 'connected' | 'reconnected' | 'disconnected' | 'reconnecting';
 
+export const TERMINAL_STATUS_EVENT = 'ws-terminal';
+
 export interface FrierenTerminalOptions {
     wsUrl: string;
     termOptions?: ITerminalOptions;
     clientOptions?: Partial<ClientOptions>;
     flowControl?: Partial<FlowControl>;
     onSendFile?: () => void;
+    onStatusChange?: (status: TerminalStatus) => void;
 }
 
 enum ServerCommand {
@@ -71,12 +74,14 @@ export class FrierenTerminal {
     private clientOptions: ClientOptions;
     private flowControl: FlowControl;
     private sendCb: () => void;
+    private statusCb: (status: TerminalStatus) => void;
 
     constructor(options: FrierenTerminalOptions) {
         this.wsUrl = options.wsUrl;
         this.clientOptions = { ...DEFAULT_CLIENT_OPTIONS, ...options.clientOptions } as ClientOptions;
         this.flowControl = { ...DEFAULT_FLOW_CONTROL, ...options.flowControl } as FlowControl;
         this.sendCb = options.onSendFile ?? (() => {});
+        this.statusCb = options.onStatusChange ?? (() => {});
 
         const termOptions = { ...DEFAULT_TERM_OPTIONS, ...options.termOptions };
         this.terminal = new Terminal(termOptions);
@@ -129,7 +134,7 @@ export class FrierenTerminal {
         }
     }
 
-    dispose() {
+    close() {
         this.doReconnect = false;
         this.socket?.close(1000);
         this.socket = undefined;
@@ -137,6 +142,11 @@ export class FrierenTerminal {
             d.dispose();
         }
         this.disposables.length = 0;
+    }
+
+    dispose() {
+        this.close();
+        this.terminal.dispose();
     }
 
     sendFile(files: FileList) {
@@ -175,7 +185,7 @@ export class FrierenTerminal {
 
         const { doReconnect, overlayAddon } = this;
         overlayAddon.showOverlay('Connection Closed');
-        this.dispose();
+        this.close();
         this.dispatchStatus('disconnected');
 
         if (event.code !== 1000 && doReconnect) {
@@ -385,6 +395,7 @@ export class FrierenTerminal {
     }
 
     private dispatchStatus(status: TerminalStatus) {
-        window.dispatchEvent(new CustomEvent('ws-terminal', { detail: { status } }));
+        this.statusCb(status);
+        window.dispatchEvent(new CustomEvent(TERMINAL_STATUS_EVENT, { detail: { status } }));
     }
 }

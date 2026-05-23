@@ -143,6 +143,11 @@
     vertical-align: sub;
 }
 
+/* terminal panel: padding must be on .xterm, not parent — FitAddon only subtracts .xterm padding */
+.xterm {
+    padding: 0.6rem;
+}
+
 /* for use in about section */
 .about-image {
     max-width: 100%;

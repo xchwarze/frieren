@@ -7,17 +7,16 @@
 import { useMemo, useRef } from 'react';
 import { Resizable } from 're-resizable';
 import Collapse from 'react-bootstrap/Collapse';
-import { useAtomValue } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai'
 
 import terminalStatusAtom from '@src/features/terminal/atoms/terminalStatusAtom.js';
 import terminalSettingsAtom from '@src/features/terminal/atoms/terminalSettingsAtom.js';
 import collapseStatusAtom from '@src/features/terminal/atoms/collapseStatusAtom.js';
+import panelHeightAtom from '@src/features/terminal/atoms/panelHeightAtom.js';
 import { TERMINAL_THEMES } from '@src/features/terminal/helpers/terminalThemes.js';
 import useTerminal from '@src/features/terminal/hooks/useTerminal.js';
 import useTerminalStatusEvent from '@src/features/terminal/hooks/useTerminalStatusEvent.js';
 import TerminalHeader from '@src/features/terminal/components/TerminalHeader';
-
-const DEFAULT_HEIGHT = 200;
 
 /**
  * Inner terminal panel that mounts the xterm.js instance.
@@ -29,6 +28,7 @@ const DEFAULT_HEIGHT = 200;
 const TerminalPanel = () => {
     const collapseStatus = useAtomValue(collapseStatusAtom);
     const { terminalTheme } = useAtomValue(terminalSettingsAtom);
+    const [panelHeight, setPanelHeight] = useAtom(panelHeightAtom);
     const containerRef = useRef(null);
 
     const terminalRef = useTerminal(containerRef);
@@ -46,7 +46,7 @@ const TerminalPanel = () => {
                 }}
                 defaultSize={{
                     width: '100%',
-                    height: DEFAULT_HEIGHT,
+                    height: panelHeight,
                 }}
                 enable={{
                     top: collapseStatus,
@@ -55,12 +55,8 @@ const TerminalPanel = () => {
 
                 // fix shitty bug with width calculation
                 maxWidth={'100%'}
-                onResizeStop={(event, direction, elementRef, delta) => {
-                    // update panel height
-                    const currentHeight = parseInt(containerRef.current.style.height);
-                    containerRef.current.style.height = `${currentHeight + delta.height}px`;
-
-                    // force fit terminal content
+                onResizeStop={(event, direction, elementRef) => {
+                    setPanelHeight(elementRef.offsetHeight);
                     requestAnimationFrame(() => terminalRef.current?.fit());
                 }}
             >
@@ -68,9 +64,8 @@ const TerminalPanel = () => {
                     ref={containerRef}
                     style={{
                         width: '100%',
-                        height: DEFAULT_HEIGHT,
+                        height: '100%',
                     }}
-                    className={'p-2'}
                 />
             </Resizable>
         </Collapse>

@@ -14292,6 +14292,7 @@ const DEFAULT_FLOW_CONTROL = {
   highWater: 10,
   lowWater: 4
 };
+const TERMINAL_STATUS_EVENT = "ws-terminal";
 function toDisposable(f2) {
   return { dispose: f2 };
 }
@@ -14339,7 +14340,7 @@ class FrierenTerminal {
       console.log(`[frieren-terminal] websocket connection closed with code: ${event.code}`);
       const { doReconnect, overlayAddon } = this;
       overlayAddon.showOverlay("Connection Closed");
-      this.dispose();
+      this.close();
       this.dispatchStatus("disconnected");
       if (event.code !== 1e3 && doReconnect) {
         overlayAddon.showOverlay("Reconnecting...");
@@ -14520,6 +14521,8 @@ class FrierenTerminal {
     this.flowControl = { ...DEFAULT_FLOW_CONTROL, ...options.flowControl };
     this.sendCb = options.onSendFile ?? (() => {
     });
+    this.statusCb = options.onStatusChange ?? (() => {
+    });
     const termOptions = { ...DEFAULT_TERM_OPTIONS, ...options.termOptions };
     this.terminal = new xtermExports.Terminal(termOptions);
   }
@@ -14560,7 +14563,7 @@ class FrierenTerminal {
       fitAddon.fit();
     }
   }
-  dispose() {
+  close() {
     this.doReconnect = false;
     this.socket?.close(1e3);
     this.socket = void 0;
@@ -14568,6 +14571,10 @@ class FrierenTerminal {
       d2.dispose();
     }
     this.disposables.length = 0;
+  }
+  dispose() {
+    this.close();
+    this.terminal.dispose();
   }
   sendFile(files) {
     this.zmodemAddon?.sendFile(files);
@@ -14602,7 +14609,8 @@ class FrierenTerminal {
     }
   }
   dispatchStatus(status) {
-    window.dispatchEvent(new CustomEvent("ws-terminal", { detail: { status } }));
+    this.statusCb(status);
+    window.dispatchEvent(new CustomEvent(TERMINAL_STATUS_EVENT, { detail: { status } }));
   }
 }
 export {
@@ -14610,5 +14618,6 @@ export {
   DEFAULT_FLOW_CONTROL,
   DEFAULT_TERM_OPTIONS,
   DEFAULT_THEME,
-  FrierenTerminal
+  FrierenTerminal,
+  TERMINAL_STATUS_EVENT
 };
