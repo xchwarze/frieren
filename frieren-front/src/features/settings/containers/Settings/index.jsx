@@ -34,7 +34,7 @@ const Settings = () => {
             </Row>
             <Row className={'g-3'}>
                 <Col md={6}>
-                    <PanelThemeCard query={query} />
+                    <TerminalSettingsCard query={query} />
                 </Col>
                 <Col md={6}>
                     <UpdateUserPasswordCard />
@@ -42,7 +42,7 @@ const Settings = () => {
             </Row>
             <Row className={'g-3'}>
                 <Col md={6}>
-                    <TerminalSettingsCard query={query} />
+                    <PanelThemeCard query={query} />
                 </Col>
             </Row>
         </>
