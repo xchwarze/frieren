@@ -12,7 +12,7 @@ use frieren\helper\OpenWrtHelper;
 
 class ModuleOpenWrtHelper
 {
-    const SCRIPT_PATH = '/bin/package-manager-call';
+    const SCRIPT_PATH = '/bin/package-manager-call.sh';
 
     const UPDATE_FLAG = '/tmp/opkgUpdateDone';
     const UPDATE_OUTPUT = '/tmp/opkgUpdateOutput.log';

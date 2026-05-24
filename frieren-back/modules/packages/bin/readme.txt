@@ -1,0 +1,1 @@
+https://github.com/openwrt/luci/blob/openwrt-24.10/applications/luci-app-package-manager/root/usr/libexec/package-manager-call
