@@ -14,6 +14,8 @@ class DashboardController extends \frieren\core\Controller
         'getSystemResume' => true,
         'getSystemStats' => true,
         'getNews' => true,
+        'startSystemUpdate' => true,
+        'getSystemUpdateStatus' => true,
     ];
 
     public function getSystemResume()
@@ -45,5 +47,21 @@ class DashboardController extends \frieren\core\Controller
         }
 
         self::setError('Error connecting to remote host. Please check your connection.');
+    }
+
+    public function startSystemUpdate()
+    {
+        $updateUrl = filter_var($this->request['updateUrl'] ?? '', FILTER_VALIDATE_URL);
+        if (!$updateUrl) {
+            return self::setError('Invalid update URL');
+        }
+
+        self::setupModuleHelper()::startSystemUpdate($updateUrl);
+        self::setSuccess();
+    }
+
+    public function getSystemUpdateStatus()
+    {
+        self::setSuccess(self::setupModuleHelper()::getSystemUpdateStatus());
     }
 }

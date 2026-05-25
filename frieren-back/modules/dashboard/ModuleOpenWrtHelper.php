@@ -11,6 +11,42 @@ namespace frieren\modules\dashboard;
 class ModuleOpenWrtHelper
 {
     const SYSTEM_LOAD_SCALE_FACTOR = 65536;
+    const UPDATE_SCRIPT = '/bin/system-update.sh';
+    const UPDATE_FLAG = '/tmp/frieren-update-done';
+    const UPDATE_LOG = '/tmp/frieren-update.log';
+
+    private static function getScriptPath()
+    {
+        return \DeviceConfig::MODULE_ROOT_FOLDER . '/dashboard' . self::UPDATE_SCRIPT;
+    }
+
+    /**
+     * Starts a background system update: download, install, reboot.
+     *
+     * @param string $updateUrl URL to the .ipk update package.
+     */
+    public static function startSystemUpdate($updateUrl)
+    {
+        @unlink(self::UPDATE_FLAG);
+        @unlink(self::UPDATE_LOG);
+
+        $script = self::getScriptPath();
+        $url = escapeshellarg($updateUrl);
+        \frieren\helper\OpenWrtHelper::execBackground("/bin/sh {$script} {$url}");
+    }
+
+    /**
+     * Returns the current status of a running system update.
+     *
+     * @return array Update status with completed flag and log output.
+     */
+    public static function getSystemUpdateStatus()
+    {
+        return [
+            'completed' => file_exists(self::UPDATE_FLAG),
+            'output' => @file_get_contents(self::UPDATE_LOG) ?: '',
+        ];
+    }
 
     /**
      * Fetches and returns system board info via ubus, or false on JSON error.
