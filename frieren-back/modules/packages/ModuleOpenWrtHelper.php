@@ -118,11 +118,12 @@ class ModuleOpenWrtHelper
         return self::getBackgroundStatus(self::INSTALL_FLAG, self::INSTALL_OUTPUT);
     }
 
-    public static function removePackage($packageName)
+    public static function removePackage($packageName, $autoremove = false)
     {
         $script = self::getScriptPath();
+        $flags = $autoremove ? '--force-removal-of-dependent-packages --autoremove ' : '';
         self::runBackground(
-            "/bin/sh {$script} remove {$packageName}",
+            "/bin/sh {$script} remove {$flags}{$packageName}",
             self::REMOVE_OUTPUT,
             self::REMOVE_FLAG
         );

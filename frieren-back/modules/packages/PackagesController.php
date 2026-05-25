@@ -70,7 +70,8 @@ class PackagesController extends \frieren\core\Controller
     public function removePackage()
     {
         $packageName = escapeshellarg($this->request['packageName']);
-        self::setupModuleHelper()::removePackage($packageName);
+        $autoremove = !empty($this->request['autoremove']);
+        self::setupModuleHelper()::removePackage($packageName, $autoremove);
         self::setSuccess();
     }
 

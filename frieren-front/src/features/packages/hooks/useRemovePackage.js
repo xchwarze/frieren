@@ -34,10 +34,11 @@ const useRemovePackage = () => {
     });
 
     const mutation = useAuthenticatedMutation({
-        mutationFn: ({ packageName }) => fetchPost({
+        mutationFn: ({ packageName, autoremove = false }) => fetchPost({
             module: 'packages',
             action: 'removePackage',
             packageName,
+            autoremove,
         }),
         onSuccess: ({ success }, { packageName }) => {
             if (success) {
