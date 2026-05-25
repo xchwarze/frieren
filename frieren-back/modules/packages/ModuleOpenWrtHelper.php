@@ -8,64 +8,39 @@
 
 namespace frieren\modules\packages;
 
+use frieren\helper\BackgroundTaskHelper;
 use frieren\helper\OpenWrtHelper;
 
 class ModuleOpenWrtHelper
 {
     const SCRIPT_PATH = '/bin/package-manager-call.sh';
 
-    const UPDATE_FLAG = '/tmp/opkgUpdateDone';
-    const UPDATE_OUTPUT = '/tmp/opkgUpdateOutput.log';
-    const INSTALLED_FLAG = '/tmp/opkgInstalledDone';
-    const INSTALLED_OUTPUT = '/tmp/opkgInstalledOutput.log';
-    const AVAILABLE_FLAG = '/tmp/opkgAvailableDone';
-    const AVAILABLE_OUTPUT = '/tmp/opkgAvailableOutput.log';
-    const INSTALL_FLAG = '/tmp/opkgInstallDone';
-    const INSTALL_OUTPUT = '/tmp/opkgInstallOutput.log';
-    const REMOVE_FLAG = '/tmp/opkgRemoveDone';
-    const REMOVE_OUTPUT = '/tmp/opkgRemoveOutput.log';
+    const TASK_UPDATE = 'opkg-update';
+    const TASK_INSTALLED = 'opkg-installed';
+    const TASK_AVAILABLE = 'opkg-available';
+    const TASK_INSTALL = 'opkg-install';
+    const TASK_REMOVE = 'opkg-remove';
 
     private static function getScriptPath()
     {
         return \DeviceConfig::MODULE_ROOT_FOLDER . '/packages' . self::SCRIPT_PATH;
     }
 
-    private static function runBackground($command, $outputFile, $flagFile)
-    {
-        @unlink($flagFile);
-        @unlink($outputFile);
-        OpenWrtHelper::execBackground(
-            "sh -c \"{$command} > {$outputFile} 2>&1; touch {$flagFile}\""
-        );
-    }
-
-    private static function getBackgroundStatus($flagFile, $outputFile)
-    {
-        return [
-            'completed' => file_exists($flagFile),
-            'output' => @file_get_contents($outputFile) ?: '',
-        ];
-    }
-
     public static function updateLists()
     {
         $script = self::getScriptPath();
-        self::runBackground(
-            "/bin/sh {$script} update",
-            self::UPDATE_OUTPUT,
-            self::UPDATE_FLAG
-        );
+        BackgroundTaskHelper::start(self::TASK_UPDATE, "/bin/sh {$script} update");
     }
 
     public static function getUpdateStatus()
     {
-        return self::getBackgroundStatus(self::UPDATE_FLAG, self::UPDATE_OUTPUT);
+        return BackgroundTaskHelper::getStatus(self::TASK_UPDATE);
     }
 
     public static function listInstalledPackages()
     {
         $script = self::getScriptPath();
-        $outputFile = self::INSTALLED_OUTPUT;
+        $outputFile = BackgroundTaskHelper::getLogPath(self::TASK_INSTALLED);
         OpenWrtHelper::exec("/bin/sh {$script} list-installed > {$outputFile} 2>&1");
 
         return [
@@ -75,63 +50,51 @@ class ModuleOpenWrtHelper
 
     public static function getInstalledPackagesStatus()
     {
-        $completed = file_exists(self::INSTALLED_FLAG);
+        $completed = BackgroundTaskHelper::isCompleted(self::TASK_INSTALLED);
 
         return [
             'completed' => $completed,
-            'packages' => $completed ? self::parsePackageFile(self::INSTALLED_OUTPUT) : [],
+            'packages' => $completed ? self::parsePackageFile(BackgroundTaskHelper::getLogPath(self::TASK_INSTALLED)) : [],
         ];
     }
 
     public static function listAvailablePackages()
     {
         $script = self::getScriptPath();
-        self::runBackground(
-            "/bin/sh {$script} list-available",
-            self::AVAILABLE_OUTPUT,
-            self::AVAILABLE_FLAG
-        );
+        BackgroundTaskHelper::start(self::TASK_AVAILABLE, "/bin/sh {$script} list-available");
     }
 
     public static function getAvailablePackagesStatus()
     {
-        $completed = file_exists(self::AVAILABLE_FLAG);
+        $completed = BackgroundTaskHelper::isCompleted(self::TASK_AVAILABLE);
 
         return [
             'completed' => $completed,
-            'packages' => $completed ? self::parsePackageFile(self::AVAILABLE_OUTPUT) : [],
+            'packages' => $completed ? self::parsePackageFile(BackgroundTaskHelper::getLogPath(self::TASK_AVAILABLE)) : [],
         ];
     }
 
     public static function installPackage($packageName)
     {
         $script = self::getScriptPath();
-        self::runBackground(
-            "/bin/sh {$script} install {$packageName}",
-            self::INSTALL_OUTPUT,
-            self::INSTALL_FLAG
-        );
+        BackgroundTaskHelper::start(self::TASK_INSTALL, "/bin/sh {$script} install {$packageName}");
     }
 
     public static function getInstallStatus()
     {
-        return self::getBackgroundStatus(self::INSTALL_FLAG, self::INSTALL_OUTPUT);
+        return BackgroundTaskHelper::getStatus(self::TASK_INSTALL);
     }
 
     public static function removePackage($packageName, $autoremove = false)
     {
         $script = self::getScriptPath();
         $flags = $autoremove ? '--force-removal-of-dependent-packages --autoremove ' : '';
-        self::runBackground(
-            "/bin/sh {$script} remove {$flags}{$packageName}",
-            self::REMOVE_OUTPUT,
-            self::REMOVE_FLAG
-        );
+        BackgroundTaskHelper::start(self::TASK_REMOVE, "/bin/sh {$script} remove {$flags}{$packageName}");
     }
 
     public static function getRemoveStatus()
     {
-        return self::getBackgroundStatus(self::REMOVE_FLAG, self::REMOVE_OUTPUT);
+        return BackgroundTaskHelper::getStatus(self::TASK_REMOVE);
     }
 
     /**

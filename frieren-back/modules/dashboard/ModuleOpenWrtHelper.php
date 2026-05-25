@@ -8,12 +8,13 @@
 
 namespace frieren\modules\dashboard;
 
+use frieren\helper\BackgroundTaskHelper;
+
 class ModuleOpenWrtHelper
 {
     const SYSTEM_LOAD_SCALE_FACTOR = 65536;
     const UPDATE_SCRIPT = '/bin/system-update.sh';
-    const UPDATE_FLAG = '/tmp/frieren-update-done';
-    const UPDATE_LOG = '/tmp/frieren-update.log';
+    const TASK_UPDATE = 'frieren-update';
 
     private static function getScriptPath()
     {
@@ -27,12 +28,9 @@ class ModuleOpenWrtHelper
      */
     public static function startSystemUpdate($updateUrl)
     {
-        @unlink(self::UPDATE_FLAG);
-        @unlink(self::UPDATE_LOG);
-
         $script = self::getScriptPath();
         $url = escapeshellarg($updateUrl);
-        \frieren\helper\OpenWrtHelper::execBackground("/bin/sh {$script} {$url}");
+        BackgroundTaskHelper::start(self::TASK_UPDATE, "/bin/sh {$script} {$url}");
     }
 
     /**
@@ -42,10 +40,7 @@ class ModuleOpenWrtHelper
      */
     public static function getSystemUpdateStatus()
     {
-        return [
-            'completed' => file_exists(self::UPDATE_FLAG),
-            'output' => @file_get_contents(self::UPDATE_LOG) ?: '',
-        ];
+        return BackgroundTaskHelper::getStatus(self::TASK_UPDATE);
     }
 
     /**

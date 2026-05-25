@@ -8,11 +8,13 @@
 
 namespace frieren\modules\modules;
 
+use frieren\helper\BackgroundTaskHelper;
+
 class ModulesController extends \frieren\core\Controller
 {
     const UCI_SIDEBAR = 'frieren.@settings[0].sidebar';
-    const DOWN_FLAG = '/tmp/moduleDownloaded';
-    const INSTALL_FLAG = '/tmp/moduleInstalled';
+    const TASK_DOWNLOAD = 'module-download';
+    const TASK_INSTALL = 'module-install';
     const MIN_DISK_SPACE = 524288;
 
     public $endpointRoutes = [
@@ -157,7 +159,8 @@ class ModulesController extends \frieren\core\Controller
 
     public function downloadModule()
     {
-        @unlink(self::DOWN_FLAG);
+        $flagPath = BackgroundTaskHelper::getFlagPath(self::TASK_DOWNLOAD);
+        @unlink($flagPath);
 
         $remoteFileName = self::getModuleCompressName(
             "{$this->request['moduleName']}-{$this->request['version']}"
@@ -165,7 +168,7 @@ class ModulesController extends \frieren\core\Controller
         $localFileName = self::getModuleCompressName($this->request['moduleName']);
         $filePath = "/tmp/{$localFileName}";
         $url = sprintf(\DeviceConfig::MODULE_PACKAGE_PATH, \DeviceConfig::MODULE_SERVER_URL, $remoteFileName);
-        self::setupCoreHelper()::downloadFile($url, $filePath , self::DOWN_FLAG);
+        self::setupCoreHelper()::downloadFile($url, $filePath, $flagPath);
 
         self::setSuccess([
             'success' => true,
@@ -175,7 +178,9 @@ class ModulesController extends \frieren\core\Controller
 
     public function downloadStatus()
     {
-        self::setSuccess(['success' => file_exists(self::DOWN_FLAG)]);
+        self::setSuccess([
+            'success' => BackgroundTaskHelper::isCompleted(self::TASK_DOWNLOAD),
+        ]);
     }
 
     public function installModule()
@@ -187,7 +192,6 @@ class ModulesController extends \frieren\core\Controller
             return self::setError('Checksum mismatch');
         }
 
-        @unlink(self::INSTALL_FLAG);
         $this->removeModuleFiles($moduleName);
 
         $useSD = $this->request['destination'] === 'sd';
@@ -201,10 +205,9 @@ class ModulesController extends \frieren\core\Controller
 
         $installPath = escapeshellarg($useSD ? $moduleSDDirPath : $moduleDirPath);
         $safeFilePath = escapeshellarg($filePath);
-        self::setupCoreHelper()::execBackground(
-            "tar -xzC {$installPath} -f {$safeFilePath} && " .
-            "rm {$safeFilePath} && " .
-            "touch " . self::INSTALL_FLAG
+        BackgroundTaskHelper::start(
+            self::TASK_INSTALL,
+            "tar -xzC {$installPath} -f {$safeFilePath} && rm {$safeFilePath}"
         );
 
         self::setSuccess();
@@ -212,7 +215,9 @@ class ModulesController extends \frieren\core\Controller
 
     public function installStatus()
     {
-        self::setSuccess(['success' => file_exists(self::INSTALL_FLAG)]);
+        self::setSuccess([
+            'success' => BackgroundTaskHelper::isCompleted(self::TASK_INSTALL),
+        ]);
     }
 
     public function checkDestination()

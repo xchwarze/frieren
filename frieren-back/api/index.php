@@ -24,6 +24,7 @@ $classMap = [
     'frieren\\core\\Controller' => __DIR__ . '/core/Controller.php',
     'frieren\\core\\ResponseHandler' => __DIR__ . '/core/ResponseHandler.php',
     'frieren\\core\\Router' => __DIR__ . '/core/Router.php',
+    'frieren\\helper\\BackgroundTaskHelper' => __DIR__ . '/helper/BackgroundTaskHelper.php',
     'frieren\\helper\\HelperFactory' => __DIR__ . '/helper/HelperFactory.php',
     'frieren\\helper\\OpenWrtHelper' => __DIR__ . '/helper/OpenWrtHelper.php',
     'frieren\\helper\\UciConfigHelper' => __DIR__ . '/helper/UciConfigHelper.php',

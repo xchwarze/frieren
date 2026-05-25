@@ -8,8 +8,12 @@
 
 namespace frieren\modules\hardware;
 
+use frieren\helper\BackgroundTaskHelper;
+
 class HardwareController extends \frieren\core\Controller
 {
+    const TASK_DIAGNOSTICS = 'diagnostics';
+
     public $endpointRoutes = [
         'getUsbDevices' => true,
         'getFileSystemUsage' => true,
@@ -52,7 +56,7 @@ class HardwareController extends \frieren\core\Controller
     public function startDiagnosticsScript()
     {
         $scriptPath = self::getModulePath() . '/bin/diagnostics.sh';
-        self::setupCoreHelper()::execBackground($scriptPath);
+        BackgroundTaskHelper::start(self::TASK_DIAGNOSTICS, $scriptPath);
 
         self::setSuccess();
     }
@@ -60,8 +64,8 @@ class HardwareController extends \frieren\core\Controller
     public function getDiagnosticsStatus()
     {
         return self::setSuccess([
-            'status' => @file_get_contents('/tmp/diagnostics_status.log'),
-            'completed' => file_exists('/tmp/diagnostics_done.flag'),
+            'status' => @file_get_contents(BackgroundTaskHelper::getLogPath(self::TASK_DIAGNOSTICS)),
+            'completed' => BackgroundTaskHelper::isCompleted(self::TASK_DIAGNOSTICS),
         ]);
     }
 
