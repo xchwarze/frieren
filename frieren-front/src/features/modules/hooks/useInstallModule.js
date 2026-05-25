@@ -18,7 +18,7 @@ import useInstallationStatus from '@src/features/modules/hooks/useInstallationSt
  */
 const useInstallModule = () => {
     const { name: moduleName, destination, checksum } = useAtomValue(installModuleAtom);
-    const installationStatusQuery = useInstallationStatus();
+    const installationStatus = useInstallationStatus();
 
     return useAuthenticatedMutation({
         mutationFn: () => fetchPost({
@@ -30,7 +30,7 @@ const useInstallModule = () => {
         }),
         onSuccess: ({ success }) => {
             if (success) {
-                installationStatusQuery.refetch();
+                installationStatus.start();
             }
         },
     });

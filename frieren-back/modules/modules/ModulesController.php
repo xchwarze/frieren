@@ -179,7 +179,7 @@ class ModulesController extends \frieren\core\Controller
     public function downloadStatus()
     {
         self::setSuccess([
-            'success' => BackgroundTaskHelper::isCompleted(self::TASK_DOWNLOAD),
+            'completed' => BackgroundTaskHelper::isCompleted(self::TASK_DOWNLOAD),
         ]);
     }
 
@@ -216,7 +216,7 @@ class ModulesController extends \frieren\core\Controller
     public function installStatus()
     {
         self::setSuccess([
-            'success' => BackgroundTaskHelper::isCompleted(self::TASK_INSTALL),
+            'completed' => BackgroundTaskHelper::isCompleted(self::TASK_INSTALL),
         ]);
     }
 

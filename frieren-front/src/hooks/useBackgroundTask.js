@@ -14,21 +14,24 @@ import { fetchPost } from '@src/services/fetchService.js';
  *
  * @param {Object} options
  * @param {string} options.queryKey - React Query cache key for the status query.
+ * @param {string} options.module - Backend module name.
  * @param {string} options.action - Backend action name to poll.
  * @param {Function} [options.onCompleted] - Called with response data when task completes.
+ * @param {number} [options.refetchInterval=2500] - Polling interval in milliseconds.
+ * @param {number} [options.gcTime] - React Query garbage collection time.
  * @return {Object} Query object extended with isRunning flag and start function.
  */
-const useBackgroundTask = ({ queryKey, action, onCompleted, gcTime }) => {
+const useBackgroundTask = ({ queryKey, module, action, onCompleted, refetchInterval = 2500, gcTime }) => {
     const [isRunning, setIsRunning] = useState(false);
     const onCompletedRef = useRef(onCompleted);
     onCompletedRef.current = onCompleted;
 
     const query = useAuthenticatedQuery({
         queryKey: [queryKey],
-        queryFn: () => fetchPost({ module: 'packages', action }),
+        queryFn: () => fetchPost({ module, action }),
         enabled: isRunning,
         staleTime: 0,
-        refetchInterval: 2500,
+        refetchInterval,
         ...(gcTime !== undefined && { gcTime }),
     });
 

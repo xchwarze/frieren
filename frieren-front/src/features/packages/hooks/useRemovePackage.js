@@ -12,7 +12,7 @@ import { fetchPost } from '@src/services/fetchService.js';
 import { PACKAGES_GET_REMOVE_STATUS } from '@src/features/packages/helpers/queryKeys.js';
 import reloadPackagesAtom from '@src/features/packages/atoms/reloadPackagesAtom.js';
 import removingPackageAtom from '@src/features/packages/atoms/removingPackageAtom.js';
-import useBackgroundTask from '@src/features/packages/hooks/useBackgroundTask.js';
+import useBackgroundTask from '@src/hooks/useBackgroundTask.js';
 
 /**
  * Manages removing a package via trigger + poll pattern.
@@ -25,6 +25,7 @@ const useRemovePackage = () => {
 
     const taskStatus = useBackgroundTask({
         queryKey: PACKAGES_GET_REMOVE_STATUS,
+        module: 'packages',
         action: 'getRemoveStatus',
         onCompleted: () => {
             toast.success(`Package ${removingName} successfully removed`);

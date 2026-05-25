@@ -11,7 +11,7 @@ import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
 import { PACKAGES_GET_AVAILABLE_STATUS } from '@src/features/packages/helpers/queryKeys.js';
 import availablePackagesAtom from '@src/features/packages/atoms/availablePackagesAtom.js';
-import useBackgroundTask from '@src/features/packages/hooks/useBackgroundTask.js';
+import useBackgroundTask from '@src/hooks/useBackgroundTask.js';
 
 /**
  * Manages loading available packages via trigger + poll pattern.
@@ -24,6 +24,7 @@ const useAvailablePackages = () => {
 
     const taskStatus = useBackgroundTask({
         queryKey: PACKAGES_GET_AVAILABLE_STATUS,
+        module: 'packages',
         action: 'getAvailablePackagesStatus',
         gcTime: 30 * 60 * 1000,
         onCompleted: (data) => {

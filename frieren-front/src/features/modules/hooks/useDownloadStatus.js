@@ -4,46 +4,24 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useEffect, useState } from 'react';
-
-import { fetchPost } from '@src/services/fetchService.js';
-import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
+import useBackgroundTask from '@src/hooks/useBackgroundTask.js';
 import { MODULES_DOWNLOAD_STATUS } from '@src/features/modules/helpers/queryKeys.js';
 import useInstallModule from '@src/features/modules/hooks/useInstallModule.js';
 
 /**
- * Generates a hook to track download status.
+ * Tracks module download status via polling. Triggers install on completion.
  *
- * @return {Boolean} Returns true when download is complete.
+ * @return {Object} Query object with isRunning flag and start function.
  */
 const useDownloadStatus = () => {
-    const [isRunning, setIsRunning] = useState(false);
     const { mutate: installModule } = useInstallModule();
 
-    const query = useAuthenticatedQuery({
-        queryKey: [MODULES_DOWNLOAD_STATUS],
-        queryFn: () => fetchPost({
-            module: 'modules',
-            action: 'downloadStatus',
-        }),
-        enabled: isRunning,
-        staleTime: 0,
-        refetchInterval: 2500,
+    return useBackgroundTask({
+        queryKey: MODULES_DOWNLOAD_STATUS,
+        module: 'modules',
+        action: 'downloadStatus',
+        onCompleted: () => installModule(),
     });
-
-    useEffect(() => {
-        // I use both of them to force the effect to always run...!
-        if (query.isSuccess && query.isFetching === false) {
-            // for enabling polling
-            setIsRunning(query.data.success === false);
-
-            if (query.data.success) {
-                installModule();
-            }
-        }
-    }, [query.data, query.isSuccess, query.isFetching, installModule]);
-
-    return query
 };
 
 export default useDownloadStatus;

@@ -12,7 +12,7 @@ import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
 import { PACKAGES_GET_INSTALL_STATUS } from '@src/features/packages/helpers/queryKeys.js';
 import reloadPackagesAtom from '@src/features/packages/atoms/reloadPackagesAtom.js';
-import useBackgroundTask from '@src/features/packages/hooks/useBackgroundTask.js';
+import useBackgroundTask from '@src/hooks/useBackgroundTask.js';
 
 /**
  * Manages installing a package via trigger + poll pattern.
@@ -25,6 +25,7 @@ const useInstallPackage = () => {
 
     const taskStatus = useBackgroundTask({
         queryKey: PACKAGES_GET_INSTALL_STATUS,
+        module: 'packages',
         action: 'getInstallStatus',
         onCompleted: () => {
             toast.success(`Package ${installingName} successfully installed`);

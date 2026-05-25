@@ -18,7 +18,7 @@ import useDownloadStatus from '@src/features/modules/hooks/useDownloadStatus.js'
  */
 const useDownloadModule = () => {
     const { name: moduleName, version } = useAtomValue(installModuleAtom);
-    const downloadStatusQuery = useDownloadStatus();
+    const downloadStatus = useDownloadStatus();
 
     return useAuthenticatedMutation({
         mutationFn: () => fetchPost({
@@ -29,7 +29,7 @@ const useDownloadModule = () => {
         }),
         onSuccess: ({ success }) => {
             if (success) {
-                downloadStatusQuery.refetch();
+                downloadStatus.start();
             }
         },
     });

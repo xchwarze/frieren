@@ -7,7 +7,7 @@
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
 import { PACKAGES_GET_UPDATE_STATUS } from '@src/features/packages/helpers/queryKeys.js';
-import useBackgroundTask from '@src/features/packages/hooks/useBackgroundTask.js';
+import useBackgroundTask from '@src/hooks/useBackgroundTask.js';
 
 /**
  * Manages updating package lists via trigger + poll pattern.
@@ -19,6 +19,7 @@ import useBackgroundTask from '@src/features/packages/hooks/useBackgroundTask.js
 const useUpdateLists = ({ onCompleted } = {}) => {
     const taskStatus = useBackgroundTask({
         queryKey: PACKAGES_GET_UPDATE_STATUS,
+        module: 'packages',
         action: 'getUpdateStatus',
         onCompleted,
     });

@@ -5,9 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import Form from 'react-bootstrap/Form';
-import { useAtomValue } from 'jotai';
 
-import isPollingActiveAtom from '@src/features/hardware/atoms/isPollingActiveAtom.js';
 import useDiagnosticsStatus from '@src/features/hardware/hooks/useDiagnosticsStatus.js';
 import useStartDiagnosticsScript from '@src/features/hardware/hooks/useStartDiagnosticsScript.js';
 import useDownloadDiagnosticsFile from '@src/features/hardware/hooks/useDownloadDiagnosticsFile.js';
@@ -21,9 +19,8 @@ import Button from '@src/components/Button';
  */
 const DiagnosticsCard = () => {
     const query = useDiagnosticsStatus();
-    const { mutate: startDiagnostics, isPending: startDiagnosticsRunning } = useStartDiagnosticsScript();
+    const { mutate: startDiagnostics, isPending: startDiagnosticsRunning, isPolling } = useStartDiagnosticsScript();
     const { mutate: downloadDiagnostics, isPending: downloadDiagnosticsRunning } = useDownloadDiagnosticsFile();
-    const isPollingActive = useAtomValue(isPollingActiveAtom);
 
     const { status, completed } = query?.data ?? {};
     const resume = status ? status : 'There are no reports generated.';
@@ -48,7 +45,7 @@ const DiagnosticsCard = () => {
                 <Button
                     label={'Generate Report'}
                     icon={'play'}
-                    loading={startDiagnosticsRunning || isPollingActive}
+                    loading={startDiagnosticsRunning || isPolling}
                     onClick={startDiagnostics}
                 />
                 <Button

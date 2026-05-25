@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
-import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
+import useBackgroundTask from '@src/hooks/useBackgroundTask.js';
 import { fetchPost } from '@src/services/fetchService.js';
 import { DASHBOARD_GET_UPDATE_STATUS } from '@src/features/dashboard/helpers/queryKeys.js';
 
@@ -18,28 +17,15 @@ import { DASHBOARD_GET_UPDATE_STATUS } from '@src/features/dashboard/helpers/que
  * @return {Object} { startUpdate, isUpdating, isPending }
  */
 const useSystemUpdate = () => {
-    const [isUpdating, setIsUpdating] = useState(false);
-    const toastShownRef = useRef(false);
-
-    const statusQuery = useAuthenticatedQuery({
-        queryKey: [DASHBOARD_GET_UPDATE_STATUS],
-        queryFn: () => fetchPost({ module: 'dashboard', action: 'getSystemUpdateStatus' }),
-        enabled: isUpdating,
-        staleTime: 0,
+    const taskStatus = useBackgroundTask({
+        queryKey: DASHBOARD_GET_UPDATE_STATUS,
+        module: 'dashboard',
+        action: 'getSystemUpdateStatus',
         refetchInterval: 3000,
-    });
-
-    useEffect(() => {
-        if (!isUpdating || !statusQuery.isSuccess || statusQuery.isFetching) {
-            return;
-        }
-
-        if (statusQuery.data?.completed && !toastShownRef.current) {
-            toastShownRef.current = true;
-            setIsUpdating(false);
+        onCompleted: () => {
             toast.success('Update installed. Device is rebooting...');
-        }
-    }, [isUpdating, statusQuery.data, statusQuery.isSuccess, statusQuery.isFetching]);
+        },
+    });
 
     const mutation = useAuthenticatedMutation({
         mutationFn: ({ updateUrl }) => fetchPost({
@@ -49,20 +35,15 @@ const useSystemUpdate = () => {
         }),
         onSuccess: ({ success }) => {
             if (success) {
-                toastShownRef.current = false;
-                setIsUpdating(true);
+                taskStatus.start();
                 toast.info('Downloading and installing update...');
             }
         },
     });
 
-    const startUpdate = useCallback(({ updateUrl }) => {
-        mutation.mutate({ updateUrl });
-    }, [mutation]);
-
     return {
-        startUpdate,
-        isUpdating,
+        startUpdate: mutation.mutate,
+        isUpdating: taskStatus.isRunning,
         isPending: mutation.isPending,
     };
 };
