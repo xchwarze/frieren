@@ -8,8 +8,12 @@
 
 namespace frieren\modules\dashboard;
 
+use frieren\helper\BackgroundTaskHelper;
+
 class DashboardController extends \frieren\core\Controller
 {
+    const TASK_UPDATE = 'frieren-update';
+
     public $endpointRoutes = [
         'getSystemResume' => true,
         'getSystemStats' => true,
@@ -25,7 +29,7 @@ class DashboardController extends \frieren\core\Controller
             return self::setSuccess($resume);
         }
 
-        self::setError();
+        return self::setError();
     }
 
     public function getSystemStats()
@@ -35,7 +39,7 @@ class DashboardController extends \frieren\core\Controller
             return self::setSuccess($resume);
         }
 
-        self::setError();
+        return self::setError();
     }
 
     public function getNews()
@@ -46,7 +50,7 @@ class DashboardController extends \frieren\core\Controller
             return self::setSuccess(json_decode($newsData));
         }
 
-        self::setError('Error connecting to remote host. Please check your connection.');
+        return self::setError('Error connecting to remote host. Please check your connection.');
     }
 
     public function startSystemUpdate()
@@ -56,12 +60,15 @@ class DashboardController extends \frieren\core\Controller
             return self::setError('Invalid update URL');
         }
 
-        self::setupModuleHelper()::startSystemUpdate($updateUrl);
-        self::setSuccess();
+        $scriptPath = self::getModulePath() . '/bin/system-update.sh';
+        $url = escapeshellarg($updateUrl);
+        BackgroundTaskHelper::start(self::TASK_UPDATE, "{$scriptPath} {$url}");
+
+        return self::setSuccess();
     }
 
     public function getSystemUpdateStatus()
     {
-        self::setSuccess(self::setupModuleHelper()::getSystemUpdateStatus());
+        return self::setSuccess(BackgroundTaskHelper::getStatus(self::TASK_UPDATE));
     }
 }

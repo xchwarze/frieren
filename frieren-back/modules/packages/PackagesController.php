@@ -8,8 +8,17 @@
 
 namespace frieren\modules\packages;
 
+use frieren\helper\BackgroundTaskHelper;
+use frieren\helper\OpenWrtHelper;
+
 class PackagesController extends \frieren\core\Controller
 {
+    const TASK_UPDATE = 'opkg-update';
+    const TASK_INSTALLED = 'opkg-installed';
+    const TASK_AVAILABLE = 'opkg-available';
+    const TASK_INSTALL = 'opkg-install';
+    const TASK_REMOVE = 'opkg-remove';
+
     public $endpointRoutes = [
         'updateLists' => true,
         'getUpdateStatus' => true,
@@ -23,60 +32,95 @@ class PackagesController extends \frieren\core\Controller
         'getRemoveStatus' => true,
     ];
 
+    private function getScriptPath()
+    {
+        return self::getModulePath() . '/bin/package-manager-call.sh';
+    }
+
     public function updateLists()
     {
-        self::setupModuleHelper()::updateLists();
-        self::setSuccess();
+        $script = $this->getScriptPath();
+        BackgroundTaskHelper::start(self::TASK_UPDATE, "{$script} update");
+
+        return self::setSuccess();
     }
 
     public function getUpdateStatus()
     {
-        self::setSuccess(self::setupModuleHelper()::getUpdateStatus());
+        return self::setSuccess(BackgroundTaskHelper::getStatus(self::TASK_UPDATE));
     }
 
     public function getInstalledPackages()
     {
-        self::setSuccess(self::setupModuleHelper()::listInstalledPackages());
+        $script = $this->getScriptPath();
+        $outputFile = BackgroundTaskHelper::getLogPath(self::TASK_INSTALLED);
+        $command = "{$script} list-installed > {$outputFile} 2>&1";
+        OpenWrtHelper::exec($command, true, true);
+
+        return self::setSuccess([
+            'packages' => self::setupModuleHelper()::parsePackageFile($outputFile),
+        ]);
     }
 
     public function getInstalledPackagesStatus()
     {
-        self::setSuccess(self::setupModuleHelper()::getInstalledPackagesStatus());
+        $completed = BackgroundTaskHelper::isCompleted(self::TASK_INSTALLED);
+
+        return self::setSuccess([
+            'completed' => $completed,
+            'packages' => $completed
+                ? self::setupModuleHelper()::parsePackageFile(BackgroundTaskHelper::getLogPath(self::TASK_INSTALLED))
+                : [],
+        ]);
     }
 
     public function getAvailablePackages()
     {
-        self::setupModuleHelper()::listAvailablePackages();
-        self::setSuccess();
+        $script = $this->getScriptPath();
+        BackgroundTaskHelper::start(self::TASK_AVAILABLE, "{$script} list-available");
+
+        return self::setSuccess();
     }
 
     public function getAvailablePackagesStatus()
     {
-        self::setSuccess(self::setupModuleHelper()::getAvailablePackagesStatus());
+        $completed = BackgroundTaskHelper::isCompleted(self::TASK_AVAILABLE);
+
+        return self::setSuccess([
+            'completed' => $completed,
+            'packages' => $completed
+                ? self::setupModuleHelper()::parsePackageFile(BackgroundTaskHelper::getLogPath(self::TASK_AVAILABLE))
+                : [],
+        ]);
     }
 
     public function installPackage()
     {
+        $script = $this->getScriptPath();
         $packageName = escapeshellarg($this->request['packageName']);
-        self::setupModuleHelper()::installPackage($packageName);
-        self::setSuccess();
+        BackgroundTaskHelper::start(self::TASK_INSTALL, "{$script} install {$packageName}");
+
+        return self::setSuccess();
     }
 
     public function getInstallStatus()
     {
-        self::setSuccess(self::setupModuleHelper()::getInstallStatus());
+        return self::setSuccess(BackgroundTaskHelper::getStatus(self::TASK_INSTALL));
     }
 
     public function removePackage()
     {
+        $script = $this->getScriptPath();
         $packageName = escapeshellarg($this->request['packageName']);
         $autoremove = !empty($this->request['autoremove']);
-        self::setupModuleHelper()::removePackage($packageName, $autoremove);
-        self::setSuccess();
+        $flags = $autoremove ? '--force-removal-of-dependent-packages --autoremove ' : '';
+        BackgroundTaskHelper::start(self::TASK_REMOVE, "{$script} remove {$flags}{$packageName}");
+
+        return self::setSuccess();
     }
 
     public function getRemoveStatus()
     {
-        self::setSuccess(self::setupModuleHelper()::getRemoveStatus());
+        return self::setSuccess(BackgroundTaskHelper::getStatus(self::TASK_REMOVE));
     }
 }

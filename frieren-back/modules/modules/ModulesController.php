@@ -15,7 +15,6 @@ class ModulesController extends \frieren\core\Controller
     const UCI_SIDEBAR = 'frieren.@settings[0].sidebar';
     const TASK_DOWNLOAD = 'module-download';
     const TASK_INSTALL = 'module-install';
-    const MIN_DISK_SPACE = 524288;
 
     public $endpointRoutes = [
         'getModuleList' => true,

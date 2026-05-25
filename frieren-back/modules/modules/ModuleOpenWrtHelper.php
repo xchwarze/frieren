@@ -21,7 +21,8 @@ class ModuleOpenWrtHelper
      */
     public static function getLocalModuleSize($moduleFolder)
     {
-        $size = OpenWrtHelper::exec("du -sh " . escapeshellarg($moduleFolder) . " | awk '{print $1;}'");
+        $command = "du -sh " . escapeshellarg($moduleFolder) . " | awk '{print $1;}'";
+        $size = OpenWrtHelper::exec($command, true, true);
         if ($size === false) {
             throw new \Exception("Error getting size of module {$moduleFolder}");
         }
@@ -37,7 +38,8 @@ class ModuleOpenWrtHelper
      */
     public static function getAllModuleSizes($modulesRoot)
     {
-        $output = OpenWrtHelper::exec("du -sh " . escapeshellarg($modulesRoot) . "/*/", false);
+        $command = "du -sh " . escapeshellarg($modulesRoot) . "/*/";
+        $output = OpenWrtHelper::exec($command, false, true);
         if (!$output) {
             return [];
         }

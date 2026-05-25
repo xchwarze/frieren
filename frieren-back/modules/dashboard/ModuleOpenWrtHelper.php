@@ -8,40 +8,9 @@
 
 namespace frieren\modules\dashboard;
 
-use frieren\helper\BackgroundTaskHelper;
-
 class ModuleOpenWrtHelper
 {
     const SYSTEM_LOAD_SCALE_FACTOR = 65536;
-    const UPDATE_SCRIPT = '/bin/system-update.sh';
-    const TASK_UPDATE = 'frieren-update';
-
-    private static function getScriptPath()
-    {
-        return \DeviceConfig::MODULE_ROOT_FOLDER . '/dashboard' . self::UPDATE_SCRIPT;
-    }
-
-    /**
-     * Starts a background system update: download, install, reboot.
-     *
-     * @param string $updateUrl URL to the .ipk update package.
-     */
-    public static function startSystemUpdate($updateUrl)
-    {
-        $script = self::getScriptPath();
-        $url = escapeshellarg($updateUrl);
-        BackgroundTaskHelper::start(self::TASK_UPDATE, "/bin/sh {$script} {$url}");
-    }
-
-    /**
-     * Returns the current status of a running system update.
-     *
-     * @return array Update status with completed flag and log output.
-     */
-    public static function getSystemUpdateStatus()
-    {
-        return BackgroundTaskHelper::getStatus(self::TASK_UPDATE);
-    }
 
     /**
      * Fetches and returns system board info via ubus, or false on JSON error.
@@ -89,34 +58,6 @@ class ModuleOpenWrtHelper
             'swap_used' => ($swapTotal > 0 ? round(($swapUsed / $swapTotal) * 100, 2) : 0) . '%',
             'uptime' => self::secondsToUptime($resume['uptime']),
             'localtime' => date('Y-m-d H:i:s', $resume['localtime']),
-        ];
-    }
-
-    /**
-     * Retrieves and calculates memory usage information.
-     *
-     * @return array Memory info with total, used, and free memory in MB.
-     */
-    public static function getMemoryInfo() {
-        $validType = ['MemTotal' => true, 'MemFree' => true, 'Buffers' => true, 'Cached' => true];
-        $memoryInfo = [];
-
-        $handle = fopen('/proc/meminfo', 'r');
-        while (($line = fgets($handle)) !== false && count($memoryInfo) < 4) {
-            list($key, $val) = explode(':', $line, 2);
-            if (isset($validType[$key])) {
-                $memoryInfo[$key] = (int)$val;
-            }
-        }
-        fclose($handle);
-
-        // I understand that for a more accurate calculation this would be the correct way to get this data for real
-        $memUsed = $memoryInfo['MemTotal'] - $memoryInfo['MemFree'] - $memoryInfo['Buffers'] - $memoryInfo['Cached'];
-
-        return [
-            'total' => self::sizeToHuman($memoryInfo['MemTotal']),
-            'free' => self::sizeToHuman($memoryInfo['MemFree']),
-            'used' => self::sizeToHuman($memUsed),
         ];
     }
 

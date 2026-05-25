@@ -82,7 +82,8 @@ class ModuleOpenWrtHelper
     public static function setSystemHostname($hostname)
     {
         OpenWrtHelper::uciSet('system.@system[0].hostname', $hostname);
-        OpenWrtHelper::exec("echo " . escapeshellarg($hostname) . " > /proc/sys/kernel/hostname");
+        $command = "echo " . escapeshellarg($hostname) . " > /proc/sys/kernel/hostname";
+        OpenWrtHelper::exec($command, true, true);
 
         return OpenWrtHelper::uciGet('system.@system[0].hostname') === $hostname;
     }
@@ -146,7 +147,7 @@ class ModuleOpenWrtHelper
      */
     public static function getTerminalAutologin()
     {
-        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_autologin') === '1';
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_autologin') === true;
     }
 
     /**
@@ -167,10 +168,9 @@ class ModuleOpenWrtHelper
      */
     public static function setTerminalAutologin($enabled)
     {
-        $value = $enabled ? '1' : '0';
-        OpenWrtHelper::uciSet('frieren.@settings[0].terminal_autologin', $value);
+        OpenWrtHelper::uciSet('frieren.@settings[0].terminal_autologin', (bool) $enabled);
 
-        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_autologin') === $value;
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_autologin') === (bool) $enabled;
     }
 
 
@@ -246,7 +246,7 @@ class ModuleOpenWrtHelper
      */
     public static function getTerminalCursorBlink()
     {
-        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_blink') === '1';
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_blink') === true;
     }
 
     /**
@@ -257,10 +257,9 @@ class ModuleOpenWrtHelper
      */
     public static function setTerminalCursorBlink($enabled)
     {
-        $value = $enabled ? '1' : '0';
-        OpenWrtHelper::uciSet('frieren.@settings[0].terminal_cursor_blink', $value);
+        OpenWrtHelper::uciSet('frieren.@settings[0].terminal_cursor_blink', (bool) $enabled);
 
-        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_blink') === $value;
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_blink') === (bool) $enabled;
     }
 
     /**

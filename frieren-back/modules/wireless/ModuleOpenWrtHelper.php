@@ -583,7 +583,8 @@ class ModuleOpenWrtHelper
      */
     public static function resetWirelessConfig()
     {
-        OpenWrtHelper::exec('wifi config > ' . self::WIRELESS_CONFIG_PATH);
+        $command = 'wifi config > ' . self::WIRELESS_CONFIG_PATH;
+        OpenWrtHelper::exec($command, true, true);
         OpenWrtHelper::execBackground('wifi reload');
 
         return true;

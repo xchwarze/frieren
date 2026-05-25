@@ -20,11 +20,14 @@ class OpenWrtHelper
      *
      * @param string $command The command to be executed.
      * @param bool $merge Whether to merge the output into a single string. Default is true.
+     * @param bool $raw If true, skips escapeshellcmd. Use for commands with pipes, redirects, or globs.
      * @return array|false|string The output of the command. If $merge is true, the output will be a single string. Otherwise, it will be an array of lines.
      */
-    public static function exec($command, $merge = true)
+    public static function exec($command, $merge = true, $raw = false)
     {
-        //$command = escapeshellcmd($command);
+        if (!$raw) {
+            $command = escapeshellcmd($command);
+        }
         exec($command, $output, $retval);
 
         // Check if the command executed successfully
