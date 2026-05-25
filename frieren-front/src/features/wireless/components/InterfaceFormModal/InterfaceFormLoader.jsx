@@ -8,8 +8,8 @@ import { Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import useGetInterfaceConfig from '@src/features/wireless/hooks/useGetInterfaceConfig.js';
+import { ENCRYPTION_OPTIONS } from '@src/features/wireless/helpers/constants.js';
 import InterfaceForm from './InterfaceForm';
-import { ENCRYPTION_OPTIONS } from './ModeAwareFields';
 
 const normalizeEncryption = (enc) => {
     if (!enc || enc === 'none') return 'none';

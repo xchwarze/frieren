@@ -19,7 +19,6 @@ const useStartDiagnosticsScript = () => {
         queryKey: HARDWARE_GET_DIAGNOSTICS_STATUS,
         module: 'hardware',
         action: 'getDiagnosticsStatus',
-        refetchInterval: 600,
     });
 
     const mutation = useAuthenticatedMutation({

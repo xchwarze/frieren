@@ -6,50 +6,17 @@
  */
 import { useCallback } from 'react';
 import { Button as BaseButton, Form } from 'react-bootstrap';
-import * as yup from 'yup';
 import PropTypes from 'prop-types';
 
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import { MODE_OPTIONS } from '@src/features/wireless/helpers/constants.js';
+import { interfaceSchema } from '@src/features/wireless/helpers/validationSchemas.js';
 import useAddInterface from '@src/features/wireless/hooks/useAddInterface.js';
 import useSetInterfaceConfig from '@src/features/wireless/hooks/useSetInterfaceConfig.js';
 import ModeAwareFields from './ModeAwareFields';
-
-const MODE_OPTIONS = [
-    { value: 'ap', label: 'Access Point' },
-    { value: 'sta', label: 'Station' },
-    { value: 'monitor', label: 'Monitor' },
-];
-
-export const interfaceSchema = yup.object({
-    mode: yup.string().required('Mode is mandatory'),
-    ssid: yup.string().when('mode', {
-        is: 'monitor',
-        then: (schema) => schema.notRequired(),
-        otherwise: (schema) => schema.required('SSID is mandatory'),
-    }),
-    network: yup.string().when('mode', {
-        is: 'monitor',
-        then: (schema) => schema.notRequired(),
-        otherwise: (schema) => schema.required('Network is mandatory'),
-    }),
-    encryption: yup.string().when('mode', {
-        is: 'monitor',
-        then: (schema) => schema.notRequired(),
-        otherwise: (schema) => schema.required('Encryption is mandatory'),
-    }),
-    key: yup.string().when(['encryption', 'mode'], {
-        is: (encryption, mode) => mode !== 'monitor' && encryption && encryption !== 'none',
-        then: (schema) => schema.required('Key is required').min(8, 'Min 8 characters'),
-        otherwise: (schema) => schema.notRequired(),
-    }),
-    hidden: yup.boolean(),
-    disabled: yup.boolean(),
-    isManagement: yup.boolean(),
-    isRecon: yup.boolean(),
-});
 
 const InterfaceForm = ({ radio, section, onHide, defaultValues }) => {
     const isEditMode = !!section;

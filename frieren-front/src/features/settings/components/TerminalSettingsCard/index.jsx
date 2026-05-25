@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import * as yup from 'yup';
 import PropTypes from 'prop-types';
 
 import { TERMINAL_THEME_OPTIONS } from '@src/features/terminal/helpers/terminalThemes.js';
 import useSetTerminalSettings from '@src/features/settings/hooks/useSetTerminalSettings.js';
+import { terminalSettingsSchema } from '@src/features/settings/helpers/validationSchemas.js';
 import PanelCard from '@src/components/PanelCard';
 import FormProvider from '@src/components/Form/FormProvider';
 import InputField from '@src/components/Form/InputField';
@@ -21,14 +21,6 @@ const CURSOR_STYLE_OPTIONS = [
     { value: 'underline', label: 'Underline' },
     { value: 'bar', label: 'Bar' },
 ];
-
-const terminalSettingsSchema = yup.object({
-    terminalTheme: yup.string().required('Theme selection is mandatory'),
-    fontSize: yup.number().min(8, 'Minimum 8').max(32, 'Maximum 32').required('Font size is required'),
-    cursorStyle: yup.string().oneOf(['block', 'underline', 'bar']).required(),
-    cursorBlink: yup.boolean(),
-    terminalAutologin: yup.boolean(),
-}).required();
 
 /**
  * Settings card for terminal configuration options.

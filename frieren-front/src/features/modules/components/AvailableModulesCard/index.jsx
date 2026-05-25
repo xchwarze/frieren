@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import { openLink } from '@src/helpers/actionsHelper.js';
 import PanelCard from '@src/components/PanelCard';
 import Button from '@src/components/Button';
-import { installModuleAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
+import { installModuleAtom } from '@src/features/modules/atoms/installModuleAtom.js';
 
 /**
  * Generates a card component displaying available modules. Handles click events for downloading modules.

@@ -21,7 +21,6 @@ const useSystemUpdate = () => {
         queryKey: DASHBOARD_GET_UPDATE_STATUS,
         module: 'dashboard',
         action: 'getSystemUpdateStatus',
-        refetchInterval: 3000,
         onCompleted: () => {
             toast.success('Update installed. Device is rebooting...');
         },

@@ -17,12 +17,15 @@ import PropTypes from 'prop-types';
  * @param {String} description - The description of the modal.
  * @return {ReactElement} The rendered confirmation modal component.
  */
-const ConfirmationModal = ({ show, onHide, onConfirm, title, description }) => (
+const ConfirmationModal = ({ show, onHide, onConfirm, title, description, children }) => (
     <Modal show={show} onHide={onHide} centered>
         <Modal.Header closeButton>
             <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>{description}</Modal.Body>
+        <Modal.Body>
+            {description}
+            {children}
+        </Modal.Body>
         <Modal.Footer>
             <Button variant={'secondary'} onClick={onHide}>
                 Cancel
@@ -39,7 +42,8 @@ ConfirmationModal.propTypes = {
     onHide: PropTypes.func.isRequired,
     onConfirm: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    children: PropTypes.node,
 };
 
 export default ConfirmationModal;

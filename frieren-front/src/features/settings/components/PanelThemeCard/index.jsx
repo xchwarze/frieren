@@ -4,18 +4,14 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import * as yup from 'yup';
 import PropTypes from 'prop-types';
 
 import useSetPanelTheme from '@src/features/settings/hooks/useSetPanelTheme.js';
+import { themeSchema } from '@src/features/settings/helpers/validationSchemas.js';
 import PanelCard from '@src/components/PanelCard';
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SubmitButton from '@src/components/Form/SubmitButton';
-
-const themeSchema = yup.object({
-    theme: yup.string().required('Theme selection is mandatory')
-}).required();
 
 const THEMES = [
     { value: 'light', label: 'Light' },

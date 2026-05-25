@@ -8,7 +8,7 @@ import { useAtomValue } from 'jotai';
 
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
-import { installModuleAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
+import { installModuleAtom } from '@src/features/modules/atoms/installModuleAtom.js';
 import useDownloadStatus from '@src/features/modules/hooks/useDownloadStatus.js';
 
 /**

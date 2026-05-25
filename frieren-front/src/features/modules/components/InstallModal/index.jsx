@@ -10,7 +10,7 @@ import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
 
 import { MODULE_INSTALL_TYPE_INTERNAL, MODULE_INSTALL_TYPE_SD } from '@src/features/modules/helpers/constants.js';
-import { installModuleAtom, setModuleDestinationAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
+import { installModuleAtom, setModuleDestinationAtom } from '@src/features/modules/atoms/installModuleAtom.js';
 import useCheckDestination from '@src/features/modules/hooks/useCheckDestination';
 import useDownloadModule from '@src/features/modules/hooks/useDownloadModule';
 import Button from '@src/components/Button';

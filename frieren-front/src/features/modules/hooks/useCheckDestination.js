@@ -9,7 +9,7 @@ import { useAtomValue } from 'jotai';
 import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
 import { fetchPost } from '@src/services/fetchService.js';
 import { MODULES_CHECK_DESTINATION } from '@src/features/modules/helpers/queryKeys.js';
-import { installModuleAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
+import { installModuleAtom } from '@src/features/modules/atoms/installModuleAtom.js';
 
 /**
  * Function to utilize a mutation hook to check a destination using the atom provided module name and size.

@@ -7,7 +7,7 @@
 import { Router } from 'wouter';
 import { useAtomValue } from 'jotai';
 
-import useRouterRules from '@src/hooks/useRouterRules.js';
+import useHashLocation from '@src/hooks/useHashLocation.js';
 import authAtom from '@src/atoms/authAtom.js';
 import LoginStack from '@src/navigation/LoginStack.jsx';
 import LogoffStack from '@src/navigation/LogoffStack.jsx';
@@ -24,7 +24,7 @@ const RouterProvider = () => {
     }
 
     return (
-        <Router hook={useRouterRules}>
+        <Router hook={useHashLocation}>
             {authStatus ? <LoginStack /> : <LogoffStack />}
         </Router>
     );

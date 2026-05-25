@@ -18,7 +18,7 @@ import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
  *
  * @return {Function} The mutation function for user logout
  */
-const useUserLogoutMutation = () => {
+const useShutDownMutation = () => {
   const queryClient = useQueryClient();
   const setAuth = useSetAtom(authAtom)
   const [, setLocation] = useLocation();
@@ -40,4 +40,4 @@ const useUserLogoutMutation = () => {
   });
 };
 
-export default useUserLogoutMutation;
+export default useShutDownMutation;

@@ -7,22 +7,14 @@
 import { useCallback } from 'react';
 import { Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import * as yup from 'yup';
 
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import { radioConfigSchema } from '@src/features/wireless/helpers/validationSchemas.js';
 import useGetRadioConfig from '@src/features/wireless/hooks/useGetRadioConfig.js';
 import useSetRadioConfig from '@src/features/wireless/hooks/useSetRadioConfig.js';
-
-const radioConfigSchema = yup.object({
-    channel: yup.string().required('Channel is mandatory'),
-    txpower: yup.string().required('TX Power is mandatory'),
-    htmode: yup.string().required('Mode is mandatory'),
-    country: yup.string().required('Country is mandatory'),
-    disabled: yup.boolean(),
-}).required();
 
 const RadioConfigForm = ({ radio, onHide }) => {
     const { data: radioConfig, isFetching } = useGetRadioConfig(radio);

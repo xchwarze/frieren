@@ -27,8 +27,6 @@ const useHashLocation = () => {
 
     const location = authStatus ? realLocation : '/login';
     const hashNavigate = (to) => navigate("#" + to);
-    //console.log({ authStatus, location })
-
     return [location, hashNavigate];
 };
 

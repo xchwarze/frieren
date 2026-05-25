@@ -4,18 +4,14 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import * as yup from 'yup';
 import PropTypes from 'prop-types';
 
 import useSetHostname from '@src/features/settings/hooks/useSetHostname';
+import { hostnameSchema } from '@src/features/settings/helpers/validationSchemas.js';
 import PanelCard from '@src/components/PanelCard';
 import FormProvider from '@src/components/Form/FormProvider';
 import InputField from '@src/components/Form/InputField';
 import SubmitButton from '@src/components/Form/SubmitButton';
-
-const hostnameSchema = yup.object({
-    hostname: yup.string().required('Hostname is mandatory')
-}).required();
 
 /**
  * Generate a HostnameCard component that allows users to change the hostname.

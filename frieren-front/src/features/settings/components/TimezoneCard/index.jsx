@@ -4,20 +4,16 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import * as yup from 'yup';
 import PropTypes from 'prop-types';
 
 import { TIMEZONES } from '@src/features/settings/helpers/timezones';
 import useSetTimezone from '@src/features/settings/hooks/useSetTimezone.js';
+import { timezoneSchema } from '@src/features/settings/helpers/validationSchemas.js';
 import SyncFromBrowserButton from '@src/features/settings/components/SyncFromBrowserButton';
 import PanelCard from '@src/components/PanelCard';
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SubmitButton from '@src/components/Form/SubmitButton';
-
-const timezoneSchema = yup.object({
-    timezone: yup.string().required('Timezone is mandatory')
-}).required();
 
 /**
  * Generate a timezone card component with the ability to change the timezone.

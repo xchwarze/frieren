@@ -9,19 +9,7 @@ import { useWatch } from 'react-hook-form';
 import InputField from '@src/components/Form/InputField';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
-
-export const NETWORK_OPTIONS = [
-    { value: 'lan', label: 'LAN' },
-    { value: 'wwan', label: 'WWAN' },
-    { value: 'guest', label: 'Guest' },
-];
-
-export const ENCRYPTION_OPTIONS = [
-    { value: 'none', label: 'None' },
-    { value: 'psk2+ccmp', label: 'WPA2-PSK' },
-    { value: 'sae', label: 'WPA3-SAE' },
-    { value: 'psk-mixed+ccmp', label: 'WPA/WPA2 Mixed' },
-];
+import { NETWORK_OPTIONS, ENCRYPTION_OPTIONS } from '@src/features/wireless/helpers/constants.js';
 
 const ModeAwareFields = () => {
     const mode = useWatch({ name: 'mode', defaultValue: 'ap' });

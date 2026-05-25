@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import useBackgroundTask from '@src/hooks/useBackgroundTask.js';
 import { MODULES_GET_MODULE_LIST } from '@src/helpers/queryKeys.js';
 import { MODULES_INSTALLATION_STATUS, MODULES_GET_INSTALLED_MODULES } from '@src/features/modules/helpers/queryKeys.js';
-import { installModuleAtom } from '@src/features/modules/atoms/selectedRemoteModuleAtom.js';
+import { installModuleAtom } from '@src/features/modules/atoms/installModuleAtom.js';
 
 /**
  * Tracks module installation status via polling. Invalidates queries on completion.

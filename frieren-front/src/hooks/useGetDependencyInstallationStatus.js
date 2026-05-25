@@ -26,7 +26,7 @@ const useGetDependencyInstallationStatus = ({ module, dependenciesQueryKey }) =>
         }),
         enabled: isRunning,
         staleTime: 0,
-        refetchInterval: 5000,
+        refetchInterval: 2000,
     });
 
     useEffect(() => {
