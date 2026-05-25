@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+trap 'echo "ERROR: failed at line $LINENO" >&2' ERR
 #
 # Frieren API test helper
 # Usage:

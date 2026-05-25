@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+trap 'echo "ERROR: failed at line $LINENO" >&2' ERR
 #
 # Run a command on the device via SSH
 # Usage: ./ssh-cmd.sh <command> [host] [password]
@@ -6,10 +8,12 @@
 #   host     - default: 192.168.7.1
 #   password - default: root
 
-CMD="$1"
+CMD="${1:-}"
 HOST="${2:-192.168.7.1}"
 PASS="${3:-root}"
 USER="root"
+
+ssh-keygen -R "${HOST}" 2>/dev/null || true
 
 if [ -z "$CMD" ]; then
     echo "Usage: $0 <command> [host] [password]"

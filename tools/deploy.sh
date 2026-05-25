@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+trap 'echo "ERROR: failed at line $LINENO" >&2' ERR
 #
 # Deploy frieren to device via SSH/SCP
 # Usage: ./deploy.sh <service> [host] [password]
@@ -6,7 +8,7 @@
 #   host     - default: 192.168.7.1
 #   password - default: root
 
-SERVICE="$1"
+SERVICE="${1:-}"
 HOST="${2:-192.168.7.1}"
 PASS="${3:-root}"
 USER="root"
@@ -15,6 +17,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACK_PATH="$(cd "${SCRIPT_DIR}/../frieren-back" && pwd)"
 FRONT_PATH="$(cd "${SCRIPT_DIR}/../frieren-front" && pwd)"
 TERMINAL_PATH="$(cd "${SCRIPT_DIR}/../frieren-terminal" && pwd)"
+
+ssh-keygen -R "${HOST}" 2>/dev/null || true
 
 if [ -z "$SERVICE" ] || { [ "$SERVICE" != "back" ] && [ "$SERVICE" != "front" ] && [ "$SERVICE" != "terminal" ]; }; then
     echo "Usage: $0 <back|front|terminal> [host] [password]"
@@ -36,7 +40,7 @@ scp_with_pass() {
     local password="$1"
     shift
     printf '#!/bin/sh\necho "%s"\n' "${password}" > "${ASKPASS_HELPER}"
-    DISPLAY=:0 SSH_ASKPASS="${ASKPASS_HELPER}" SSH_ASKPASS_REQUIRE=force scp -o StrictHostKeyChecking=no "$@"
+    DISPLAY=:0 SSH_ASKPASS="${ASKPASS_HELPER}" SSH_ASKPASS_REQUIRE=force scp -O -o StrictHostKeyChecking=no "$@"
 }
 
 deploy_back() {
