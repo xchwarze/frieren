@@ -30,7 +30,13 @@ const SearchInput = ({ value, onChange, placeholder = 'Search...', className = '
             onChange={(e) => onChange(e.target.value)}
         />
         {value && (
-            <InputGroup.Text role={'button'} onClick={() => onChange('')}>
+            <InputGroup.Text
+                role={'button'}
+                tabIndex={0}
+                aria-label={'Clear search'}
+                onClick={() => onChange('')}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onChange(''); }}
+            >
                 <Icon name={'x'} />
             </InputGroup.Text>
         )}

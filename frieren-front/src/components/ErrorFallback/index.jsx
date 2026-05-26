@@ -8,14 +8,16 @@ import Card from 'react-bootstrap/Card';
 import PropTypes from 'prop-types';
 
 import Icon from '@src/components/Icon';
+import Button from '@src/components/Button';
 
 /**
  * Renders an error fallback component when a crash occurs.
  *
  * @param {Object} error - The error object.
+ * @param {Function} resetErrorBoundary - Callback to reset the error boundary and retry rendering.
  * @return {ReactElement} The rendered error fallback component.
  */
-const ErrorFallback = ({ error }) => (
+const ErrorFallback = ({ error, resetErrorBoundary }) => (
     <Card border={'danger'} className={'mb-3'} role={'alert'}>
         <Card.Header className={'bg-danger text-white'}>
             <h5>
@@ -23,9 +25,17 @@ const ErrorFallback = ({ error }) => (
             </h5>
         </Card.Header>
         <Card.Body>
-            <p>An unexpected error has occurred. Here&amp;apos;s more detail for debugging:</p>
+            <p>An unexpected error has occurred. Here&apos;s more detail for debugging:</p>
             <p>Error Message: <strong>{error.message}</strong></p>
             <pre className={'border rounded bg-body-secondary text-danger p-2'}>{error.stack}</pre>
+            {resetErrorBoundary && (
+                <Button
+                    icon={'refresh-cw'}
+                    label={'Try Again'}
+                    variant={'outline-danger'}
+                    onClick={resetErrorBoundary}
+                />
+            )}
         </Card.Body>
     </Card>
 );
@@ -33,9 +43,9 @@ const ErrorFallback = ({ error }) => (
 ErrorFallback.propTypes = {
     error: PropTypes.shape({
         message: PropTypes.string.isRequired,
-        stack: PropTypes.string
+        stack: PropTypes.string,
     }).isRequired,
-   //resetErrorBoundary: PropTypes.func.isRequired
+    resetErrorBoundary: PropTypes.func,
 };
 
 export default ErrorFallback;

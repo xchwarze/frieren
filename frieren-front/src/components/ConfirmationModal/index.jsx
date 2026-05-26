@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 /**
@@ -17,9 +17,9 @@ import PropTypes from 'prop-types';
  * @param {String} description - The description of the modal.
  * @return {ReactElement} The rendered confirmation modal component.
  */
-const ConfirmationModal = ({ show, onHide, onConfirm, title, description, children }) => (
-    <Modal show={show} onHide={onHide} centered>
-        <Modal.Header closeButton>
+const ConfirmationModal = ({ show, onHide, onConfirm, title, description, isConfirmLoading, children }) => (
+    <Modal show={show} onHide={isConfirmLoading ? undefined : onHide} backdrop={isConfirmLoading ? 'static' : true} centered>
+        <Modal.Header closeButton={!isConfirmLoading}>
             <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -27,10 +27,11 @@ const ConfirmationModal = ({ show, onHide, onConfirm, title, description, childr
             {children}
         </Modal.Body>
         <Modal.Footer>
-            <Button variant={'secondary'} onClick={onHide}>
+            <Button variant={'secondary'} onClick={onHide} disabled={isConfirmLoading}>
                 Cancel
             </Button>
-            <Button variant={'danger'} onClick={onConfirm}>
+            <Button variant={'danger'} onClick={onConfirm} disabled={isConfirmLoading}>
+                {isConfirmLoading && <Spinner animation={'border'} size={'sm'} className={'me-2'} />}
                 Confirm
             </Button>
         </Modal.Footer>
@@ -42,7 +43,8 @@ ConfirmationModal.propTypes = {
     onHide: PropTypes.func.isRequired,
     onConfirm: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    description: PropTypes.string,
+    description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    isConfirmLoading: PropTypes.bool,
     children: PropTypes.node,
 };
 

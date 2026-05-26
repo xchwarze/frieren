@@ -41,6 +41,11 @@ const UsbDevicesCard = () => {
                     </tr>
                     </thead>
                     <tbody>
+                    {data.length === 0 && (
+                        <tr>
+                            <td colSpan={4}>No USB devices detected.</td>
+                        </tr>
+                    )}
                     {data.map(({ id, name, device, bus }, index) => (
                         <tr key={index}>
                             <td>{bus}</td>

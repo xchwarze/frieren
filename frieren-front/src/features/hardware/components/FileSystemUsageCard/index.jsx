@@ -44,6 +44,11 @@ const FileSystemUsageCard = () => {
                     </tr>
                     </thead>
                     <tbody>
+                    {data.length === 0 && (
+                        <tr>
+                            <td colSpan={7}>No file systems found.</td>
+                        </tr>
+                    )}
                     {data.map(({ filesystem, type, size, used, available, usePercent, mountedOn }, index) => (
                         <tr key={index}>
                             <td>{filesystem}</td>

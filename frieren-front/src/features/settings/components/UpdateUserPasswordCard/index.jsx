@@ -4,12 +4,20 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
+import { useCallback } from 'react';
+
 import useUpdateUserPassword from '@src/features/settings/hooks/useUpdateUserPassword';
 import { updatePasswordSchema } from '@src/features/settings/helpers/validationSchemas.js';
 import PanelCard from '@src/components/PanelCard';
 import FormProvider from '@src/components/Form/FormProvider';
 import InputField from '@src/components/Form/InputField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+
+const defaultValues = {
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+};
 
 /**
  * Update the user's password card component.
@@ -19,18 +27,17 @@ import SubmitButton from '@src/components/Form/SubmitButton';
 const UpdateUserPasswordCard = () => {
     const { mutateAsync: updateUserPassword } = useUpdateUserPassword();
 
-    const defaultValues = {
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-    };
+    const handleSubmit = useCallback(async (values, { reset }) => {
+        await updateUserPassword(values);
+        reset(defaultValues);
+    }, [updateUserPassword]);
 
     return (
         <PanelCard
             title={'User Management'}
             showRefresh={false}
         >
-            <FormProvider autoComplete={'off'} schema={updatePasswordSchema} onSubmit={updateUserPassword} defaultValues={defaultValues}>
+            <FormProvider autoComplete={'off'} schema={updatePasswordSchema} onSubmit={handleSubmit} defaultValues={defaultValues}>
                 <InputField
                     name={'currentPassword'}
                     label={'Current Password'}

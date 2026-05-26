@@ -20,8 +20,13 @@ import Icon from '@src/components/Icon';
  * @param {Object} rest - Additional props to be spread onto the BaseButton component.
  * @return {ReactElement} The rendered Button component.
  */
-const Button = ({ label, icon, disabled, loading, ...rest}) => (
-    <BaseButton variant={'primary'} disabled={disabled || loading} {...rest}>
+const Button = ({ label, icon, disabled, loading, 'aria-label': ariaLabel, ...rest}) => (
+    <BaseButton
+        variant={'primary'}
+        disabled={disabled || loading}
+        aria-label={ariaLabel || label || icon}
+        {...rest}
+    >
         {loading ? (
             <Spinner animation={'border'} size={'sm'} />
         ) : (
@@ -36,6 +41,7 @@ Button.propTypes = {
     icon: PropTypes.string.isRequired,
     disabled: PropTypes.bool,
     loading: PropTypes.bool,
+    'aria-label': PropTypes.string,
 };
 
 export default Button;

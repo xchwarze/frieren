@@ -13,7 +13,8 @@ import PropTypes from 'prop-types';
  * Generates a form provider for the given children, onSubmit function, schema, and default values.
  *
  * @param {ReactNode} children - The child components to be rendered within the form provider.
- * @param {(values: any) => Promise<any>} onSubmit - Async submit handler.
+ * @param {(values: any, methods: Object) => Promise<any>} onSubmit - Async submit handler.
+ *        Receives form values and react-hook-form methods (reset, setValue, etc.).
  *        MUST return a Promise. Form state `isSubmitting` remains true
  *        until the Promise resolves or rejects.
  * @param {Object} schema - The schema to be used for form validation.
@@ -30,7 +31,7 @@ const FormProvider = ({ children, onSubmit, schema, defaultValues, ...rest }) =>
 
     return (
         <HookFormProvider {...methods}>
-            <Form onSubmit={methods.handleSubmit(onSubmit)} noValidate={true} className={'mt-3'} {...rest}>
+            <Form onSubmit={methods.handleSubmit((values) => onSubmit(values, methods))} noValidate={true} className={'mt-3'} {...rest}>
                 {children}
             </Form>
         </HookFormProvider>
