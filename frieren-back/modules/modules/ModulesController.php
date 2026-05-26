@@ -70,8 +70,9 @@ class ModulesController extends \frieren\core\Controller
 
     private function categorizeModule($info, $sidebarSettings, &$modules) {
         $module = [
-            'name'  => $info['name'],
-            'title' => $info['title'],
+            'name'    => $info['name'],
+            'title'   => $info['title'],
+            'version' => $info['version'] ?? '0.0.0',
         ];
 
         if ($info['forceSidebar'] || isset($sidebarSettings[$module['name']])) {

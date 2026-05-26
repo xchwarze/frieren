@@ -33,11 +33,12 @@ const LoginStack = () => {
         <Layout>
             <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <Switch>
-                    {modules.map(({ name, title }) => (
+                    {modules.map(({ name, title, version }) => (
                         <Route key={name} path={`/${name}`}>
                             <DynamicModule
                                 name={name}
                                 title={title}
+                                version={version}
                             />
                         </Route>
                     ))}
