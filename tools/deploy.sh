@@ -46,7 +46,8 @@ scp_with_pass() {
 deploy_back() {
     echo "Deploying backend -> ${USER}@${HOST}:${REMOTE_PATH}"
 
-    # api/ without index.php and config/
+    # api/ core files
+    scp_with_pass "${PASS}" "${BACK_PATH}/api/index.php" "${USER}@${HOST}:${REMOTE_PATH}/api/"
     for dir in core helper orm; do
         scp_with_pass "${PASS}" -r "${BACK_PATH}/api/${dir}" "${USER}@${HOST}:${REMOTE_PATH}/api/"
     done

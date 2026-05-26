@@ -63,7 +63,6 @@
 
 #sidebar .btn-toggle-sidebar {
     margin-top: auto;
-    border-top: 1px solid var(--bs-gray-600);
     user-select: none;
 }
 

@@ -38,7 +38,7 @@ const ConfirmationModalWrapper = () => {
             onHide={handleClose}
             onConfirm={handleConfirm}
             title={'Confirm Removal'}
-            description={`Are you sure you want to remove the package "${selectedPackage?.name}"? This action cannot be undone.`}
+            description={<>Are you sure you want to remove the package <strong>{selectedPackage?.name}</strong>?<br />This action cannot be undone.</>}
         >
             <Form.Check
                 type={'switch'}

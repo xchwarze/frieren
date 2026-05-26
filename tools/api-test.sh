@@ -41,13 +41,13 @@ done
 shift $((OPTIND - 1))
 
 BASE_URL="http://${HOST}:${PORT}/api/index.php"
-ACTION="$1"
-PAYLOAD="$2"
+ACTION="${1:-}"
+PAYLOAD="${2:-}"
 
 api_call() {
     local data="$1"
     local xsrf
-    xsrf=$(grep XSRF-TOKEN "$COOKIE_JAR" 2>/dev/null | awk '{print $NF}')
+    xsrf=$(grep XSRF-TOKEN "$COOKIE_JAR" 2>/dev/null | awk '{print $NF}' || true)
 
     local extra_args=()
     [ -n "$xsrf" ] && extra_args+=(-H "X-XSRF-TOKEN: $xsrf")

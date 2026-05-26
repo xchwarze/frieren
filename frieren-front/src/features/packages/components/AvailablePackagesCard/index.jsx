@@ -6,16 +6,14 @@
  */
 import { useState, useMemo, useCallback, memo } from 'react';
 import Table from 'react-bootstrap/Table';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
 import { useAtomValue } from 'jotai';
 import PropTypes from 'prop-types';
 
 import PanelCard from '@src/components/PanelCard';
 import TablePagination from '@src/components/TablePagination';
+import SearchInput from '@src/components/SearchInput';
 import Button from '@src/components/Button';
-import Icon from '@src/components/Icon';
 import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
 import usePagination from '@src/hooks/usePagination.js';
 import useAvailablePackages from '@src/features/packages/hooks/useAvailablePackages.js';
@@ -142,16 +140,11 @@ const AvailablePackagesCard = () => {
 
                 {isLoaded && !isBusy && (
                     <>
-                        <InputGroup className={'mb-3'}>
-                            <InputGroup.Text>
-                                <Icon name={'search'} />
-                            </InputGroup.Text>
-                            <Form.Control
-                                placeholder={'Search available packages...'}
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </InputGroup>
+                        <SearchInput
+                            value={searchTerm}
+                            onChange={setSearchTerm}
+                            placeholder={'Search available packages...'}
+                        />
 
                         <PackageTable
                             packages={pageData}

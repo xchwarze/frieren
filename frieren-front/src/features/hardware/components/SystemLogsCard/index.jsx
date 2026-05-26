@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
+import { useState, useMemo } from 'react';
 import { Table } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
+import SearchInput from '@src/components/SearchInput';
 import useGetSystemLogs from '@src/features/hardware/hooks/useGetSystemLogs.js';
+import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
 
 /**
  * Generates a card displaying system logs. Only the last 1000 events are shown for performance reasons.
@@ -17,6 +20,20 @@ import useGetSystemLogs from '@src/features/hardware/hooks/useGetSystemLogs.js';
 const SystemLogsCard = () => {
     const query = useGetSystemLogs();
     const { data, isSuccess } = query;
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearch = useDebouncedValue(searchTerm);
+
+    const filteredLogs = useMemo(() => {
+        if (!debouncedSearch || !data) {
+            return data;
+        }
+        const term = debouncedSearch.toLowerCase();
+        return data.filter(({ tag, process, message }) =>
+            tag.toLowerCase().includes(term)
+            || process.toLowerCase().includes(term)
+            || message.toLowerCase().includes(term)
+        );
+    }, [data, debouncedSearch]);
 
     return (
         <PanelCard
@@ -26,26 +43,39 @@ const SystemLogsCard = () => {
             query={query}
         >
             {isSuccess && (
-                <Table className={'mt-4'} striped hover responsive>
-                    <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Tag</th>
-                        <th>Process</th>
-                        <th>Message</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {data.map(({ timestamp, tag, process, message }, index) => (
-                        <tr key={index}>
-                            <td>{timestamp}</td>
-                            <td>{tag}</td>
-                            <td>{process}</td>
-                            <td>{message}</td>
+                <>
+                    <SearchInput
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        placeholder={'Search logs...'}
+                        className={'mb-3 mt-3'}
+                    />
+                    <Table striped hover responsive>
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Tag</th>
+                            <th>Process</th>
+                            <th>Message</th>
                         </tr>
-                    ))}
-                    </tbody>
-                </Table>
+                        </thead>
+                        <tbody>
+                        {filteredLogs.map(({ timestamp, tag, process, message }, index) => (
+                            <tr key={index}>
+                                <td>{timestamp}</td>
+                                <td>{tag}</td>
+                                <td>{process}</td>
+                                <td>{message}</td>
+                            </tr>
+                        ))}
+                        {filteredLogs.length === 0 && (
+                            <tr>
+                                <td colSpan={4}>No logs found.</td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </Table>
+                </>
             )}
         </PanelCard>
     );

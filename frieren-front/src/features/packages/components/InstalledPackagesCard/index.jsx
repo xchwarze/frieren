@@ -6,14 +6,12 @@
  */
 import { useState, useMemo } from 'react';
 import Table from 'react-bootstrap/Table';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Form from 'react-bootstrap/Form';
 import { useAtomValue, useSetAtom } from 'jotai';
 
 import PanelCard from '@src/components/PanelCard';
 import TablePagination from '@src/components/TablePagination';
+import SearchInput from '@src/components/SearchInput';
 import Button from '@src/components/Button';
-import Icon from '@src/components/Icon';
 import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
 import usePagination from '@src/hooks/usePagination.js';
 import useInstalledPackages from '@src/features/packages/hooks/useInstalledPackages.js';
@@ -56,16 +54,11 @@ const InstalledPackagesCard = () => {
         >
             {isLoaded && (
                 <>
-                    <InputGroup className={'mb-3'}>
-                        <InputGroup.Text>
-                            <Icon name={'search'} />
-                        </InputGroup.Text>
-                        <Form.Control
-                            placeholder={'Search installed packages...'}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </InputGroup>
+                    <SearchInput
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        placeholder={'Search installed packages...'}
+                    />
 
                     <Table striped hover responsive>
                         <thead>

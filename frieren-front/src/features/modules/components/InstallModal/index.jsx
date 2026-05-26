@@ -45,8 +45,8 @@ const InstallModal = () => {
     }, [selectedRemoteModule, checkDestination]);
 
     return (
-        <Modal show={selectedRemoteModule} onHide={handleCloseClick} centered>
-            <Modal.Header closeButton>
+        <Modal show={!!selectedRemoteModule} onHide={handleCloseClick} backdrop={isProcessing ? 'static' : true} keyboard={!isProcessing} centered>
+            <Modal.Header closeButton={!isProcessing}>
                 <Modal.Title>
                     {updating ? `Update Module ${title}` : `Install Module ${title}`}
                 </Modal.Title>
