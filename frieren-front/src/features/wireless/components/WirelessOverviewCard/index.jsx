@@ -5,7 +5,6 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useCallback } from 'react';
-
 import PanelCard from '@src/components/PanelCard';
 import useGetWirelessOverview from '@src/features/wireless/hooks/useGetWirelessOverview.js';
 import ScanModal from '@src/features/wireless/components/ScanModal';
@@ -77,6 +76,7 @@ const WirelessOverviewCard = () => {
                     onEdit={handleEdit}
                     onAdd={handleAdd}
                     onConfigure={handleConfigure}
+                    checkingSection={checkingSection}
                 />
             ))}
 

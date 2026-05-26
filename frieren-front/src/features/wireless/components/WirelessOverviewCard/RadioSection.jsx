@@ -5,7 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useCallback } from 'react';
-import { Table, Badge } from 'react-bootstrap';
+import { Table, Badge, Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Button from '@src/components/Button';
@@ -13,7 +13,7 @@ import ConfirmationModal from '@src/components/ConfirmationModal';
 import useRemoveInterface from '@src/features/wireless/hooks/useRemoveInterface.js';
 import useToggleInterface from '@src/features/wireless/hooks/useToggleInterface.js';
 
-const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) => {
+const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, checkingSection }) => {
     const { mutate: removeInterface, isPending: isRemoving } = useRemoveInterface();
     const { mutate: toggleInterface, isPending: isToggling } = useToggleInterface();
 
@@ -95,9 +95,13 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure }) 
                                 <td><code>{iface.bssid || '-'}</code></td>
                                 <td>{iface.encryption || 'None'}</td>
                                 <td>
-                                    <Badge bg={iface.disabled ? 'secondary' : (iface.up ? 'success' : 'danger')}>
-                                        {iface.disabled ? 'Disabled' : (iface.up ? 'Up' : 'Down')}
-                                    </Badge>
+                                    {checkingSection === iface.section ? (
+                                        <Spinner animation={'border'} size={'sm'} />
+                                    ) : (
+                                        <Badge bg={iface.disabled ? 'secondary' : (iface.up ? 'success' : 'danger')}>
+                                            {iface.disabled ? 'Disabled' : (iface.up ? 'Up' : 'Down')}
+                                        </Badge>
+                                    )}
                                 </td>
                                 <td>
                                     <div className={'d-flex gap-1'}>
@@ -153,6 +157,7 @@ RadioSection.propTypes = {
     onEdit: PropTypes.func.isRequired,
     onAdd: PropTypes.func.isRequired,
     onConfigure: PropTypes.func.isRequired,
+    checkingSection: PropTypes.string,
 };
 
 export default RadioSection;
