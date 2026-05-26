@@ -32,7 +32,7 @@ const ADD_DEFAULTS = {
     isRecon: false,
 };
 
-const InterfaceFormLoader = ({ radio, section, onHide, initialValues }) => {
+const InterfaceFormLoader = ({ radio, section, onHide, initialValues, onInterfaceSaved }) => {
     const { data: interfaceConfig, isFetching } = useGetInterfaceConfig(section);
 
     if (isFetching) {
@@ -63,6 +63,7 @@ const InterfaceFormLoader = ({ radio, section, onHide, initialValues }) => {
             section={section}
             onHide={onHide}
             defaultValues={defaultValues}
+            onInterfaceSaved={onInterfaceSaved}
         />
     );
 };
@@ -72,6 +73,7 @@ InterfaceFormLoader.propTypes = {
     section: PropTypes.string,
     onHide: PropTypes.func.isRequired,
     initialValues: PropTypes.object,
+    onInterfaceSaved: PropTypes.func,
 };
 
 export default InterfaceFormLoader;

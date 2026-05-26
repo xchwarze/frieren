@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 
 import InterfaceFormLoader from './InterfaceFormLoader';
 
-const InterfaceFormModal = ({ show, onHide, radio, section, initialValues }) => {
+const InterfaceFormModal = ({ show, onHide, radio, section, initialValues, onInterfaceSaved }) => {
     const isEditMode = !!section;
     const title = isEditMode ? 'Edit Interface' : 'Add Interface';
 
@@ -25,6 +25,7 @@ const InterfaceFormModal = ({ show, onHide, radio, section, initialValues }) => 
                         section={section}
                         onHide={onHide}
                         initialValues={initialValues}
+                        onInterfaceSaved={onInterfaceSaved}
                     />
                 )}
             </Modal.Body>
@@ -38,6 +39,7 @@ InterfaceFormModal.propTypes = {
     radio: PropTypes.string,
     section: PropTypes.string,
     initialValues: PropTypes.object,
+    onInterfaceSaved: PropTypes.func,
 };
 
 export default InterfaceFormModal;

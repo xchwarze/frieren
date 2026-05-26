@@ -343,7 +343,86 @@ class ModuleOpenWrtHelper
 
         OpenWrtHelper::execBackground('wifi reload');
 
-        return true;
+        return $sectionName;
+    }
+
+    /**
+     * Returns the runtime status of a wireless interface after a config change.
+     * For STA mode, queries wpa_supplicant for detailed connection state.
+     * For AP/monitor modes, checks whether the interface came up.
+     *
+     * @param string $section UCI section name (e.g. 'wifinet1').
+     * @return array Status with keys: state, mode, and mode-specific details.
+     */
+    public static function getInterfaceStatus($section)
+    {
+        $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
+
+        try {
+            $device = OpenWrtHelper::uciGet("wireless.{$section}.device");
+            $mode = OpenWrtHelper::uciGet("wireless.{$section}.mode");
+        } catch (\Exception $e) {
+            return ['state' => 'UNKNOWN', 'mode' => ''];
+        }
+
+        if (!$device) {
+            return ['state' => 'UNKNOWN', 'mode' => $mode ?? ''];
+        }
+
+        $wirelessStatus = OpenWrtHelper::execUbusCall('network.wireless', 'status');
+        if (!$wirelessStatus || !isset($wirelessStatus[$device])) {
+            return ['state' => 'WAITING', 'mode' => $mode];
+        }
+
+        $ifname = null;
+        $isUp = false;
+        foreach ($wirelessStatus[$device]['interfaces'] ?? [] as $iface) {
+            if (($iface['section'] ?? '') === $section) {
+                $ifname = $iface['ifname'] ?? null;
+                $isUp = ($wirelessStatus[$device]['up'] ?? false) && $ifname !== null;
+                break;
+            }
+        }
+
+        if (!$ifname) {
+            return ['state' => 'WAITING', 'mode' => $mode];
+        }
+
+        if ($mode === 'sta') {
+            $bssInfo = OpenWrtHelper::execUbusCall('wpa_supplicant', 'bss_info', ['iface' => $ifname]);
+            if ($bssInfo !== false && isset($bssInfo['wpa_state'])) {
+                return [
+                    'state'     => $bssInfo['wpa_state'],
+                    'mode'      => $mode,
+                    'ssid'      => $bssInfo['ssid'] ?? '',
+                    'bssid'     => $bssInfo['bssid'] ?? '',
+                    'ip'        => $bssInfo['ip_address'] ?? '',
+                    'frequency' => $bssInfo['freq'] ?? null,
+                ];
+            }
+
+            $wirelessDevices = OpenWrtHelper::execUbusCall('luci-rpc', 'getWirelessDevices');
+            $phy = $wirelessDevices[$device]['iwinfo']['phy'] ?? null;
+            if ($phy) {
+                $phyStatus = OpenWrtHelper::execUbusCall('wpa_supplicant', 'phy_status', ['phy' => $phy]);
+                if ($phyStatus !== false && isset($phyStatus['state'])) {
+                    return [
+                        'state'     => $phyStatus['state'],
+                        'mode'      => $mode,
+                        'ssid'      => '',
+                        'bssid'     => '',
+                        'ip'        => '',
+                        'frequency' => $phyStatus['frequency'] ?? null,
+                    ];
+                }
+            }
+        }
+
+        return [
+            'state'  => $isUp ? 'UP' : 'DOWN',
+            'mode'   => $mode,
+            'ifname' => $ifname,
+        ];
     }
 
     /**

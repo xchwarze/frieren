@@ -16,6 +16,7 @@ class WirelessController extends \frieren\core\Controller
         'getRadioConfig' => true,
         'setRadioConfig' => true,
         'getAssociationList' => true,
+        'getInterfaceStatus' => true,
         'addInterface' => true,
         'removeInterface' => true,
         'toggleInterface' => true,
@@ -70,9 +71,16 @@ class WirelessController extends \frieren\core\Controller
         );
     }
 
+    public function getInterfaceStatus()
+    {
+        return self::setSuccess(
+            self::setupModuleHelper()::getInterfaceStatus($this->request['section'])
+        );
+    }
+
     public function addInterface()
     {
-        if (self::setupModuleHelper()::addInterface(
+        $section = self::setupModuleHelper()::addInterface(
             $this->request['radio'],
             $this->request['ssid'],
             $this->request['encryption'],
@@ -83,8 +91,10 @@ class WirelessController extends \frieren\core\Controller
             $this->request['disabled'],
             $this->request['isManagement'] ?? false,
             $this->request['isRecon'] ?? false
-        )) {
-            return self::setSuccess();
+        );
+
+        if ($section) {
+            return self::setSuccess(['section' => $section]);
         }
 
         self::setError('Error adding interface.');

@@ -12,6 +12,7 @@ import ScanModal from '@src/features/wireless/components/ScanModal';
 import InterfaceFormModal from '@src/features/wireless/components/InterfaceFormModal';
 import RadioConfigModal from '@src/features/wireless/components/RadioConfigModal';
 import RadioSection from './RadioSection';
+import InterfaceStatusNotifier from './InterfaceStatusNotifier';
 
 const mapScanSecurityToEncryption = (security) => {
     if (!security || security === 'Open') return 'none';
@@ -28,6 +29,7 @@ const WirelessOverviewCard = () => {
     const [scanModal, setScanModal] = useState({ show: false, radioName: '' });
     const [formModal, setFormModal] = useState({ show: false, radio: null, section: null, initialValues: null });
     const [radioConfigModal, setRadioConfigModal] = useState({ show: false, radioName: '', band: '' });
+    const [checkingSection, setCheckingSection] = useState(null);
 
     const handleScan = useCallback((radioName) => {
         setScanModal({ show: true, radioName });
@@ -90,7 +92,14 @@ const WirelessOverviewCard = () => {
                 radio={formModal.radio}
                 section={formModal.section}
                 initialValues={formModal.initialValues}
+                onInterfaceSaved={setCheckingSection}
             />
+            {checkingSection && (
+                <InterfaceStatusNotifier
+                    section={checkingSection}
+                    onDone={() => setCheckingSection(null)}
+                />
+            )}
             <RadioConfigModal
                 show={radioConfigModal.show}
                 onHide={() => setRadioConfigModal({ show: false, radioName: '', band: '' })}

@@ -18,7 +18,7 @@ import useAddInterface from '@src/features/wireless/hooks/useAddInterface.js';
 import useSetInterfaceConfig from '@src/features/wireless/hooks/useSetInterfaceConfig.js';
 import ModeAwareFields from './ModeAwareFields';
 
-const InterfaceForm = ({ radio, section, onHide, defaultValues }) => {
+const InterfaceForm = ({ radio, section, onHide, defaultValues, onInterfaceSaved }) => {
     const isEditMode = !!section;
     const { mutateAsync: addInterface } = useAddInterface();
     const { mutateAsync: setInterfaceConfig } = useSetInterfaceConfig();
@@ -26,11 +26,15 @@ const InterfaceForm = ({ radio, section, onHide, defaultValues }) => {
     const handleSubmit = useCallback(async (values) => {
         if (isEditMode) {
             await setInterfaceConfig({ section, ...values });
+            onInterfaceSaved?.(section);
         } else {
-            await addInterface({ radio, ...values });
+            const result = await addInterface({ radio, ...values });
+            if (result?.section) {
+                onInterfaceSaved?.(result.section);
+            }
         }
         onHide();
-    }, [isEditMode, section, radio, addInterface, setInterfaceConfig, onHide]);
+    }, [isEditMode, section, radio, addInterface, setInterfaceConfig, onHide, onInterfaceSaved]);
 
     return (
         <FormProvider
@@ -72,6 +76,7 @@ InterfaceForm.propTypes = {
     section: PropTypes.string,
     onHide: PropTypes.func.isRequired,
     defaultValues: PropTypes.object.isRequired,
+    onInterfaceSaved: PropTypes.func,
 };
 
 export default InterfaceForm;
