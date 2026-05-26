@@ -20,29 +20,29 @@ const RadioConfigForm = ({ radio, onHide }) => {
     const { data: radioConfig, isFetching } = useGetRadioConfig(radio);
     const { mutateAsync: setRadioConfig } = useSetRadioConfig();
 
-    const channelOptions = (radioConfig?.available?.channels ?? []).map(ch => ({
-        value: String(ch.channel ?? ch),
-        label: ch.channel ? `${ch.channel} (${ch.mhz} MHz)` : String(ch),
+    const channelOptions = (radioConfig?.available?.channels ?? []).map(channel => ({
+        value: String(channel.channel ?? channel),
+        label: channel.channel ? `${channel.channel} (${channel.mhz} MHz)` : String(channel),
     }));
 
     const txpowerOptions = [
         { value: '0', label: 'Default (driver)' },
-        ...(radioConfig?.available?.txpowers ?? []).map(tp => ({
-            value: String(tp.dbm != null ? tp.dbm : tp),
-            label: tp.dbm != null ? `${tp.dbm} dBm (${tp.mw} mW)` : String(tp),
+        ...(radioConfig?.available?.txpowers ?? []).map(txpower => ({
+            value: String(txpower.dbm != null ? txpower.dbm : txpower),
+            label: txpower.dbm != null ? `${txpower.dbm} dBm (${txpower.mw} mW)` : String(txpower),
         })),
     ];
 
-    const htmodeOptions = (radioConfig?.available?.htmodes ?? []).map(m => ({
-        value: m,
-        label: m,
+    const htmodeOptions = (radioConfig?.available?.htmodes ?? []).map(mode => ({
+        value: mode,
+        label: mode,
     }));
 
     const countryOptions = [
         { value: '00', label: 'Default (driver)' },
-        ...(radioConfig?.available?.countries ?? []).map(c => ({
-            value: c.code ?? String(c),
-            label: c.code ? (c.name ? `${c.name} (${c.code})` : c.code) : String(c),
+        ...(radioConfig?.available?.countries ?? []).map(country => ({
+            value: country.code ?? String(country),
+            label: country.code ? (country.name ? `${country.name} (${country.code})` : country.code) : String(country),
         })),
     ];
 
@@ -54,8 +54,8 @@ const RadioConfigForm = ({ radio, onHide }) => {
         disabled: radioConfig?.current?.disabled === '1',
     };
 
-    const handleSubmit = useCallback(async (data) => {
-        await setRadioConfig({ radio, ...data });
+    const handleSubmit = useCallback(async (values) => {
+        await setRadioConfig({ radio, ...values });
         onHide();
     }, [setRadioConfig, radio, onHide]);
 

@@ -25,7 +25,7 @@ export const interfaceSchema = yup.object({
     }),
     key: yup.string().when(['encryption', 'mode'], {
         is: (encryption, mode) => mode !== 'monitor' && encryption && encryption !== 'none',
-        then: (schema) => schema.required('Key is required').min(8, 'Min 8 characters'),
+        then: (schema) => schema.required('Key is required').min(8, 'Min 8 characters').max(63, 'Max 63 characters'),
         otherwise: (schema) => schema.notRequired(),
     }),
     hidden: yup.boolean(),

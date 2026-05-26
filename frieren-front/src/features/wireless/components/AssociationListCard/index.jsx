@@ -15,11 +15,11 @@ import useGetAssociationList from '@src/features/wireless/hooks/useGetAssociatio
 const parseRate = (rate) => parseFloat(rate) || 0;
 
 const SORT_FIELDS = {
-    mac: (a, b) => a.mac.localeCompare(b.mac),
-    signal: (a, b) => b.signal - a.signal,
-    noise: (a, b) => b.noise - a.noise,
-    rx_rate: (a, b) => parseRate(b.rx_rate) - parseRate(a.rx_rate),
-    tx_rate: (a, b) => parseRate(b.tx_rate) - parseRate(a.tx_rate),
+    mac: (left, right) => left.mac.localeCompare(right.mac),
+    signal: (left, right) => right.signal - left.signal,
+    noise: (left, right) => right.noise - left.noise,
+    rx_rate: (left, right) => parseRate(right.rx_rate) - parseRate(left.rx_rate),
+    tx_rate: (left, right) => parseRate(right.tx_rate) - parseRate(left.tx_rate),
 };
 
 /**
@@ -34,8 +34,8 @@ const AssociationListCard = () => {
 
     const allInterfaces = Object.values(overview ?? {}).flatMap(
         radio => (radio.interfaces ?? [])
-            .filter(i => (i.mode === 'ap' || i.mode === 'Master') && i.ifname)
-            .map(i => i.ifname)
+            .filter(iface => (iface.mode === 'ap' || iface.mode === 'Master') && iface.ifname)
+            .map(iface => iface.ifname)
     );
 
     const actualInterface = selectedInterface || allInterfaces[0] || '';

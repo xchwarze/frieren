@@ -20,11 +20,11 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
 
     const mergeResults = useCallback((newResults) => {
         setResults(prev => {
-            const map = new Map(prev.map(r => [r.bssid, r]));
-            for (const r of newResults) {
-                const existing = map.get(r.bssid);
-                if (!existing || (r.signal ?? -999) > (existing.signal ?? -999)) {
-                    map.set(r.bssid, r);
+            const map = new Map(prev.map(result => [result.bssid, result]));
+            for (const result of newResults) {
+                const existing = map.get(result.bssid);
+                if (!existing || (result.signal ?? -999) > (existing.signal ?? -999)) {
+                    map.set(result.bssid, result);
                 }
             }
             return Array.from(map.values());
@@ -44,10 +44,10 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
         }
     }, [scanData, mergeResults]);
 
-    const sortedResults = results.slice().sort((a, b) => {
-        if (sortField === 'signal') return (b.signal ?? -999) - (a.signal ?? -999);
-        if (sortField === 'channel') return (a.channel ?? 0) - (b.channel ?? 0);
-        if (sortField === 'ssid') return (a.ssid || '').localeCompare(b.ssid || '');
+    const sortedResults = results.slice().sort((left, right) => {
+        if (sortField === 'signal') return (right.signal ?? -999) - (left.signal ?? -999);
+        if (sortField === 'channel') return (left.channel ?? 0) - (right.channel ?? 0);
+        if (sortField === 'ssid') return (left.ssid || '').localeCompare(right.ssid || '');
         return 0;
     });
 
@@ -127,7 +127,7 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
                     variant={autoScan ? 'outline-warning' : 'outline-success'}
                     icon={autoScan ? 'pause' : 'play'}
                     label={autoScan ? 'Pause' : 'Resume'}
-                    onClick={() => setAutoScan(v => !v)}
+                    onClick={() => setAutoScan(prev => !prev)}
                 />
                 <Button variant={'secondary'} icon={'x'} label={'Close'} onClick={onHide} />
             </Modal.Footer>
