@@ -24,21 +24,23 @@ import * as Yup from 'yup';
  * Sets up UMD support by assigning global variables for various libraries.
  */
 const setupUMDSupport = () => {
-    window.React = React;
-    window.ReactDOM = ReactDOM;
-    window.PropTypes = PropTypes;
-    window.jsxRuntime = jsxRuntime;
-    window.ReactQuery = ReactQuery;
-    window.Jotai = Jotai;
-    window.JotaiUtils = JotaiUtils;
-    window.ReactHookForm = ReactHookForm;
-    window.HookformResolvers = HookformResolvers;
-    window.HookformResolversYup = HookformResolversYup;
-    window.ReactBootstrap = ReactBootstrap;
-    window.ReactContentLoader = ReactContentLoader;
-    window.ReactToastify = ReactToastify;
-    window.Wouter = Wouter;
-    window.Yup = Yup;
+    window.Frieren = {
+        React,
+        ReactDOM,
+        PropTypes,
+        jsxRuntime,
+        ReactQuery,
+        Jotai,
+        JotaiUtils,
+        ReactHookForm,
+        HookformResolvers,
+        HookformResolversYup,
+        ReactBootstrap,
+        ReactContentLoader,
+        ReactToastify,
+        Wouter,
+        Yup,
+    };
 };
 
 export default setupUMDSupport;
