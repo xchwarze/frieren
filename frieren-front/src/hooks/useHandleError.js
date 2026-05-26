@@ -21,7 +21,7 @@ const useHandleError = () => {
     const [, setLocation] = useLocation();
     const queryClient = useQueryClient();
 
-    return (error) => {
+    return (error, { showGenericToast = true } = {}) => {
         const errorMessage = error instanceof Error ? error.message : '';
         if (errorMessage.includes('Not Authenticated')) {
             setAuth(false);
@@ -33,7 +33,7 @@ const useHandleError = () => {
                 window.authErrorToastShown = true;
                 setTimeout(() => window.authErrorToastShown = false, 2000);
             }
-        } else {
+        } else if (showGenericToast) {
             toast.error(errorMessage);
         }
     };

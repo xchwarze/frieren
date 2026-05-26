@@ -6,6 +6,7 @@
  */
 import { useQueryClient } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
+import { toast } from 'react-toastify';
 
 import themeVariantAtom from '@src/atoms/themeVariantAtom.js';
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
@@ -29,9 +30,13 @@ const useSetPanelTheme = () => {
         }),
         onSuccess: (data, { theme }) => {
             setThemeVariant(theme);
+            toast.success('Theme updated');
             queryClient.invalidateQueries({
                 queryKey: [SETTINGS_GET_FORM_VALUES],
             });
+        },
+        onError: () => {
+            toast.error('Failed to update theme');
         },
     })
 };

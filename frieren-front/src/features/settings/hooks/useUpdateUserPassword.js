@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
+import { toast } from 'react-toastify';
+
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
 
@@ -19,7 +21,13 @@ const useUpdateUserPassword = () => (
             action: 'setUserPassword',
             currentPassword,
             newPassword,
-        })
+        }),
+        onSuccess: () => {
+            toast.success('Password updated');
+        },
+        onError: () => {
+            toast.error('Failed to update password');
+        },
     })
 );
 

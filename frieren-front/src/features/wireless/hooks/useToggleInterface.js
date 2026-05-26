@@ -5,6 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
@@ -26,11 +27,15 @@ const useToggleInterface = () => {
             section,
             disabled,
         }),
-        onSuccess: async () => {
+        onSuccess: async (data, { disabled }) => {
+            toast.success(disabled ? 'Interface disabled' : 'Interface enabled');
             await sleep(1500);
             queryClient.invalidateQueries({
                 queryKey: [WIRELESS_GET_WIRELESS_OVERVIEW],
             });
+        },
+        onError: () => {
+            toast.error('Failed to toggle interface');
         },
     });
 };

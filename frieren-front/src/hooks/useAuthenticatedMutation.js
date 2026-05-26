@@ -44,14 +44,17 @@ import useHandleError from '@src/hooks/useHandleError.js';
  *   variables: any | undefined
  * }} The mutation object with various properties and methods for mutation state management.
  */
-const useAuthenticatedMutation = ({ mutationFn, ...rest }) => {
+const useAuthenticatedMutation = ({ mutationFn, onError: customOnError, ...rest }) => {
     const handleError = useHandleError();
 
     return useMutation({
         mutationFn: async (props) => {
             return await mutationFn(props);
         },
-        onError: (error) => handleError(error),
+        onError: (error, variables, context) => {
+            handleError(error, { showGenericToast: !customOnError });
+            customOnError?.(error, variables, context);
+        },
         ...rest,
     });
 };

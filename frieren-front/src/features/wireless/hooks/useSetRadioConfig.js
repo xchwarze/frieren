@@ -5,6 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
@@ -32,9 +33,13 @@ const useSetRadioConfig = () => {
             disabled,
         }),
         onSuccess: async () => {
+            toast.success('Radio configuration updated');
             await sleep(1500);
             queryClient.invalidateQueries({ queryKey: [WIRELESS_GET_WIRELESS_OVERVIEW] });
             queryClient.invalidateQueries({ queryKey: [WIRELESS_GET_RADIO_CONFIG] });
+        },
+        onError: () => {
+            toast.error('Failed to update radio configuration');
         },
     });
 };

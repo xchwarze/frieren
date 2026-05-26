@@ -32,10 +32,10 @@ const useUserLogoutMutation = () => {
       setAuth(false);
       setLocation('/');
       queryClient.clear();
-      toast.success('Logoff user');
+      toast.success('Logged out');
     },
     onError: () => {
-      toast.error('Logoff failed');
+      toast.error('Logout failed');
     }
   });
 };

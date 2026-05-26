@@ -5,6 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
@@ -39,9 +40,13 @@ const useSetDatetimeFromBrowser = () => {
             ...retrieveDatetime(),
         }),
         onSuccess: () => {
+            toast.success('Date and time synchronized');
             queryClient.invalidateQueries({
                 queryKey: [SETTINGS_GET_FORM_VALUES],
             });
+        },
+        onError: () => {
+            toast.error('Failed to synchronize date and time');
         },
     });
 };

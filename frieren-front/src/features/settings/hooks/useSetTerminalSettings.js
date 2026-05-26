@@ -6,6 +6,7 @@
  */
 import { useQueryClient } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
+import { toast } from 'react-toastify';
 
 import terminalSettingsAtom from '@src/features/terminal/atoms/terminalSettingsAtom.js';
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
@@ -33,9 +34,13 @@ const useSetTerminalSettings = () => {
         }),
         onSuccess: (data, { terminalTheme, fontSize, cursorStyle, cursorBlink }) => {
             setTerminalSettings({ terminalTheme, fontSize, cursorStyle, cursorBlink });
+            toast.success('Terminal settings updated');
             queryClient.invalidateQueries({
                 queryKey: [SETTINGS_GET_FORM_VALUES],
             });
+        },
+        onError: () => {
+            toast.error('Failed to update terminal settings');
         },
     });
 };

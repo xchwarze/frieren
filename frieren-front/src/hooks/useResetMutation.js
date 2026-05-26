@@ -32,10 +32,10 @@ const useResetMutation = () => {
       setAuth(false);
       setLocation('/');
       queryClient.clear();
-      toast.success('Logoff user');
+      toast.success('Device is rebooting');
     },
     onError: () => {
-      toast.error('Logoff failed');
+      toast.error('Reboot failed');
     }
   });
 };

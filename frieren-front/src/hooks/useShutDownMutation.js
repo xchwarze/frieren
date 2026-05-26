@@ -32,10 +32,10 @@ const useShutDownMutation = () => {
       setAuth(false);
       setLocation('/');
       queryClient.clear();
-      toast.success('Logoff user');
+      toast.success('Device is shutting down');
     },
     onError: () => {
-      toast.error('Logoff failed');
+      toast.error('Shutdown failed');
     }
   });
 };
