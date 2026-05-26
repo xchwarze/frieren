@@ -24,6 +24,7 @@ const EXTERNAL_DEPS = [
   'react-dom',
   'react/jsx-runtime',
   'react-bootstrap',
+  'react-content-loader',
   'react-hook-form',
   'react-toastify',
   'wouter',
@@ -41,6 +42,7 @@ const GLOBALS_MAP = {
   'react-dom': 'ReactDOM',
   'react/jsx-runtime': 'jsxRuntime',
   'react-bootstrap': 'ReactBootstrap',
+  'react-content-loader': 'ReactContentLoader',
   'react-hook-form': 'ReactHookForm',
   'react-toastify': 'ReactToastify',
   'wouter': 'Wouter',
@@ -103,7 +105,7 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@module': path.resolve(__dirname, './src'),
         '@src': path.resolve(__dirname, COMMON_ALIAS),
-        '@common': path.resolve(__dirname, COMMON_ALIAS),
+        '@common': path.resolve(__dirname, COlapMMON_ALIAS),
       },
     },
     build: {

@@ -14,8 +14,9 @@ import * as JotaiUtils from 'jotai/utils';
 import * as ReactHookForm from 'react-hook-form';
 import * as HookformResolvers from '@hookform/resolvers';
 import * as HookformResolversYup from '@hookform/resolvers/yup';
-import * as ReactToastify from 'react-toastify';
 import * as ReactBootstrap from 'react-bootstrap';
+import * as ReactContentLoader from 'react-content-loader';
+import * as ReactToastify from 'react-toastify';
 import * as Wouter from 'wouter';
 import * as Yup from 'yup';
 
@@ -34,6 +35,7 @@ const setupUMDSupport = () => {
     window.HookformResolvers = HookformResolvers;
     window.HookformResolversYup = HookformResolversYup;
     window.ReactBootstrap = ReactBootstrap;
+    window.ReactContentLoader = ReactContentLoader;
     window.ReactToastify = ReactToastify;
     window.Wouter = Wouter;
     window.Yup = Yup;

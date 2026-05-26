@@ -2046,6 +2046,7 @@ __metadata:
     re-resizable: "npm:^6.11.2"
     react: "npm:^18.3.1"
     react-bootstrap: "npm:^2.10.10"
+    react-content-loader: "npm:^7.1.2"
     react-dom: "npm:^18.3.1"
     react-error-boundary: "npm:^6.1.1"
     react-hook-form: "npm:^7.75.0"
@@ -3057,6 +3058,15 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/7d515ca782398a267809f0e62b8cb9b94a9c5190c7cdeb974d54365ac445c3280872258722a95ee753f2e124c0354a875e167c17dcb93138cf16c633681925d6
+  languageName: node
+  linkType: hard
+
+"react-content-loader@npm:^7.1.2":
+  version: 7.1.2
+  resolution: "react-content-loader@npm:7.1.2"
+  peerDependencies:
+    react: ">=18.0.0"
+  checksum: 10c0/11bdc384ea94731a9066e0598dcd62e9eaee69528c1db0dd581652b47c329f0cb92de55ea0dc37ec2ef0791de5e1c4738032a8f61b839d8f03df1f13fb03b144
   languageName: node
   linkType: hard
 
