@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useEffect } from 'react';
 import { useForm, FormProvider as HookFormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Form from 'react-bootstrap/Form';
@@ -26,13 +25,8 @@ const FormProvider = ({ children, onSubmit, schema, defaultValues, ...rest }) =>
     const methods = useForm({
         resolver: schema ? yupResolver(schema) : undefined,
         defaultValues,
+        values: defaultValues,
     });
-
-    useEffect(() => {
-        if (!methods?.formState.isSubmitted) {
-            methods.reset(defaultValues);
-        }
-    }, [defaultValues, methods]);
 
     return (
         <HookFormProvider {...methods}>
