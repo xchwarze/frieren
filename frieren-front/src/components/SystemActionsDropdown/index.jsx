@@ -6,13 +6,13 @@
  */
 import { useState } from 'react';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import { useLocation } from 'wouter';
 
 import useResetMutation from '@src/hooks/useResetMutation';
 import useShutDownMutation from '@src/hooks/useShutDownMutation';
 import useUserLogoutMutation from '@src/hooks/useUserLogoutMutation';
 import Icon from '@src/components/Icon';
 import ConfirmationModal from '@src/components/ConfirmationModal';
+import AboutModal from '@src/components/AboutModal';
 
 /**
  * Actions for system control.
@@ -32,7 +32,7 @@ const SystemActionsDropdown = () => {
     const { mutate: logoffMutation } = useUserLogoutMutation();
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [currentAction, setCurrentAction] = useState('');
-    const [, navigate] = useLocation();
+    const [showAbout, setShowAbout] = useState(false);
 
     const handleConfirm = () => {
         if (currentAction === RESET_ACTION) {
@@ -56,7 +56,7 @@ const SystemActionsDropdown = () => {
     return (
         <>
             <NavDropdown title={<Icon name={'more-vertical'} />} align={'end'}>
-                <NavDropdown.Item onClick={() => navigate('/about')}>
+                <NavDropdown.Item onClick={() => setShowAbout(true)}>
                     <Icon name={'github'} /> About
                 </NavDropdown.Item>
                 <NavDropdown.Item onClick={() => handleOpenModal(RESET_ACTION)}>
@@ -76,6 +76,10 @@ const SystemActionsDropdown = () => {
                 onConfirm={handleConfirm}
                 title={`Confirm ${currentAction}`}
                 description={`Are you sure you want to ${currentAction} the hardware?`}
+            />
+            <AboutModal
+                show={showAbout}
+                onHide={() => setShowAbout(false)}
             />
         </>
     );

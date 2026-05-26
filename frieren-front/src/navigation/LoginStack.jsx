@@ -12,7 +12,6 @@ import Layout from '@src/components/Layout';
 import NotFoundPage from '@src/components/NotFoundPage';
 import DynamicModule from '@src/components/DynamicModule';
 import ErrorFallback from '@src/components/ErrorFallback';
-import About from '@src/components/About';
 import Dashboard from '@src/features/dashboard/containers/Dashboard';
 import Modules from '@src/features/modules/containers/Modules';
 import Packages from '@src/features/packages/containers/Packages';
@@ -48,7 +47,6 @@ const LoginStack = () => {
                     <Route path='/hardware' component={Hardware} />
                     <Route path='/settings' component={Settings} />
                     <Route path='/wireless' component={Wireless} />
-                    <Route path='/about' component={About} />
                     <Route component={NotFoundPage} />
                 </Switch>
             </ErrorBoundary>
