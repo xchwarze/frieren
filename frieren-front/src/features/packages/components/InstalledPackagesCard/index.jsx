@@ -9,6 +9,7 @@ import Table from 'react-bootstrap/Table';
 import { useAtomValue, useSetAtom } from 'jotai';
 
 import PanelCard from '@src/components/PanelCard';
+import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import TablePagination from '@src/components/TablePagination';
 import SearchInput from '@src/components/SearchInput';
 import Button from '@src/components/Button';
@@ -44,17 +45,19 @@ const InstalledPackagesCard = () => {
 
     const { pageData, currentPage, totalPages, setCurrentPage } = usePagination(filteredPackages);
 
-    return (
-        <PanelCard
-            title={'Installed Packages'}
-            showRefresh={true}
-            refetch={load}
-            isFetching={isPolling}
-            isLoading={isPolling}
-        >
-            {isLoaded && (
-                <>
-                    <SearchInput
+    const renderContent = () => {
+        if (!isLoaded) {
+            return (
+                <SkeletonTable
+                    headers={['Name', 'Version', 'Description', 'Action']}
+                    widths={[120, 80, 200, 60]}
+                />
+            );
+        }
+
+        return (
+            <>
+                <SearchInput
                         value={searchTerm}
                         onChange={setSearchTerm}
                         placeholder={'Search installed packages...'}
@@ -95,14 +98,24 @@ const InstalledPackagesCard = () => {
                         </tbody>
                     </Table>
 
-                    <TablePagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={setCurrentPage}
-                        totalItems={filteredPackages.length}
-                    />
-                </>
-            )}
+                <TablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    totalItems={filteredPackages.length}
+                />
+            </>
+        );
+    };
+
+    return (
+        <PanelCard
+            title={'Installed Packages'}
+            showRefresh={true}
+            refetch={load}
+            isFetching={isPolling}
+        >
+            {renderContent()}
         </PanelCard>
     );
 };

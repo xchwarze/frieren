@@ -7,6 +7,7 @@
 import { Table } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
+import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import useGetFileSystemUsage from '@src/features/hardware/hooks/useGetFileSystemUsage.js';
 
 /**
@@ -15,18 +16,21 @@ import useGetFileSystemUsage from '@src/features/hardware/hooks/useGetFileSystem
  * @return {ReactElement} The panel card component with filesystem information displayed in a table.
  */
 const FileSystemUsageCard = () => {
-    const query = useGetFileSystemUsage();
-    const { data, isSuccess } = query;
+    const { data, isSuccess, isLoading, isFetching, refetch } = useGetFileSystemUsage();
 
-    return (
-        <PanelCard
-            title={'Resources'}
-            subtitle={'Overview of storage usage across all mounted file systems, providing insights into ' +
-                'space allocation and utilization.'}
-            query={query}
-            className={'mt-4'}
-        >
-            {isSuccess && (
+    const renderContent = () => {
+        if (isLoading) {
+            return (
+                <SkeletonTable
+                    headers={['Filesystem', 'Type', 'Size', 'Used', 'Available', 'Used', 'Mounted on']}
+                    widths={[100, 50, 50, 50, 60, 40, 80]}
+                    className={'mt-3'}
+                />
+            );
+        }
+
+        if (isSuccess) {
+            return (
                 <Table className={'mt-3'} striped hover responsive>
                     <thead>
                     <tr>
@@ -53,7 +57,22 @@ const FileSystemUsageCard = () => {
                     ))}
                     </tbody>
                 </Table>
-            )}
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <PanelCard
+            title={'Resources'}
+            subtitle={'Overview of storage usage across all mounted file systems, providing insights into ' +
+                'space allocation and utilization.'}
+            isFetching={isFetching}
+            refetch={refetch}
+            className={'mt-4'}
+        >
+            {renderContent()}
         </PanelCard>
     );
 };

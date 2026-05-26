@@ -10,6 +10,7 @@ import useDiagnosticsStatus from '@src/features/hardware/hooks/useDiagnosticsSta
 import useStartDiagnosticsScript from '@src/features/hardware/hooks/useStartDiagnosticsScript.js';
 import useDownloadDiagnosticsFile from '@src/features/hardware/hooks/useDownloadDiagnosticsFile.js';
 import PanelCard from '@src/components/PanelCard';
+import SkeletonBar from '@src/components/SkeletonBar';
 import Button from '@src/components/Button';
 
 /**
@@ -25,38 +26,61 @@ const DiagnosticsCard = () => {
     const { status, completed } = query?.data ?? {};
     const resume = status ? status : 'There are no reports generated.';
 
+    const renderContent = () => {
+        if (query.isLoading) {
+            return (
+                <>
+                    <div className={'mb-3'}>
+                        <SkeletonBar width={400} height={120} barHeight={116} />
+                    </div>
+                    <div className={'d-flex justify-content-end gap-2'}>
+                        <SkeletonBar width={140} height={38} barHeight={34} />
+                        <SkeletonBar width={110} height={38} barHeight={34} />
+                    </div>
+                </>
+            );
+        }
+
+        return (
+            <>
+                <Form.Group className={'mb-3'}>
+                    <Form.Control
+                        as={'textarea'}
+                        rows={6}
+                        readOnly={true}
+                        value={resume}
+                        className={'text-muted'}
+                    />
+                </Form.Group>
+                <div className={'d-flex justify-content-end gap-2'}>
+                    <Button
+                        label={'Generate Report'}
+                        icon={'play'}
+                        loading={startDiagnosticsRunning || isPolling}
+                        onClick={startDiagnostics}
+                    />
+                    <Button
+                        label={'Download'}
+                        icon={'download'}
+                        variant={'secondary'}
+                        disabled={!completed}
+                        loading={downloadDiagnosticsRunning}
+                        onClick={downloadDiagnostics}
+                    />
+                </div>
+            </>
+        );
+    };
+
     return (
         <PanelCard
             title={'Diagnostics'}
             subtitle={'Comprehensive system analysis covering logs, configurations, and vital stats for ' +
                 'troubleshooting and performance assessment.'}
-            query={query}
+            isFetching={query.isFetching}
+            refetch={query.refetch}
         >
-            <Form.Group className={'mb-3'}>
-                <Form.Control
-                    as={'textarea'}
-                    rows={6}
-                    readOnly={true}
-                    value={resume}
-                    className={'text-muted'}
-                />
-            </Form.Group>
-            <div className={'d-flex justify-content-end gap-2'}>
-                <Button
-                    label={'Generate Report'}
-                    icon={'play'}
-                    loading={startDiagnosticsRunning || isPolling}
-                    onClick={startDiagnostics}
-                />
-                <Button
-                    label={'Download'}
-                    icon={'download'}
-                    variant={'secondary'}
-                    disabled={!completed}
-                    loading={downloadDiagnosticsRunning}
-                    onClick={downloadDiagnostics}
-                />
-            </div>
+            {renderContent()}
         </PanelCard>
     );
 };

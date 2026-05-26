@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 
 import { openLink } from '@src/helpers/actionsHelper.js';
 import PanelCard from '@src/components/PanelCard';
+import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import Icon from '@src/components/Icon';
 import ModuleIcon from '@src/components/ModuleIcon';
 import selectedInstalledModuleAtom from '@src/features/modules/atoms/selectedInstalledModuleAtom.js';
@@ -27,7 +28,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
     const setSelectedInstalledModule = useSetAtom(selectedInstalledModuleAtom);
     const { mutate: pinModuleMutation, isPending: isPinPending } = usePinModule();
     const [, navigate] = useLocation();
-    const { data, isSuccess } = installedQuery;
+    const { data, isSuccess, isLoading, isFetching, refetch } = installedQuery;
 
     const handleLaunchClick = ({ name }) => {
         navigate(`/${name}`);
@@ -45,12 +46,18 @@ const InstalledModulesCard = ({ installedQuery }) => {
         setSelectedInstalledModule(module);
     };
 
-    return (
-        <PanelCard
-            title={'Installed Modules'}
-            query={installedQuery}
-        >
-            {isSuccess && (
+    const renderContent = () => {
+        if (isLoading) {
+            return (
+                <SkeletonTable
+                    headers={['Module', 'Description', 'Author', 'Version', 'Size', 'Action']}
+                    widths={[100, 160, 80, 60, 50, 90]}
+                />
+            );
+        }
+
+        if (isSuccess) {
+            return (
                 <Table striped hover responsive>
                     <thead>
                     <tr>
@@ -135,7 +142,15 @@ const InstalledModulesCard = ({ installedQuery }) => {
                     )}
                     </tbody>
                 </Table>
-            )}
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <PanelCard title={'Installed Modules'} isFetching={isFetching} refetch={refetch}>
+            {renderContent()}
         </PanelCard>
     );
 };

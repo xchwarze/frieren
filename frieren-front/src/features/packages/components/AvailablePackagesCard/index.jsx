@@ -6,11 +6,12 @@
  */
 import { useState, useMemo, useCallback, memo } from 'react';
 import Table from 'react-bootstrap/Table';
-import Spinner from 'react-bootstrap/Spinner';
 import { useAtomValue } from 'jotai';
 import PropTypes from 'prop-types';
 
 import PanelCard from '@src/components/PanelCard';
+import SkeletonBar from '@src/components/SkeletonBar';
+import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import TablePagination from '@src/components/TablePagination';
 import SearchInput from '@src/components/SearchInput';
 import Button from '@src/components/Button';
@@ -120,49 +121,51 @@ const AvailablePackagesCard = () => {
             refetch={() => update()}
             isFetching={isBusy}
         >
-            <>
-                {!isLoaded && !isBusy && (
-                    <div className={'text-center'}>
-                        <Button
-                            label={'Update Lists'}
-                            icon={'refresh-cw'}
-                            onClick={() => update()}
-                        />
-                    </div>
-                )}
+            {!isLoaded && !isBusy && (
+                <div className={'text-center'}>
+                    <Button
+                        label={'Update Lists'}
+                        icon={'refresh-cw'}
+                        onClick={() => update()}
+                    />
+                </div>
+            )}
 
-                {isBusy && (
-                    <div className={'text-center'}>
-                        <Spinner animation={'border'} className={'me-2'} />
-                        <span>{isUpdating ? 'Updating package lists...' : 'Loading available packages...'}</span>
-                    </div>
-                )}
+            {isBusy && (
+                <>
+                    <SkeletonBar width={250} height={38} barHeight={34} />
+                    <SkeletonTable
+                        headers={['Name', 'Version', 'Description', 'Action']}
+                        widths={[120, 80, 200, 60]}
+                        rows={5}
+                    />
+                </>
+            )}
 
-                {isLoaded && !isBusy && (
-                    <>
-                        <SearchInput
-                            value={searchTerm}
-                            onChange={setSearchTerm}
-                            placeholder={'Search available packages...'}
-                        />
+            {isLoaded && !isBusy && (
+                <>
+                    <SearchInput
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        placeholder={'Search available packages...'}
+                    />
 
-                        <PackageTable
-                            packages={pageData}
-                            isInstalling={isInstalling}
-                            installingName={installingName}
-                            installedNames={installedNames}
-                            onInstall={handleInstallClick}
-                        />
+                    <PackageTable
+                        packages={pageData}
+                        isInstalling={isInstalling}
+                        installingName={installingName}
+                        installedNames={installedNames}
+                        onInstall={handleInstallClick}
+                    />
 
-                        <TablePagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={setCurrentPage}
-                            totalItems={filteredPackages.length}
-                        />
-                    </>
-                )}
-            </>
+                    <TablePagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                        totalItems={filteredPackages.length}
+                    />
+                </>
+            )}
         </PanelCard>
     );
 };

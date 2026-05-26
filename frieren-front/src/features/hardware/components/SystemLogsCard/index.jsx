@@ -8,6 +8,8 @@ import { useState, useMemo } from 'react';
 import { Table } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
+import SkeletonBar from '@src/components/SkeletonBar';
+import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import SearchInput from '@src/components/SearchInput';
 import useGetSystemLogs from '@src/features/hardware/hooks/useGetSystemLogs.js';
 import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
@@ -18,8 +20,7 @@ import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
  * @return {ReactElement} The SystemLogsCard component
  */
 const SystemLogsCard = () => {
-    const query = useGetSystemLogs();
-    const { data, isSuccess } = query;
+    const { data, isSuccess, isLoading, isFetching, refetch } = useGetSystemLogs();
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearch = useDebouncedValue(searchTerm);
 
@@ -35,14 +36,24 @@ const SystemLogsCard = () => {
         );
     }, [data, debouncedSearch]);
 
-    return (
-        <PanelCard
-            title={'System Log'}
-            subtitle={'For performance reasons only the last 1000 events are shown. If you want to see more you ' +
-                'can use the terminal or the diagnostics section.'}
-            query={query}
-        >
-            {isSuccess && (
+    const renderContent = () => {
+        if (isLoading) {
+            return (
+                <>
+                    <div className={'mb-3 mt-3'}>
+                        <SkeletonBar width={250} height={38} barHeight={34} />
+                    </div>
+                    <SkeletonTable
+                        headers={['Date', 'Tag', 'Process', 'Message']}
+                        widths={[110, 60, 70, 200]}
+                        rows={5}
+                    />
+                </>
+            );
+        }
+
+        if (isSuccess) {
+            return (
                 <>
                     <SearchInput
                         value={searchTerm}
@@ -76,7 +87,21 @@ const SystemLogsCard = () => {
                         </tbody>
                     </Table>
                 </>
-            )}
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <PanelCard
+            title={'System Log'}
+            subtitle={'For performance reasons only the last 1000 events are shown. If you want to see more you ' +
+                'can use the terminal or the diagnostics section.'}
+            isFetching={isFetching}
+            refetch={refetch}
+        >
+            {renderContent()}
         </PanelCard>
     );
 };

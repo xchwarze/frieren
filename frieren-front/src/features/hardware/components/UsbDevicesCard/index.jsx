@@ -7,6 +7,7 @@
 import { Table } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
+import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import useGetUsbDevices from '@src/features/hardware/hooks/useGetUsbDevices.js';
 
 /**
@@ -15,17 +16,21 @@ import useGetUsbDevices from '@src/features/hardware/hooks/useGetUsbDevices.js';
  * @return {ReactElement} The panel card component with USB devices information.
  */
 const UsbDevicesCard = () => {
-    const query = useGetUsbDevices();
-    const { data, isSuccess } = query;
+    const { data, isSuccess, isLoading, isFetching, refetch } = useGetUsbDevices();
 
-    return (
-        <PanelCard
-            title={'USB Devices'}
-            subtitle={'Detailed tracking of connected USB devices, facilitating device identification ' +
-                'and resolving USB-related issues'}
-            query={query}
-        >
-            {isSuccess && (
+    const renderContent = () => {
+        if (isLoading) {
+            return (
+                <SkeletonTable
+                    headers={['Bus', 'Device', 'ID', 'Name']}
+                    widths={[40, 50, 80, 200]}
+                    className={'mt-4'}
+                />
+            );
+        }
+
+        if (isSuccess) {
+            return (
                 <Table className={'mt-4'} striped hover responsive>
                     <thead>
                     <tr>
@@ -46,7 +51,21 @@ const UsbDevicesCard = () => {
                     ))}
                     </tbody>
                 </Table>
-            )}
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <PanelCard
+            title={'USB Devices'}
+            subtitle={'Detailed tracking of connected USB devices, facilitating device identification ' +
+                'and resolving USB-related issues'}
+            isFetching={isFetching}
+            refetch={refetch}
+        >
+            {renderContent()}
         </PanelCard>
     );
 };

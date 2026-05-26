@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import useSetPanelTheme from '@src/features/settings/hooks/useSetPanelTheme.js';
 import { themeSchema } from '@src/features/settings/helpers/validationSchemas.js';
 import PanelCard from '@src/components/PanelCard';
+import SkeletonBar from '@src/components/SkeletonBar';
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SubmitButton from '@src/components/Form/SubmitButton';
@@ -32,12 +33,20 @@ const PanelThemeCard = ({ query }) => {
         theme: query?.data?.theme ?? 'auto',
     };
 
-    return (
-        <PanelCard
-            title={'Change Panel Theme'}
-            query={query}
-            showRefresh={false}
-        >
+    const renderContent = () => {
+        if (query.isLoading) {
+            return (
+                <>
+                    <div className={'mb-3'}>
+                        <SkeletonBar width={120} />
+                        <div className={'mt-1'}><SkeletonBar width={300} height={38} barHeight={34} /></div>
+                    </div>
+                    <SkeletonBar width={80} height={38} barHeight={34} />
+                </>
+            );
+        }
+
+        return (
             <FormProvider schema={themeSchema} onSubmit={setPanelTheme} defaultValues={defaultValues}>
                 <SelectField
                     name={'theme'}
@@ -46,6 +55,12 @@ const PanelThemeCard = ({ query }) => {
                 />
                 <SubmitButton />
             </FormProvider>
+        );
+    };
+
+    return (
+        <PanelCard title={'Change Panel Theme'} showRefresh={false}>
+            {renderContent()}
         </PanelCard>
     );
 };

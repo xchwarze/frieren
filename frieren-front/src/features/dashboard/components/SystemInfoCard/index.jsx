@@ -7,6 +7,7 @@
 import { Table } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
+import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import useSystemResume from '@src/features/dashboard/hooks/useSystemResume.js';
 
 /**
@@ -15,16 +16,15 @@ import useSystemResume from '@src/features/dashboard/hooks/useSystemResume.js';
  * @return {ReactElement} The System Information card component
  */
 const SystemInfoCard = () => {
-    const query = useSystemResume();
-    const { data, isSuccess } = query;
+    const { data, isSuccess, isLoading } = useSystemResume();
 
-    return (
-        <PanelCard
-            title={'System Information'}
-            query={query}
-            showRefresh={false}
-        >
-            {isSuccess && (
+    const renderContent = () => {
+        if (isLoading) {
+            return <SkeletonTable widths={[120, 180]} rows={6} className={'mt-4'} />;
+        }
+
+        if (isSuccess) {
+            return (
                 <Table className={'mt-4'} striped hover responsive>
                     <tbody>
                     <tr>
@@ -53,7 +53,15 @@ const SystemInfoCard = () => {
                     </tr>
                     </tbody>
                 </Table>
-            )}
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <PanelCard title={'System Information'} showRefresh={false}>
+            {renderContent()}
         </PanelCard>
     );
 };

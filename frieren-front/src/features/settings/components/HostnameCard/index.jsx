@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import useSetHostname from '@src/features/settings/hooks/useSetHostname';
 import { hostnameSchema } from '@src/features/settings/helpers/validationSchemas.js';
 import PanelCard from '@src/components/PanelCard';
+import SkeletonBar from '@src/components/SkeletonBar';
 import FormProvider from '@src/components/Form/FormProvider';
 import InputField from '@src/components/Form/InputField';
 import SubmitButton from '@src/components/Form/SubmitButton';
@@ -26,12 +27,20 @@ const HostnameCard = ({ query }) => {
         hostname: query?.data?.hostname ?? '',
     };
 
-    return (
-        <PanelCard
-            title={'Change Hostname'}
-            query={query}
-            showRefresh={false}
-        >
+    const renderContent = () => {
+        if (query.isLoading) {
+            return (
+                <>
+                    <div className={'mb-3'}>
+                        <SkeletonBar width={80} />
+                        <div className={'mt-1'}><SkeletonBar width={300} height={38} barHeight={34} /></div>
+                    </div>
+                    <SkeletonBar width={80} height={38} barHeight={34} />
+                </>
+            );
+        }
+
+        return (
             <FormProvider schema={hostnameSchema} onSubmit={setHostname} defaultValues={defaultValues}>
                 <InputField
                     name={'hostname'}
@@ -40,6 +49,12 @@ const HostnameCard = ({ query }) => {
                 />
                 <SubmitButton />
             </FormProvider>
+        );
+    };
+
+    return (
+        <PanelCard title={'Change Hostname'} showRefresh={false}>
+            {renderContent()}
         </PanelCard>
     );
 };

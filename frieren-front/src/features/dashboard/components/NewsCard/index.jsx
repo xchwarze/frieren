@@ -7,6 +7,7 @@
 import { Table } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
+import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import useNews from '@src/features/dashboard/hooks/useNews.js';
 
 /**
@@ -15,16 +16,21 @@ import useNews from '@src/features/dashboard/hooks/useNews.js';
  * @return {ReactElement} The NewsCard component.
  */
 const NewsCard = () => {
-    const query = useNews();
-    const { data, isSuccess } = query;
+    const { data, isSuccess, isLoading, isFetching, refetch } = useNews();
 
-    return (
-        <PanelCard
-            title={'News'}
-            subtitle={'Latest updates from the Frieren project.'}
-            query={query}
-        >
-            {isSuccess && data.news?.length > 0 && (
+    const renderContent = () => {
+        if (isLoading) {
+            return (
+                <SkeletonTable
+                    headers={['Date', 'Title', 'Description']}
+                    widths={[80, 120, 200]}
+                    rows={3}
+                />
+            );
+        }
+
+        if (isSuccess && data.news?.length > 0) {
+            return (
                 <Table striped hover responsive>
                     <thead>
                     <tr>
@@ -43,7 +49,20 @@ const NewsCard = () => {
                     ))}
                     </tbody>
                 </Table>
-            )}
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <PanelCard
+            title={'News'}
+            subtitle={'Latest updates from the Frieren project.'}
+            isFetching={isFetching}
+            refetch={refetch}
+        >
+            {renderContent()}
         </PanelCard>
     );
 };

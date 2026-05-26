@@ -11,6 +11,7 @@ import useSetTimezone from '@src/features/settings/hooks/useSetTimezone.js';
 import { timezoneSchema } from '@src/features/settings/helpers/validationSchemas.js';
 import SyncFromBrowserButton from '@src/features/settings/components/SyncFromBrowserButton';
 import PanelCard from '@src/components/PanelCard';
+import SkeletonBar from '@src/components/SkeletonBar';
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SubmitButton from '@src/components/Form/SubmitButton';
@@ -28,12 +29,23 @@ const TimezoneCard = ({ query }) => {
         timezone: query?.data?.timezone ?? '',
     };
 
-    return (
-        <PanelCard
-            title={'Change Timezone'}
-            query={query}
-            showRefresh={false}
-        >
+    const renderContent = () => {
+        if (query.isLoading) {
+            return (
+                <>
+                    <div className={'mb-3'}>
+                        <SkeletonBar width={80} />
+                        <div className={'mt-1'}><SkeletonBar width={300} height={38} barHeight={34} /></div>
+                    </div>
+                    <div className={'d-flex gap-2'}>
+                        <SkeletonBar width={80} height={38} barHeight={34} />
+                        <SkeletonBar width={38} height={38} barHeight={34} />
+                    </div>
+                </>
+            );
+        }
+
+        return (
             <FormProvider schema={timezoneSchema} onSubmit={setTimezone} defaultValues={defaultValues}>
                 <SelectField
                     name={'timezone'}
@@ -45,6 +57,12 @@ const TimezoneCard = ({ query }) => {
                     <SyncFromBrowserButton />
                 </div>
             </FormProvider>
+        );
+    };
+
+    return (
+        <PanelCard title={'Change Timezone'} showRefresh={false}>
+            {renderContent()}
         </PanelCard>
     );
 };

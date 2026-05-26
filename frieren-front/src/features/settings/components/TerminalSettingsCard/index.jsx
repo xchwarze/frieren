@@ -10,6 +10,7 @@ import { TERMINAL_THEME_OPTIONS } from '@src/features/terminal/helpers/terminalT
 import useSetTerminalSettings from '@src/features/settings/hooks/useSetTerminalSettings.js';
 import { terminalSettingsSchema } from '@src/features/settings/helpers/validationSchemas.js';
 import PanelCard from '@src/components/PanelCard';
+import SkeletonBar from '@src/components/SkeletonBar';
 import FormProvider from '@src/components/Form/FormProvider';
 import InputField from '@src/components/Form/InputField';
 import SelectField from '@src/components/Form/SelectField';
@@ -39,12 +40,24 @@ const TerminalSettingsCard = ({ query }) => {
         terminalAutologin: query?.data?.terminalAutologin,
     };
 
-    return (
-        <PanelCard
-            title={'Terminal'}
-            query={query}
-            showRefresh={false}
-        >
+    const renderContent = () => {
+        if (query.isLoading) {
+            return (
+                <>
+                    {[110, 70, 90].map((w) => (
+                        <div key={w} className={'mb-3'}>
+                            <SkeletonBar width={w} />
+                            <div className={'mt-1'}><SkeletonBar width={300} height={38} barHeight={34} /></div>
+                        </div>
+                    ))}
+                    <div className={'mb-3'}><SkeletonBar width={180} height={24} barHeight={20} /></div>
+                    <div className={'mb-3'}><SkeletonBar width={160} height={24} barHeight={20} /></div>
+                    <SkeletonBar width={80} height={38} barHeight={34} />
+                </>
+            );
+        }
+
+        return (
             <FormProvider schema={terminalSettingsSchema} onSubmit={setTerminalSettings} defaultValues={defaultValues}>
                 <SelectField
                     name={'terminalTheme'}
@@ -73,6 +86,12 @@ const TerminalSettingsCard = ({ query }) => {
                 />
                 <SubmitButton />
             </FormProvider>
+        );
+    };
+
+    return (
+        <PanelCard title={'Terminal'} showRefresh={false}>
+            {renderContent()}
         </PanelCard>
     );
 };
