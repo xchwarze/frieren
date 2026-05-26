@@ -238,7 +238,7 @@ class OpenWrtHelper
         }
 
         $url = escapeshellarg($url);
-        return self::exec("/bin/uclient-fetch -q -T 10 -O - {$url}");
+        return self::exec("/bin/uclient-fetch -q -T 10 -O - {$url}", true, true);
     }
 
     /**
@@ -278,7 +278,7 @@ class OpenWrtHelper
         if (!empty($args)) {
             $cmd .= ' ' . escapeshellarg(json_encode($args));
         }
-        $result = self::exec($cmd);
+        $result = self::exec($cmd, true, true);
         $parsed = json_decode($result, true);
         if (json_last_error() === JSON_ERROR_NONE) {
             return $parsed;
@@ -303,6 +303,6 @@ class OpenWrtHelper
         }
 
         $message = escapeshellarg($message);
-        return self::exec("/usr/bin/logger -p user.{$level} {$message}");
+        return self::exec("/usr/bin/logger -p user.{$level} {$message}", true, true);
     }
 }
