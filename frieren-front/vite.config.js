@@ -10,6 +10,19 @@ import { compression } from 'vite-plugin-compression2';
 import { analyzer } from 'vite-bundle-analyzer';
 import path from 'path';
 
+const cacheBuster = () => ({
+  name: 'cache-buster',
+  transformIndexHtml: {
+    order: 'post',
+    handler(html) {
+      const stamp = Date.now();
+      return html
+          .replace(/(src="[^"]+\.js)(")/g, `$1?v=${stamp}$2`)
+          .replace(/(href="[^"]+\.css)(")/g, `$1?v=${stamp}$2`);
+    }
+  }
+});
+
 export default defineConfig(({ mode }) => {
   const modeMap = { production: 'prod', development: 'dev' };
   const resolvedMode = modeMap[mode] || mode;
@@ -21,6 +34,7 @@ export default defineConfig(({ mode }) => {
   const config = {
     plugins: [
       react(),
+      cacheBuster(),
     ],
     resolve: {
       alias: {
