@@ -5,22 +5,18 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { ToastContainer } from 'react-toastify';
-import { useAtomValue } from 'jotai';
 
-import themeVariantAtom from '@src/atoms/themeVariantAtom.js';
+import useResolvedTheme from '@src/hooks/useResolvedTheme.js';
 
 /**
- * A dummy component that is used as a wrapper for the useApplyTheme hook.
+ * Wrapper component that provides a theme-aware ToastContainer.
  *
- * @return {null} Returns null.
+ * @return {ReactElement} The toast container.
  */
 const ToastProvider = () => {
-    const themeVariant = useAtomValue(themeVariantAtom);
-    const effectiveTheme = themeVariant === 'auto'
-        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-        : themeVariant;
+    const theme = useResolvedTheme();
 
-    return <ToastContainer theme={effectiveTheme} />;
+    return <ToastContainer theme={theme} />;
 };
 
 export default ToastProvider;
