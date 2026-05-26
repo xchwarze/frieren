@@ -135,7 +135,16 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                     </tbody>
                 </Table>
             ) : (
-                <p className={'text-muted'}>No interfaces configured</p>
+                <p className={'text-muted'}>
+                    {checkingSection ? (
+                        <>
+                            <Spinner animation={'border'} size={'sm'} className={'me-1'} />
+                            Checking interface status...
+                        </>
+                    ) : (
+                        'No interfaces configured'
+                    )}
+                </p>
             )}
 
             <ConfirmationModal
