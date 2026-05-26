@@ -92,6 +92,10 @@ class ModulesController extends \frieren\core\Controller
 
     public function getAvailableModules()
     {
+        if (!self::setupCoreHelper()::hasInternetConnection()) {
+            return self::setError('No internet connection available.');
+        }
+
         $url = sprintf(\DeviceConfig::MODULE_JSON_PATH, \DeviceConfig::MODULE_SERVER_URL);
         $moduleData = self::setupCoreHelper()::fileGetContentsSSL($url);
         if ($moduleData !== false) {
@@ -159,6 +163,10 @@ class ModulesController extends \frieren\core\Controller
 
     public function downloadModule()
     {
+        if (!self::setupCoreHelper()::hasInternetConnection()) {
+            return self::setError('No internet connection available.');
+        }
+
         $flagPath = BackgroundTaskHelper::getFlagPath(self::TASK_DOWNLOAD);
         @unlink($flagPath);
 

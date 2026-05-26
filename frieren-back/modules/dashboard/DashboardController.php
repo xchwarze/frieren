@@ -44,6 +44,10 @@ class DashboardController extends \frieren\core\Controller
 
     public function getNews()
     {
+        if (!self::setupCoreHelper()::hasInternetConnection()) {
+            return self::setError('No internet connection available.');
+        }
+
         $url = sprintf(\DeviceConfig::NEWS_JSON_PATH, \DeviceConfig::MODULE_SERVER_URL);
         $newsData = self::setupCoreHelper()::fileGetContentsSSL($url);
         if ($newsData !== false) {
@@ -55,6 +59,10 @@ class DashboardController extends \frieren\core\Controller
 
     public function startSystemUpdate()
     {
+        if (!self::setupCoreHelper()::hasInternetConnection()) {
+            return self::setError('No internet connection available.');
+        }
+
         $updateUrl = filter_var($this->request['updateUrl'] ?? '', FILTER_VALIDATE_URL);
         if (!$updateUrl) {
             return self::setError('Invalid update URL');

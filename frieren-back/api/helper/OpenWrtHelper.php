@@ -288,7 +288,18 @@ class OpenWrtHelper
     }
 
     /**
-     * Logs a message to the system's syslog.
+     * Checks internet connectivity by pinging a public DNS server.
+     *
+     * @return bool True if internet is reachable, false otherwise.
+     */
+    public static function hasInternetConnection()
+    {
+        $result = self::exec('/bin/ping -c1 -W2 1.1.1.1');
+
+        return $result !== false;
+    }
+
+    /**
      *
      * @param string $message The message to log.
      * @param string $level The severity level of the log ('emerg', 'alert', 'crit', 'err',

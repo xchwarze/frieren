@@ -39,6 +39,10 @@ class PackagesController extends \frieren\core\Controller
 
     public function updateLists()
     {
+        if (!self::setupCoreHelper()::hasInternetConnection()) {
+            return self::setError('No internet connection available.');
+        }
+
         $script = $this->getScriptPath();
         BackgroundTaskHelper::start(self::TASK_UPDATE, "{$script} update");
 
@@ -96,6 +100,10 @@ class PackagesController extends \frieren\core\Controller
 
     public function installPackage()
     {
+        if (!self::setupCoreHelper()::hasInternetConnection()) {
+            return self::setError('No internet connection available.');
+        }
+
         $script = $this->getScriptPath();
         $packageName = escapeshellarg($this->request['packageName']);
         BackgroundTaskHelper::start(self::TASK_INSTALL, "{$script} install {$packageName}");
