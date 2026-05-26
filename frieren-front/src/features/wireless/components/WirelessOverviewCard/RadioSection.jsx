@@ -5,15 +5,16 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useCallback } from 'react';
-import { Table, Badge, Spinner } from 'react-bootstrap';
+import { Table, Badge } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Button from '@src/components/Button';
 import ConfirmationModal from '@src/components/ConfirmationModal';
 import useRemoveInterface from '@src/features/wireless/hooks/useRemoveInterface.js';
 import useToggleInterface from '@src/features/wireless/hooks/useToggleInterface.js';
+import InterfaceSkeletonRow from './InterfaceSkeletonRow';
 
-const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, checkingSection }) => {
+const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, checkingSection, checkingRadio }) => {
     const { mutate: removeInterface, isPending: isRemoving } = useRemoveInterface();
     const { mutate: toggleInterface, isPending: isToggling } = useToggleInterface();
 
@@ -22,6 +23,9 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
     const [togglingSection, setTogglingSection] = useState(null);
 
     const isBusy = isRemoving || isToggling;
+    const isCheckingRadio = checkingRadio === radioName;
+    const existingMatch = isCheckingRadio && radio.interfaces?.some((iface) => iface.section === checkingSection);
+    const hasNewInterface = isCheckingRadio && checkingSection && !existingMatch;
 
     const handleToggle = useCallback((iface) => {
         setTogglingSection(iface.section);
@@ -73,7 +77,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                 </div>
             </div>
 
-            {radio.interfaces?.length > 0 ? (
+            {radio.interfaces?.length > 0 || hasNewInterface ? (
                 <Table striped hover responsive>
                     <thead>
                         <tr>
@@ -87,64 +91,56 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                         </tr>
                     </thead>
                     <tbody>
-                        {radio.interfaces.map((iface, idx) => (
-                            <tr key={idx}>
-                                <td>{iface.ifname || iface.section}</td>
-                                <td>{iface.ssid || '-'}</td>
-                                <td>{iface.mode}</td>
-                                <td><code>{iface.bssid || '-'}</code></td>
-                                <td>{iface.encryption || 'None'}</td>
-                                <td>
-                                    {checkingSection === iface.section ? (
-                                        <Spinner animation={'border'} size={'sm'} />
-                                    ) : (
+                        {radio.interfaces?.map((iface, idx) => (
+                            isCheckingRadio && checkingSection === iface.section ? (
+                                <InterfaceSkeletonRow key={idx} />
+                            ) : (
+                                <tr key={idx}>
+                                    <td>{iface.ifname || iface.section}</td>
+                                    <td>{iface.ssid || '-'}</td>
+                                    <td>{iface.mode}</td>
+                                    <td><code>{iface.bssid || '-'}</code></td>
+                                    <td>{iface.encryption || 'None'}</td>
+                                    <td>
                                         <Badge bg={iface.disabled ? 'secondary' : (iface.up ? 'success' : 'danger')}>
                                             {iface.disabled ? 'Disabled' : (iface.up ? 'Up' : 'Down')}
                                         </Badge>
-                                    )}
-                                </td>
-                                <td>
-                                    <div className={'d-flex gap-1'}>
-                                        <Button
-                                            size={'sm'}
-                                            variant={'outline-primary'}
-                                            icon={'edit-2'}
-                                            onClick={() => onEdit(iface.section)}
-                                            disabled={!iface.section || isBusy}
-                                        />
-                                        <Button
-                                            size={'sm'}
-                                            variant={iface.disabled ? 'outline-success' : 'outline-warning'}
-                                            icon={iface.disabled ? 'toggle-left' : 'toggle-right'}
-                                            loading={isToggling && togglingSection === iface.section}
-                                            onClick={() => handleToggle(iface)}
-                                            disabled={!iface.section || isBusy}
-                                        />
-                                        <Button
-                                            size={'sm'}
-                                            variant={'outline-danger'}
-                                            icon={'trash-2'}
-                                            onClick={() => setConfirmRemove(iface.section)}
-                                            loading={isRemoving && removingSection === iface.section}
-                                            disabled={!iface.section || isBusy}
-                                        />
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td>
+                                        <div className={'d-flex gap-1'}>
+                                            <Button
+                                                size={'sm'}
+                                                variant={'outline-primary'}
+                                                icon={'edit-2'}
+                                                onClick={() => onEdit(iface.section, radioName)}
+                                                disabled={!iface.section || isBusy}
+                                            />
+                                            <Button
+                                                size={'sm'}
+                                                variant={iface.disabled ? 'outline-success' : 'outline-warning'}
+                                                icon={iface.disabled ? 'toggle-left' : 'toggle-right'}
+                                                loading={isToggling && togglingSection === iface.section}
+                                                onClick={() => handleToggle(iface)}
+                                                disabled={!iface.section || isBusy}
+                                            />
+                                            <Button
+                                                size={'sm'}
+                                                variant={'outline-danger'}
+                                                icon={'trash-2'}
+                                                onClick={() => setConfirmRemove(iface.section)}
+                                                loading={isRemoving && removingSection === iface.section}
+                                                disabled={!iface.section || isBusy}
+                                            />
+                                        </div>
+                                    </td>
+                                </tr>
+                            )
                         ))}
+                        {hasNewInterface && <InterfaceSkeletonRow />}
                     </tbody>
                 </Table>
             ) : (
-                <p className={'text-muted'}>
-                    {checkingSection ? (
-                        <>
-                            <Spinner animation={'border'} size={'sm'} className={'me-1'} />
-                            Checking interface status...
-                        </>
-                    ) : (
-                        'No interfaces configured'
-                    )}
-                </p>
+                <p className={'text-muted'}>No interfaces configured</p>
             )}
 
             <ConfirmationModal
@@ -167,6 +163,7 @@ RadioSection.propTypes = {
     onAdd: PropTypes.func.isRequired,
     onConfigure: PropTypes.func.isRequired,
     checkingSection: PropTypes.string,
+    checkingRadio: PropTypes.string,
 };
 
 export default RadioSection;
