@@ -38,7 +38,9 @@ collectConfigurations() {
 collectSystemInfo() {
     echo "[*] Collecting additional system information"
     addDiagnosticSection "WIRELESS DEVICES" "iw dev"
-    addDiagnosticSection "WIRELESS CONFIGURATION" "iwconfig"
+    if command -v iwconfig > /dev/null 2>&1; then
+        addDiagnosticSection "WIRELESS CONFIGURATION" "iwconfig"
+    fi
     addDiagnosticSection "NETWORK INTERFACES" "ifconfig -a"
     addDiagnosticSection "CPU" "cat /proc/cpuinfo"
     addDiagnosticSection "MEMORY" "cat /proc/meminfo"

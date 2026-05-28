@@ -21,6 +21,8 @@ const useAvailableModules = (options = {}) => (
             module: 'modules',
             action: 'getAvailableModules',
         }),
+        staleTime: Infinity,
+        gcTime: 30 * 60 * 1000,
         ...options,
     })
 );
