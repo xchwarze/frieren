@@ -13,6 +13,7 @@ import useUserLogoutMutation from '@src/hooks/useUserLogoutMutation';
 import Icon from '@src/components/Icon';
 import ConfirmationModal from '@src/components/ConfirmationModal';
 import AboutModal from '@src/components/AboutModal';
+import SystemStatusModal from '@src/components/SystemStatusModal';
 
 /**
  * Actions for system control.
@@ -20,27 +21,37 @@ import AboutModal from '@src/components/AboutModal';
 const RESET_ACTION = 'reset';
 const SHUTDOWN_ACTION = 'shutdown';
 
+const ACTION_TO_STATUS = {
+    [RESET_ACTION]: 'restart',
+    [SHUTDOWN_ACTION]: 'shutdown',
+};
+
 /**
  * Dropdown component for system actions including reset, shutdown, and logout.
- * Provides confirmation modals for reset and shutdown actions.
+ * Provides confirmation modals for reset and shutdown actions, and a status
+ * modal that tracks device state during restart or shutdown operations.
  *
- * @returns {ReactElement} The system actions dropdown with confirmation modals.
+ * @returns {ReactElement} The system actions dropdown with confirmation and status modals.
  */
 const SystemActionsDropdown = () => {
-    const { mutate: resetMutation } = useResetMutation();
-    const { mutate: shutDownMutation } = useShutDownMutation();
+    const resetMutation = useResetMutation();
+    const shutDownMutation = useShutDownMutation();
     const { mutate: logoffMutation } = useUserLogoutMutation();
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [currentAction, setCurrentAction] = useState('');
+    const [systemStatus, setSystemStatus] = useState(null);
     const [showAbout, setShowAbout] = useState(false);
 
     const handleConfirm = () => {
-        if (currentAction === RESET_ACTION) {
-            resetMutation();
-        } else if (currentAction === SHUTDOWN_ACTION) {
-            shutDownMutation();
-        }
-        handleCloseModal();
+        const mutation = currentAction === RESET_ACTION ? resetMutation : shutDownMutation;
+        const status = ACTION_TO_STATUS[currentAction];
+
+        mutation.mutate(undefined, {
+            onSuccess: () => {
+                handleCloseModal();
+                setSystemStatus(status);
+            },
+        });
     };
 
     const handleOpenModal = (action) => {
@@ -52,6 +63,8 @@ const SystemActionsDropdown = () => {
         setShowConfirmModal(false);
         setCurrentAction('');
     };
+
+    const isActionPending = resetMutation.isPending || shutDownMutation.isPending;
 
     return (
         <>
@@ -76,11 +89,13 @@ const SystemActionsDropdown = () => {
                 onConfirm={handleConfirm}
                 title={`Confirm ${currentAction}`}
                 description={`Are you sure you want to ${currentAction} the hardware?`}
+                isConfirmLoading={isActionPending}
             />
             <AboutModal
                 show={showAbout}
                 onHide={() => setShowAbout(false)}
             />
+            <SystemStatusModal action={systemStatus} />
         </>
     );
 };

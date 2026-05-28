@@ -4,40 +4,21 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useQueryClient } from '@tanstack/react-query';
-import { useSetAtom } from 'jotai'
-import { useLocation } from 'wouter';
-import { toast } from 'react-toastify';
-
-import authAtom from '@src/atoms/authAtom.js';
 import { fetchPost } from '@src/services/fetchService.js';
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 
 /**
- * Restart the real hardware.
+ * Sends a reboot command to the hardware.
  *
- * @return {Function} The mutation function
+ * @return {Object} The mutation object for hardware reset.
  */
-const useResetMutation = () => {
-  const queryClient = useQueryClient();
-  const setAuth = useSetAtom(authAtom)
-  const [, setLocation] = useLocation();
-
-  return useAuthenticatedMutation({
-    mutationFn: () => fetchPost({
-      module: 'header',
-      action: 'resetHardware',
-    }),
-    onSuccess: () => {
-      setAuth(false);
-      setLocation('/');
-      queryClient.clear();
-      toast.success('Device is rebooting');
-    },
-    onError: () => {
-      toast.error('Reboot failed');
-    }
-  });
-};
+const useResetMutation = () => (
+    useAuthenticatedMutation({
+        mutationFn: () => fetchPost({
+            module: 'header',
+            action: 'resetHardware',
+        }),
+    })
+);
 
 export default useResetMutation;
