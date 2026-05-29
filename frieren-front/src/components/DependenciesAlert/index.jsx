@@ -4,13 +4,12 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Alert from 'react-bootstrap/Alert';
-import { useAtomValue } from 'jotai';
+import Form from 'react-bootstrap/Form';
 import PropTypes from 'prop-types';
 
 import { MODULE_INSTALL_TYPE_INTERNAL, MODULE_INSTALL_TYPE_SD } from '@src/features/modules/helpers/constants.js';
-import { dependencyInstallStatusAtom } from '@src/atoms/dependencyInstallStatusAtom.js';
 import useInstallModuleDependencies from '@src/hooks/useInstallModuleDependencies.js';
 import Button from '@src/components/Button';
 
@@ -26,26 +25,28 @@ import Button from '@src/components/Button';
  * @return {ReactElement} The rendered DependenciesAlert component
  */
 const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, internalAvailable, SDAvailable }) => {
-    const [selectedOption, setSelectedOption] = useState('')
-    const { isRunning, hasDependencies, logContent } = useAtomValue(dependencyInstallStatusAtom);
-    const { mutate: installDependencies, isPending: installDependenciesRunning } =
+    const [selectedOption, setSelectedOption] = useState('');
+    const [showLog, setShowLog] = useState(false);
+    const logRef = useRef(null);
+    const { install, isPolling, isPending, output, installFailed } =
         useInstallModuleDependencies({ module, dependenciesQueryKey });
-    const isLoading = installDependenciesRunning || isRunning;
-    const hasLog = hasDependencies === false && logContent.length > 0;
+    const isLoading = isPending || isPolling;
+
+    useEffect(() => {
+        if (showLog && logRef.current) {
+            logRef.current.scrollTop = logRef.current.scrollHeight;
+        }
+    }, [output, showLog]);
 
     const handleInstallToSDClick = useCallback(() => {
         setSelectedOption(MODULE_INSTALL_TYPE_SD);
-        installDependencies({
-            destination: MODULE_INSTALL_TYPE_SD
-        });
-    }, [installDependencies, setSelectedOption]);
+        install({ destination: MODULE_INSTALL_TYPE_SD });
+    }, [install, setSelectedOption]);
 
     const handleInstallInternallyClick = useCallback(() => {
         setSelectedOption(MODULE_INSTALL_TYPE_INTERNAL);
-        installDependencies({
-            destination: MODULE_INSTALL_TYPE_INTERNAL
-        });
-    }, [installDependencies, setSelectedOption]);
+        install({ destination: MODULE_INSTALL_TYPE_INTERNAL });
+    }, [install, setSelectedOption]);
 
     return (
         <Alert show={show} variant={'dark'}>
@@ -60,11 +61,30 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
                     {message}
                 </p>
             )}
-            {hasLog && (
+            {isLoading && (
+                <Form.Check
+                    type={'switch'}
+                    id={'show-install-log'}
+                    label={'Show installation log'}
+                    checked={showLog}
+                    onChange={() => setShowLog(prev => !prev)}
+                    className={'mb-2'}
+                />
+            )}
+            {showLog && isPolling && output.length > 0 && (
+                <pre
+                    ref={logRef}
+                    className={'bg-dark text-light p-2 rounded small'}
+                    style={{ maxHeight: '200px', overflowY: 'auto' }}
+                >
+                    {output}
+                </pre>
+            )}
+            {installFailed && output.length > 0 && (
                 <>
                     <hr/>
                     <p>The installation process is completed, but the dependencies are not detected.</p>
-                    <pre>{logContent}</pre>
+                    <pre>{output}</pre>
                 </>
             )}
             <hr />
