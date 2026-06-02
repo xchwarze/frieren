@@ -5,9 +5,9 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useCallback } from 'react';
-import { Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
+import Loading from '@src/components/Loading';
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
@@ -62,7 +62,7 @@ const RadioConfigForm = ({ radio, onHide }) => {
     if (isFetching && !radioConfig) {
         return (
             <div className={'text-center py-4'}>
-                <Spinner animation={'border'} size={'sm'} />
+                <Loading size={80} />
             </div>
         );
     }

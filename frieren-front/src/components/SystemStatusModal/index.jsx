@@ -5,7 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useEffect, useCallback } from 'react';
-import { Modal, Spinner } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 import { useLocation } from 'wouter';
@@ -13,6 +13,7 @@ import PropTypes from 'prop-types';
 
 import authAtom from '@src/atoms/authAtom.js';
 import Icon from '@src/components/Icon';
+import Loading from '@src/components/Loading';
 import { fetchPost } from '@src/services/fetchService.js';
 
 const REBOOT_POLL_INTERVAL = 20000;
@@ -95,7 +96,7 @@ const SystemStatusModal = ({ action }) => {
         return (
             <Modal show backdrop={'static'} keyboard={false} centered>
                 <Modal.Body className={'text-center py-5'}>
-                    <Spinner animation={'border'} className={'mb-3'} />
+                    <Loading size={96} className={'mb-3'} />
                     <h5>Restarting device...</h5>
                     <p className={'text-muted mb-0'}>Checking connectivity every 20 seconds</p>
                 </Modal.Body>
@@ -115,7 +116,7 @@ const SystemStatusModal = ({ action }) => {
                     </>
                 ) : (
                     <>
-                        <Spinner animation={'border'} className={'mb-3'} />
+                        <Loading size={96} className={'mb-3'} />
                         <h5>Shutting down device...</h5>
                     </>
                 )}

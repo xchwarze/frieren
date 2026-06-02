@@ -9,6 +9,7 @@ import { Modal, Table, Badge, Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Button from '@src/components/Button';
+import Loading from '@src/components/Loading';
 import { getSignalVariant } from '@src/features/wireless/helpers/signalHelper.js';
 import useScanRadio from '@src/features/wireless/hooks/useScanRadio.js';
 
@@ -55,8 +56,7 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
         if (results.length === 0 && isFetching) {
             return (
                 <div className={'text-center py-4'}>
-                    <Spinner animation={'border'} />
-                    <p className={'mt-2 text-muted'}>Scanning for networks…</p>
+                    <Loading />
                 </div>
             );
         }

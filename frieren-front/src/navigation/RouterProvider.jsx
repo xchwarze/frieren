@@ -9,6 +9,7 @@ import { useAtomValue } from 'jotai';
 
 import useHashLocation from '@src/hooks/useHashLocation.js';
 import authAtom from '@src/atoms/authAtom.js';
+import Loading from '@src/components/Loading';
 import LoginStack from '@src/navigation/LoginStack.jsx';
 import LogoffStack from '@src/navigation/LogoffStack.jsx';
 
@@ -20,7 +21,11 @@ import LogoffStack from '@src/navigation/LogoffStack.jsx';
 const RouterProvider = () => {
     const authStatus = useAtomValue(authAtom);
     if (authStatus === null) {
-        return null;
+        return (
+            <div className={'d-flex justify-content-center align-items-center vh-100'}>
+                <Loading />
+            </div>
+        );
     }
 
     return (

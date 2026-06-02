@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
+import Loading from '@src/components/Loading';
 import useGetInterfaceConfig from '@src/features/wireless/hooks/useGetInterfaceConfig.js';
 import { ENCRYPTION_OPTIONS } from '@src/features/wireless/helpers/constants.js';
 import InterfaceForm from './InterfaceForm';
@@ -38,7 +38,7 @@ const InterfaceFormLoader = ({ radio, section, onHide, initialValues, onInterfac
     if (isFetching) {
         return (
             <div className={'text-center py-3'}>
-                <Spinner animation={'border'} size={'sm'} />
+                <Loading size={80} />
             </div>
         );
     }

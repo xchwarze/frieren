@@ -14,6 +14,7 @@ import { installModuleAtom, setModuleDestinationAtom } from '@src/features/modul
 import useCheckDestination from '@src/features/modules/hooks/useCheckDestination';
 import useDownloadModule from '@src/features/modules/hooks/useDownloadModule';
 import Button from '@src/components/Button';
+import Loading from '@src/components/Loading';
 
 /**
  * Generates a modal for installing modules. Handles the download and installation process
@@ -54,7 +55,8 @@ const InstallModal = () => {
             <Modal.Body>
                 {isProcessing && (
                     <div className={'text-center mt-3'}>
-                        <Spinner animation={'border'}/><p>Downloading and installing...</p>
+                        <Loading size={96} />
+                        <p className={'mt-2'}>Downloading and installing...</p>
                     </div>
                 )}
                 {!isProcessing && (
