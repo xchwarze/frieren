@@ -17,6 +17,7 @@ abstract class Controller
      * Minimum required disk space in bytes.
      */
     const MIN_DISK_SPACE = 786432;
+    const TASK_DEPENDENCIES = 'fm-dependencies';
 
     /**
      * @var string The loaded module name.
@@ -166,8 +167,10 @@ abstract class Controller
             return self::setError();
         }
 
-        $installToSD = $this->request['destination'] === 'sd';
-        self::setupCoreHelper()::installDependency($dependencies, $installToSD);
+        $scriptPath = \DeviceConfig::MODULE_ROOT_FOLDER . '/modules/bin/dependency-installer.sh';
+        $installToSD = $this->request['destination'] === 'sd' ? 1 : 0;
+        $command = sprintf("%s install --sd %d --deps %s", $scriptPath, $installToSD, escapeshellarg($dependencies));
+        \frieren\helper\BackgroundTaskHelper::start(self::TASK_DEPENDENCIES, $command);
 
         return self::setSuccess();
     }
@@ -175,24 +178,18 @@ abstract class Controller
     /**
      * Retrieves the current status of the dependency installation process.
      *
-     * @return true A ResponseHandler object with the Status of the installation including 'isRunning', optional 'logContent', and 'hasDependencies'.
+     * @return true A ResponseHandler object with the status of the installation.
      */
     public function getDependencyInstallationStatus()
     {
-        $flagPath = '/tmp/fm-dependencies.flag';
-        $logPath = '/tmp/fm-dependencies.log';
-        if (!file_exists($flagPath) && !file_exists($logPath)) {
-            return self::setError('No installation process has been initiated.');
-        } else if (file_exists($flagPath)) {
-            return self::setSuccess(['isRunning' => true]);
+        $status = \frieren\helper\BackgroundTaskHelper::getStatus(self::TASK_DEPENDENCIES);
+
+        if ($status['completed']) {
+            $manifest = $this->getModuleManifest();
+            $status['hasDependencies'] = self::setupCoreHelper()::checkDependency($manifest['dependencies']);
         }
 
-        $manifest = $this->getModuleManifest();
-        return self::setSuccess([
-            'isRunning' => false,
-            'logContent' => file_get_contents($logPath),
-            'hasDependencies' => self::setupCoreHelper()::checkDependency($manifest['dependencies'])
-        ]);
+        return self::setSuccess($status);
     }
 
     /**

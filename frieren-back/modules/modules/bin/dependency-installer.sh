@@ -1,26 +1,18 @@
 #!/bin/sh
 
-TIMESTAMP=$(date "+[%Y-%m-%d %H:%M:%S]")
-LOG_FILE="/tmp/fm-dependencies.log"
-FLAG_FILE="/tmp/fm-dependencies.flag"
 SD_FLAG=0
 DEPS=""
 
-function usage {
+usage() {
     echo "Usage: $0 [install|remove] --sd [0|1] --deps \"dep1 dep2 dep3\""
     exit 1
-}
-
-function add_log {
-    echo "$1"
-    echo "$TIMESTAMP $1" >> "$LOG_FILE"
 }
 
 # Parse arguments
 ACTION=$1
 shift
 
-while [[ "$#" -gt 0 ]]; do
+while [ "$#" -gt 0 ]; do
     case $1 in
         --sd) SD_FLAG="$2"; shift ;;
         --deps) DEPS="$2"; shift ;;
@@ -34,52 +26,41 @@ if [ -z "$ACTION" ] || [ -z "$DEPS" ]; then
     usage
 fi
 
-if [ -f "$FLAG_FILE" ]; then
-    exit 0
-fi
-
-# Start installation process
-rm "$LOG_FILE"
-add_log "Starting script with action: $ACTION"
-touch "$FLAG_FILE"
-
 install_package() {
     TARGET=$1
     PACKAGE=$2
 
     if [ "$TARGET" -eq 1 ] && [ -n "$(mount | grep 'on /sd')" ]; then
-        add_log "Installing $PACKAGE on SD"
-        /bin/opkg --dest sd install "$PACKAGE" >> "$LOG_FILE"
+        echo "Installing $PACKAGE on SD"
+        /bin/opkg --dest sd install "$PACKAGE"
     else
-        add_log "Installing $PACKAGE on disk"
-        /bin/opkg install "$PACKAGE" >> "$LOG_FILE"
+        echo "Installing $PACKAGE on disk"
+        /bin/opkg install "$PACKAGE"
     fi
 
     if [ $? -ne 0 ]; then
-        add_log "ERROR: opkg --dest $TARGET install $PACKAGE failed"
-        rm "$FLAG_FILE"
+        echo "ERROR: opkg install $PACKAGE failed"
         exit 1
     fi
 }
 
 remove_package() {
     PACKAGE=$1
-    add_log "Removing $PACKAGE"
+    echo "Removing $PACKAGE"
     /bin/opkg remove "$PACKAGE"
 
     if [ $? -ne 0 ]; then
-        add_log "ERROR: opkg remove $PACKAGE failed"
-        rm "$FLAG_FILE"
+        echo "ERROR: opkg remove $PACKAGE failed"
         exit 1
     fi
 }
 
 if [ "$ACTION" = "install" ]; then
-    add_log "Update packages database..."
+    echo "Starting dependency installation..."
+    echo "Updating packages database..."
     /bin/opkg update
     if [ $? -ne 0 ]; then
-        add_log "ERROR: opkg update failed"
-        rm "$FLAG_FILE"
+        echo "ERROR: opkg update failed"
         exit 1
     fi
 
@@ -87,15 +68,13 @@ if [ "$ACTION" = "install" ]; then
         install_package $SD_FLAG $DEP
     done
 
-    add_log "Installation complete!"
+    echo "Installation complete!"
 elif [ "$ACTION" = "remove" ]; then
-    add_log "Removing dependencies"
+    echo "Removing dependencies..."
 
     for DEP in $DEPS; do
         remove_package $DEP
     done
 
-    add_log "Removal complete!"
+    echo "Removal complete!"
 fi
-
-rm "$FLAG_FILE"

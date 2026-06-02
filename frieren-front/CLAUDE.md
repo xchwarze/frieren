@@ -20,11 +20,14 @@ React SPA for Frieren security gadget framework. Runs on OpenWrt routers/SBCs. C
 ## Commands
 
 ```bash
-cp config/.env.dev .env && yarn dev    # Dev server (proxy to device at localhost:8000)
-cp config/.env.prod .env && yarn build # Production build
-yarn lint                              # ESLint
-yarn generate-icons                    # Regenerate icon font
+yarn dev                   # Dev server — loads config/.env.dev (proxies to device)
+yarn build                 # Production build — loads config/.env.prod
+yarn build --mode release  # Release build — loads config/.env.release (gzip replaces originals)
+yarn lint                  # ESLint
+yarn generate-icons        # Regenerate icon font
 ```
+
+Vite env files live in `config/` (not project root). Mode mapping in `vite.config.js`: `development` → `.env.dev`, `production` → `.env.prod`, custom modes (e.g. `release`) load `.env.{mode}` as-is. No need to copy `.env` files manually.
 
 ## Dev Proxy
 

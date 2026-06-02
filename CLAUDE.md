@@ -59,13 +59,16 @@ ResponseHandler (JSON)                              OpenWrt system commands
 
 ```bash
 # Frontend dev (from frieren-front/)
-cp config/.env.dev .env && yarn dev
+yarn dev
 
 # Backend proxy (from tools/)
 php -S localhost:8000
 
 # Production build (from frieren-front/)
-cp config/.env.prod .env && yarn build
+yarn build
+
+# Release build (from frieren-front/)
+yarn build --mode release
 ```
 
 ## Module Development
