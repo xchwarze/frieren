@@ -4,13 +4,23 @@ trap 'echo "ERROR: failed at line $LINENO" >&2' ERR
 #
 # Deploy frieren to device via SSH/SCP
 # Usage: ./deploy.sh <service> [host] [password]
-#   service  - "back", "front" or "terminal"
-#   host     - default: 192.168.7.1
-#   password - default: root
+#        ./deploy.sh module <name> <src-path> [host] [password]
+#   service   - "back", "front", "terminal" or "module"
+#   name      - module name (module mode only)
+#   src-path  - local path to the module sources; built with yarn before upload (module mode only)
+#   host      - default: 192.168.7.1
+#   password  - default: root
 
 SERVICE="${1:-}"
-HOST="${2:-192.168.7.1}"
-PASS="${3:-root}"
+if [ "$SERVICE" = "module" ]; then
+    MODULE_NAME="${2:-}"
+    MODULE_SRC_PATH="${3:-}"
+    HOST="${4:-192.168.7.1}"
+    PASS="${5:-root}"
+else
+    HOST="${2:-192.168.7.1}"
+    PASS="${3:-root}"
+fi
 USER="root"
 REMOTE_PATH="/usr/share/frieren"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -20,8 +30,9 @@ TERMINAL_PATH="$(cd "${SCRIPT_DIR}/../frieren-terminal" && pwd)"
 
 ssh-keygen -R "${HOST}" 2>/dev/null || true
 
-if [ -z "$SERVICE" ] || { [ "$SERVICE" != "back" ] && [ "$SERVICE" != "front" ] && [ "$SERVICE" != "terminal" ]; }; then
+if [ -z "$SERVICE" ] || { [ "$SERVICE" != "back" ] && [ "$SERVICE" != "front" ] && [ "$SERVICE" != "terminal" ] && [ "$SERVICE" != "module" ]; }; then
     echo "Usage: $0 <back|front|terminal> [host] [password]"
+    echo "       $0 module <name> <src-path> [host] [password]"
     exit 1
 fi
 
@@ -78,8 +89,32 @@ deploy_front() {
     echo "Frontend deployed."
 }
 
+deploy_module() {
+    if [ -z "$MODULE_NAME" ] || [ -z "$MODULE_SRC_PATH" ]; then
+        echo "Usage: $0 module <name> <src-path> [host] [password]"
+        exit 1
+    fi
+    if [ ! -d "$MODULE_SRC_PATH" ]; then
+        echo "Module source path not found: ${MODULE_SRC_PATH}"
+        exit 1
+    fi
+
+    echo "Building module '${MODULE_NAME}'..."
+    cd "${MODULE_SRC_PATH}"
+    yarn build --mode release
+
+    local remoteModulePath="${REMOTE_PATH}/modules/${MODULE_NAME}"
+    echo "Deploying module '${MODULE_NAME}' -> ${USER}@${HOST}:${remoteModulePath}"
+
+    ssh_with_pass "${PASS}" "${USER}@${HOST}" "mkdir -p '${remoteModulePath}'"
+    scp_with_pass "${PASS}" -r "dist/"* "${USER}@${HOST}:${remoteModulePath}/"
+
+    echo "Module '${MODULE_NAME}' deployed."
+}
+
 case "$SERVICE" in
     back)     deploy_back ;;
     front)    deploy_front ;;
     terminal) build_terminal ;;
+    module)   deploy_module ;;
 esac
