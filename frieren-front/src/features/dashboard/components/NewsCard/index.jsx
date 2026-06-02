@@ -44,7 +44,7 @@ const NewsCard = () => {
                         <tr key={index}>
                             <td>{item.date}</td>
                             <td>{item.title}</td>
-                            <td>{item.description}</td>
+                            <td dangerouslySetInnerHTML={{ __html: item.description }} />
                         </tr>
                     ))}
                     </tbody>
