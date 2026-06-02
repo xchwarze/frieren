@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { Switch, Route } from 'wouter';
+import { Switch, Route, useLocation } from 'wouter';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import useModulesList from '@src/hooks/useModulesList.js';
@@ -27,10 +27,11 @@ import Wireless from '@src/features/wireless/containers/Wireless';
 const LoginStack = () => {
     const { data } = useModulesList();
     const modules = data?.external ?? [];
+    const [location] = useLocation();
 
     return (
         <Layout>
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <ErrorBoundary FallbackComponent={ErrorFallback} resetKeys={[location]}>
                 <Switch>
                     {modules.map(({ name, title, version }) => (
                         <Route key={name} path={`/${name}`}>
