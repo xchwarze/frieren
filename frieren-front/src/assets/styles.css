@@ -105,6 +105,11 @@
     animation: spin 2s linear infinite;
 }
 
+/* loading.png is white; invert it on light theme so it stays visible */
+[data-bs-theme="light"] .loading-image {
+    filter: invert(1);
+}
+
 .icon-svg {
     color: var(--bs-body-color);
     width: 1em;
