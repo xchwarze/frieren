@@ -9,7 +9,15 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "outdated": "yarn upgrade-interactive",
-    "generate-icons": "fantasticon"
+    "generate-icons": "fantasticon",
+    "test:e2e": "npx playwright test --project=e2e",
+    "test:e2e:headed": "npx playwright test --project=e2e --headed",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:e2e:report": "npx playwright show-report",
+    "test:api": "npx playwright test --project=api",
+    "test:api:record": "npx playwright test --project=api e2e/api/record-responses.js",
+    "test:mock": "npx playwright test --project=mock",
+    "test:all": "npx playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -30,6 +38,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.60.0",
     "@tanstack/eslint-plugin-query": "^5.100.9",
     "@twbs/fantasticon": "^3.1.0",
     "@vitejs/plugin-react": "^5.2.0",

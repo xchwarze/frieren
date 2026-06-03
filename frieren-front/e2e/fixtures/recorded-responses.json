@@ -1,0 +1,776 @@
+{
+  "login": {
+    "login": {
+      "success": true
+    }
+  },
+  "header": {
+    "serverPing": {
+      "success": true
+    }
+  },
+  "dashboard": {
+    "getSystemStats": {
+      "cpu_cores": 4,
+      "cpu_usage": "18.9%",
+      "memory_used": "32.19%",
+      "swap_used": "0%",
+      "uptime": "05:41 hrs",
+      "localtime": "2026-06-03 05:43:51"
+    },
+    "getSystemResume": {
+      "kernel": "6.6.127",
+      "hostname": "Frieren",
+      "system": "MediaTek MT7621 ver:1 eco:3",
+      "model": "GL.iNet GL-MT1300",
+      "board_name": "glinet,gl-mt1300",
+      "rootfs_type": "squashfs",
+      "release": {
+        "distribution": "OpenWrt",
+        "version": "24.10.6",
+        "revision": "r29141-81be8a8869",
+        "target": "ramips/mt7621",
+        "description": "OpenWrt 24.10.6 r29141-81be8a8869",
+        "builddate": "1773709139"
+      }
+    },
+    "getNews": {
+      "news": [
+        {
+          "date": "2026-05-28",
+          "title": "Scan Module Complete",
+          "description": "The scanning module is now complete and available as a closed beta exclusively for Patreon supporters. More info: https://www.patreon.com/posts/159487798"
+        },
+        {
+          "date": "2026-05-28",
+          "title": "Frieren 1.2.0 Released",
+          "description": "Polish and reliability update: skeleton loaders, toast feedback everywhere, system update from dashboard, cache busting, backend security hardening, and major frontend/backend refactors."
+        },
+        {
+          "date": "2026-05-24",
+          "title": "Frieren 1.1.0 Released",
+          "description": "Major update: new Packages manager, wireless module rewrite, terminal rewrite with theme support and autologin, news feed, refreshed UI, and new developer tools."
+        },
+        {
+          "date": "2024-04-22",
+          "title": "Frieren 1.0.0 Released",
+          "description": "First public release. Dashboard, Hardware diagnostics, Login, Modules manager, Settings, Terminal, and Wireless management."
+        }
+      ],
+      "lastVersion": {
+        "version": "1.2.0",
+        "comment": "Polish and reliability update: skeleton loaders, toast feedback, system update from dashboard, cache busting, security hardening, and major refactors.",
+        "updateUrl": "https://github.com/xchwarze/frieren-release/raw/refs/heads/master/packages/openwrt/latest/frieren_1.2-r1_all.ipk"
+      }
+    }
+  },
+  "hardware": {
+    "getUsbDevices": [
+      {
+        "bus": "001",
+        "device": "001",
+        "id": "1d6b:0002",
+        "name": "Linux 6.6.127 xhci-hcd xHCI Host Controller"
+      },
+      {
+        "bus": "002",
+        "device": "001",
+        "id": "1d6b:0003",
+        "name": "Linux 6.6.127 xhci-hcd xHCI Host Controller"
+      }
+    ],
+    "getFileSystemUsage": [
+      {
+        "filesystem": "/dev/root",
+        "type": "squashfs",
+        "size": "4.5M",
+        "used": "4.5M",
+        "available": "0",
+        "usePercent": "100%",
+        "mountedOn": "/rom"
+      },
+      {
+        "filesystem": "tmpfs",
+        "type": "tmpfs",
+        "size": "121.6M",
+        "used": "6.3M",
+        "available": "115.3M",
+        "usePercent": "5%",
+        "mountedOn": "/tmp"
+      },
+      {
+        "filesystem": "/dev/mtdblock6",
+        "type": "jffs2",
+        "size": "24.2M",
+        "used": "13.8M",
+        "available": "10.4M",
+        "usePercent": "57%",
+        "mountedOn": "/overlay"
+      },
+      {
+        "filesystem": "overlayfs:/overlay",
+        "type": "overlay",
+        "size": "24.2M",
+        "used": "13.8M",
+        "available": "10.4M",
+        "usePercent": "57%",
+        "mountedOn": "/"
+      },
+      {
+        "filesystem": "tmpfs",
+        "type": "tmpfs",
+        "size": "512.0K",
+        "used": "0",
+        "available": "512.0K",
+        "usePercent": "0%",
+        "mountedOn": "/dev"
+      }
+    ],
+    "getSystemLogs": [
+      {
+        "timestamp": "Wed Jun  3 05:39:05 2026",
+        "tag": "daemon.warn",
+        "process": "odhcpd[1680]",
+        "message": "No default route present, setting ra_lifetime to 0!"
+      },
+      {
+        "timestamp": "Wed Jun  3 05:31:43 2026",
+        "tag": "daemon.warn",
+        "process": "odhcpd[1680]",
+        "message": "No default route present, setting ra_lifetime to 0!"
+      },
+      {
+        "timestamp": "Wed Jun  3 05:23:42 2026",
+        "tag": "daemon.warn",
+        "process": "odhcpd[1680]",
+        "message": "No default route present, setting ra_lifetime to 0!"
+      }
+    ],
+    "getSystemLogs:search": [
+      {
+        "timestamp": "Tue Jun  2 23:22:21 2026",
+        "tag": "user.info",
+        "process": "kernel",
+        "message": "[   13.706506] kmodloader: done loading kernel modules from /etc/modules.d/*"
+      },
+      {
+        "timestamp": "Tue Jun  2 23:22:21 2026",
+        "tag": "kern.info",
+        "process": "kernel",
+        "message": "[   13.153225] xt_time: kernel timezone is -0000"
+      },
+      {
+        "timestamp": "Tue Jun  2 23:22:21 2026",
+        "tag": "user.info",
+        "process": "kernel",
+        "message": "[   12.414570] kmodloader: loading kernel modules from /etc/modules.d/*"
+      }
+    ]
+  },
+  "modules": {
+    "getModuleList": {
+      "external": [
+        {
+          "name": "nmap",
+          "title": "nmap",
+          "version": "1.0.2",
+          "icon": "icon.png"
+        },
+        {
+          "name": "tcpdump",
+          "title": "TCP Dump",
+          "version": "1.0.3",
+          "icon": "icon.png"
+        },
+        {
+          "name": "demo",
+          "title": "Demo Module",
+          "version": "1.0.3",
+          "icon": "zap"
+        },
+        {
+          "name": "dnsspoof",
+          "title": "DNS Spoof",
+          "version": "1.0.3"
+        },
+        {
+          "name": "evilportal",
+          "title": "Evil Portal",
+          "version": "1.0.1"
+        },
+        {
+          "name": "usbstorage",
+          "title": "SD/USB Storage",
+          "version": "1.0.2"
+        },
+        {
+          "name": "wpaonlinecrack",
+          "title": "WPA Online Crack",
+          "version": "1.0.3",
+          "icon": "icon.png"
+        }
+      ],
+      "sidebar": [
+        {
+          "name": "dashboard",
+          "title": "Dashboard",
+          "version": "1.0.0",
+          "icon": "trello"
+        },
+        {
+          "name": "packages",
+          "title": "Packages",
+          "version": "1.0.0",
+          "icon": "box"
+        },
+        {
+          "name": "hardware",
+          "title": "Hardware",
+          "version": "1.0.0",
+          "icon": "hard-drive"
+        },
+        {
+          "name": "modules",
+          "title": "Modules",
+          "version": "1.0.0",
+          "icon": "package"
+        },
+        {
+          "name": "wireless",
+          "title": "Wireless",
+          "version": "1.0.0",
+          "icon": "radio"
+        },
+        {
+          "name": "settings",
+          "title": "Settings",
+          "version": "1.0.0",
+          "icon": "settings"
+        },
+        {
+          "name": "nmap",
+          "title": "nmap",
+          "version": "1.0.2",
+          "icon": "icon.png"
+        },
+        {
+          "name": "tcpdump",
+          "title": "TCP Dump",
+          "version": "1.0.3",
+          "icon": "icon.png"
+        },
+        {
+          "name": "demo",
+          "title": "Demo Module",
+          "version": "1.0.3",
+          "icon": "zap"
+        },
+        {
+          "name": "wpaonlinecrack",
+          "title": "WPA Online Crack",
+          "version": "1.0.3",
+          "icon": "icon.png"
+        }
+      ]
+    },
+    "getInstalledModules": [
+      {
+        "name": "nmap",
+        "title": "nmap",
+        "icon": "icon.png",
+        "sidebar": true,
+        "forceSidebar": false,
+        "description": "Perform nmap scans on a client!",
+        "author": "m5kro",
+        "version": "1.0.2",
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/nmap",
+        "bugs": "https://github.com/xchwarze/frieren-modules/issues",
+        "system": false,
+        "size": "13.0K"
+      },
+      {
+        "name": "tcpdump",
+        "title": "TCP Dump",
+        "icon": "icon.png",
+        "sidebar": true,
+        "forceSidebar": false,
+        "description": "TCPDump Web Interface for Simplified Packet Analysis",
+        "author": "DSR!",
+        "version": "1.0.3",
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/tcpdump",
+        "bugs": "https://github.com/xchwarze/frieren-modules/issues",
+        "system": false,
+        "size": "15.5K"
+      },
+      {
+        "name": "demo",
+        "title": "Demo Module",
+        "icon": "zap",
+        "sidebar": false,
+        "forceSidebar": true,
+        "description": "Demo module for test UMD logic",
+        "author": "DSR!",
+        "version": "1.0.3",
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/demo",
+        "bugs": "https://github.com/xchwarze/frieren-modules/issues",
+        "system": false,
+        "size": "8.0K"
+      },
+      {
+        "name": "dnsspoof",
+        "title": "DNS Spoof",
+        "icon": "icon.png",
+        "sidebar": false,
+        "forceSidebar": false,
+        "description": "Spoof DNS records using dnsmasq",
+        "author": "DSR!",
+        "version": "1.0.3",
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/dnsspoof",
+        "bugs": "https://github.com/xchwarze/frieren-modules/issues",
+        "system": false,
+        "size": "11.5K"
+      },
+      {
+        "name": "evilportal",
+        "title": "Evil Portal",
+        "icon": "icon.png",
+        "sidebar": false,
+        "forceSidebar": false,
+        "description": "Captive portal attack tool with credential harvesting and client management",
+        "author": "DSR!",
+        "version": "1.0.1",
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/evilportal",
+        "bugs": "https://github.com/xchwarze/frieren-modules/issues",
+        "system": false,
+        "size": "39.0K"
+      },
+      {
+        "name": "usbstorage",
+        "title": "SD/USB Storage",
+        "icon": "icon.png",
+        "sidebar": false,
+        "forceSidebar": false,
+        "description": "Add SD/USB Storage Support",
+        "author": "DSR!",
+        "version": "1.0.2",
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/usbstorage",
+        "bugs": "https://github.com/xchwarze/frieren-modules/issues",
+        "system": false,
+        "size": "20.5K"
+      },
+      {
+        "name": "wpaonlinecrack",
+        "title": "WPA Online Crack",
+        "icon": "icon.png",
+        "sidebar": true,
+        "forceSidebar": false,
+        "description": "Automates wpa hash cracking through online services",
+        "author": "DSR!",
+        "version": "1.0.3",
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/wpaonlinecrack",
+        "bugs": "https://github.com/xchwarze/frieren-modules/issues",
+        "system": false,
+        "size": "18.5K"
+      }
+    ],
+    "getAvailableModules": [
+      {
+        "name": "wpaonlinecrack",
+        "title": "WPA Online Crack",
+        "version": "1.0.2",
+        "description": "Automates wpa hash cracking through online services",
+        "author": "DSR!",
+        "keywords": [
+          "hash",
+          "wpa"
+        ],
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/wpaonlinecrack",
+        "size": 9392,
+        "sizeHuman": "9.17 KiB",
+        "checksum": "ee548fc28e2dcc0de356ce9361e319eefe6a30145c14bab0120e01e215587378"
+      },
+      {
+        "name": "usbstorage",
+        "title": "SD/USB Storage",
+        "version": "1.0.2",
+        "description": "Add SD/USB Storage Support",
+        "author": "DSR!",
+        "keywords": [
+          "storage"
+        ],
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/usbstorage",
+        "size": 10633,
+        "sizeHuman": "10.38 KiB",
+        "checksum": "8d454a5aacc7696e21e8eb42981af2c29360ddcc3f571af722ff3c42f49f025c"
+      },
+      {
+        "name": "tcpdump",
+        "title": "TCP Dump",
+        "version": "1.0.2",
+        "description": "TCPDump Web Interface for Simplified Packet Analysis",
+        "author": "DSR!",
+        "keywords": [
+          "network",
+          "tools"
+        ],
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/tcpdump",
+        "size": 9605,
+        "sizeHuman": "9.38 KiB",
+        "checksum": "d5a5c1937816cf74d955bfb7ac5f898ff7f03fb09aeb671a83092d1fc061c4bd"
+      },
+      {
+        "name": "nmap",
+        "title": "nmap",
+        "version": "1.0.2",
+        "description": "Perform nmap scans on a client!",
+        "author": "m5kro",
+        "keywords": [
+          "nmap"
+        ],
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/nmap",
+        "size": 9044,
+        "sizeHuman": "8.83 KiB",
+        "checksum": "b9443509fc1c72d113fb348fb438c189bc180d77c2fedabf2b939a8cacdef5f5"
+      },
+      {
+        "name": "dnsspoof",
+        "title": "DNS Spoof",
+        "version": "1.0.2",
+        "description": "Spoof DNS records using dnsmasq",
+        "author": "DSR!",
+        "keywords": [
+          "dns"
+        ],
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/dnsspoof",
+        "size": 6307,
+        "sizeHuman": "6.16 KiB",
+        "checksum": "75d66a8cf8f38eb00697d9d66d2a04aff164471447c6007827ee26ef3b91855a"
+      },
+      {
+        "name": "demo",
+        "title": "Demo Module",
+        "version": "1.0.2",
+        "description": "Demo module for test UMD logic",
+        "author": "DSR!",
+        "keywords": [
+          "development"
+        ],
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/demo",
+        "size": 5315,
+        "sizeHuman": "5.19 KiB",
+        "checksum": "2567eac20134a03ee72b1dacaa2dc9122a47ad7384ecdf68ff0e061d0835cd12"
+      }
+    ],
+    "checkDestination": {
+      "alreadyInstalled": false,
+      "isInternalAvailable": true,
+      "isSDAvailable": false
+    }
+  },
+  "packages": {
+    "getInstalledPackages": {
+      "packages": [
+        {
+          "name": "terminfo",
+          "version": "6.4-r2",
+          "description": ""
+        },
+        {
+          "name": "iwinfo",
+          "version": "2024.10.20~b94f066e-r1",
+          "description": ""
+        },
+        {
+          "name": "libopenssl3",
+          "version": "3.0.20-r1",
+          "description": ""
+        },
+        {
+          "name": "openssh-sftp-server",
+          "version": "9.9_p2-r1",
+          "description": ""
+        },
+        {
+          "name": "liblucihttp0",
+          "version": "2023.03.15~9b5b683f-r1",
+          "description": ""
+        }
+      ]
+    },
+    "getAvailablePackagesStatus": {
+      "completed": true,
+      "packages": [
+        {
+          "name": "asterisk-app-adsiprog",
+          "version": "20.8.1-r1",
+          "description": " Asterisk ADSI programming application."
+        },
+        {
+          "name": "asterisk-app-agent-pool",
+          "version": "20.8.1-r1",
+          "description": " Call center agent pool applications."
+        },
+        {
+          "name": "asterisk-app-alarmreceiver",
+          "version": "20.8.1-r1",
+          "description": " Alarm receiver for Asterisk."
+        },
+        {
+          "name": "asterisk-app-amd",
+          "version": "20.8.1-r1",
+          "description": " Answering Machine Detection application."
+        },
+        {
+          "name": "asterisk-app-attended-transfer",
+          "version": "20.8.1-r1",
+          "description": " Queues up an attended transfer to a given extension."
+        }
+      ]
+    },
+    "getInstalledPackagesStatus": {
+      "completed": false,
+      "packages": []
+    }
+  },
+  "settings": {
+    "getSectionData": {
+      "hostname": "Frieren",
+      "timezone": "UTC",
+      "theme": "auto",
+      "terminalAutologin": true,
+      "terminalTheme": "solarizedDark",
+      "fontSize": 15,
+      "cursorStyle": "bar",
+      "cursorBlink": true
+    }
+  },
+  "terminal": {
+    "getStatus": {
+      "status": false
+    }
+  },
+  "wireless": {
+    "getWirelessOverview": {
+      "radio0": {
+        "channel": "8",
+        "txpower": 24,
+        "frequency": 2447,
+        "band": "2.4 GHz",
+        "htmode": "HT20",
+        "up": true,
+        "disabled": false,
+        "phy": "phy0",
+        "country": "US",
+        "hardware": "MediaTek MT7615E",
+        "hwmodes": "b/g/n",
+        "htmodes": [
+          "HT20",
+          "HT40"
+        ],
+        "interfaces": [
+          {
+            "radio": "radio0",
+            "ifname": "phy0-sta0",
+            "section": "wifinet2",
+            "mode": "sta",
+            "ssid": "TestNetwork-2G",
+            "encryption": "psk2+ccmp",
+            "network": "wwan",
+            "hidden": false,
+            "up": true,
+            "disabled": false
+          }
+        ]
+      },
+      "radio1": {
+        "channel": "36",
+        "txpower": 20,
+        "frequency": 5180,
+        "band": "5 GHz",
+        "htmode": "VHT80",
+        "up": true,
+        "disabled": false,
+        "phy": "phy1",
+        "country": "US",
+        "hardware": "MediaTek MT7615E",
+        "hwmodes": "ac/n",
+        "htmodes": [
+          "HT20",
+          "HT40",
+          "VHT20",
+          "VHT40",
+          "VHT80"
+        ],
+        "interfaces": [
+          {
+            "radio": "radio1",
+            "ifname": "phy1-mon0",
+            "section": "wifinet3",
+            "mode": "monitor",
+            "ssid": "",
+            "encryption": "",
+            "network": "",
+            "hidden": false,
+            "up": true,
+            "disabled": false
+          }
+        ]
+      }
+    },
+    "getRawWirelessConfig": {
+      "content": "\nconfig wifi-device 'radio0'\n\toption type 'mac80211'\n\toption path '1e140000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0'\n\toption band '2g'\n\toption channel '8'\n\toption htmode 'HT20'\n\toption cell_density '0'\n\nconfig wifi-device 'radio1'\n\toption type 'mac80211'\n\toption path '1e140000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0+1'\n\toption band '5g'\n\toption channel '36'\n\toption htmode 'VHT80'\n\toption disabled '0'\n\toption txpower '20'\n\toption country 'US'\n\nconfig wifi-iface 'wifinet2'\n\toption device 'radio0'\n\toption mode 'sta'\n\toption disabled '0'\n\toption network 'wwan'\n\toption ssid 'TestNetwork-2G'\n\toption encryption psk2+ccmp\n\toption hidden '0'\n\toption key 'MOCK_WPA_KEY_FOR_TESTING'\n\nconfig wifi-iface 'wifinet3'"
+    },
+    "getRadioConfig": {
+      "current": {
+        "channel": "8",
+        "txpower": null,
+        "htmode": "HT20",
+        "country": null,
+        "disabled": null
+      },
+      "available": {
+        "channels": [
+          {
+            "channel": 1,
+            "mhz": 2412,
+            "restricted": false
+          },
+          {
+            "channel": 2,
+            "mhz": 2417,
+            "restricted": false
+          },
+          {
+            "channel": 3,
+            "mhz": 2422,
+            "restricted": false
+          },
+          {
+            "channel": 4,
+            "mhz": 2427,
+            "restricted": false
+          },
+          {
+            "channel": 5,
+            "mhz": 2432,
+            "restricted": false
+          },
+          {
+            "channel": 6,
+            "mhz": 2437,
+            "restricted": false
+          },
+          {
+            "channel": 7,
+            "mhz": 2442,
+            "restricted": false
+          },
+          {
+            "channel": 8,
+            "mhz": 2447,
+            "restricted": false
+          },
+          {
+            "channel": 9,
+            "mhz": 2452,
+            "restricted": false
+          },
+          {
+            "channel": 10,
+            "mhz": 2457,
+            "restricted": false
+          },
+          {
+            "channel": 11,
+            "mhz": 2462,
+            "restricted": false
+          }
+        ],
+        "txpowers": [
+          {
+            "dbm": 0,
+            "mw": 1
+          },
+          {
+            "dbm": 1,
+            "mw": 1
+          },
+          {
+            "dbm": 2,
+            "mw": 1
+          },
+          {
+            "dbm": 3,
+            "mw": 1
+          },
+          {
+            "dbm": 4,
+            "mw": 2
+          }
+        ],
+        "countries": [
+          {
+            "code": "00",
+            "name": null
+          },
+          {
+            "code": "AD",
+            "name": null
+          },
+          {
+            "code": "AE",
+            "name": null
+          },
+          {
+            "code": "AF",
+            "name": null
+          },
+          {
+            "code": "AG",
+            "name": null
+          }
+        ],
+        "htmodes": [
+          "HT20",
+          "HT40"
+        ]
+      }
+    },
+    "getAssociationList": [
+      {
+        "mac": "AA:BB:CC:DD:EE:01",
+        "signal": -39,
+        "noise": -75,
+        "rx_rate": 144400,
+        "tx_rate": 130000,
+        "inactive": 0
+      }
+    ],
+    "scanForNetworks": [
+      {
+        "bssid": "AA:BB:CC:DD:EE:01",
+        "ssid": "TestNetwork-2G",
+        "channel": 8,
+        "signal": -35,
+        "quality": 70,
+        "security": "WPA2-PSK / CCMP"
+      },
+      {
+        "bssid": "AA:BB:CC:11:22:33",
+        "ssid": "Neighbor-AP-1",
+        "channel": 1,
+        "signal": -64,
+        "quality": 46,
+        "security": "WPA2-PSK / CCMP"
+      },
+      {
+        "bssid": "AA:BB:CC:44:55:66",
+        "ssid": "Neighbor-AP-2",
+        "channel": 1,
+        "signal": -64,
+        "quality": 46,
+        "security": "Open"
+      }
+    ]
+  }
+}
