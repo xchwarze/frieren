@@ -25,14 +25,14 @@ import sortModulesByName from '@src/features/modules/helpers/sortModulesByName.j
 const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
     const setSelectedRemoteModule = useSetAtom(installModuleAtom);
     const { data, isSuccess, isFetching, refetch } = availableQuery;
-    const { data: installedModules } = installedQuery;
+    const { data: installedModules = [] } = installedQuery;
 
     const checkInstalled = (newModule) => (
         installedModules.some((module) => module.name === newModule.name)
     );
 
     const checkUpdateable = (newModule) => (
-        checkInstalled(newModule) && installedModules.some((module) => module.version !== newModule.version)
+        installedModules.some((module) => module.name === newModule.name && module.version !== newModule.version)
     );
 
     const handleDownloadClick = (value) => {

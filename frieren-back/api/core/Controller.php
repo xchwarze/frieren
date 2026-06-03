@@ -189,34 +189,14 @@ abstract class Controller
     public function getDependencyInstallationStatus()
     {
         $status = \frieren\helper\BackgroundTaskHelper::getStatus(self::TASK_DEPENDENCIES);
-        $status['output'] = $this->formatDependencyLog($status['output']);
         $status['isRunning'] = \frieren\helper\BackgroundTaskHelper::isRunning(self::TASK_DEPENDENCIES);
 
         if ($status['completed']) {
             $manifest = $this->getModuleManifest();
-            $status['hasDependencies'] = self::setupCoreHelper()::checkDependency($manifest['dependencies'] ?? []);
+            $status['hasDependencies'] = self::setupCoreHelper()::checkDependency($manifest['dependencies'] ?? []) === true;
         }
 
         return self::setSuccess($status);
-    }
-
-    /**
-     * Turns the package-manager-call.sh JSON output into a readable installation log.
-     * Falls back to the raw output when it is not valid JSON (e.g. still empty while running).
-     *
-     * @param string $output Raw captured task output.
-     * @return string Human readable log content.
-     */
-    private function formatDependencyLog($output)
-    {
-        $decoded = json_decode($output, true);
-        if (!is_array($decoded)) {
-            return $output;
-        }
-
-        $log = trim(($decoded['stdout'] ?? '') . "\n" . ($decoded['stderr'] ?? ''));
-
-        return $log === '' ? $output : $log;
     }
 
     /**
