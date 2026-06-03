@@ -8,7 +8,6 @@
 
 namespace frieren\modules\packages;
 
-use frieren\helper\BackgroundTaskHelper;
 use frieren\helper\OpenWrtHelper;
 
 class PackagesController extends \frieren\core\Controller
@@ -39,7 +38,7 @@ class PackagesController extends \frieren\core\Controller
 
     private function dependencyInstallInProgress()
     {
-        return BackgroundTaskHelper::isRunning(self::TASK_DEPENDENCIES);
+        return \frieren\helper\BackgroundTaskHelper::isRunning(self::TASK_DEPENDENCIES);
     }
 
     public function updateLists()
@@ -53,20 +52,20 @@ class PackagesController extends \frieren\core\Controller
         }
 
         $script = $this->getScriptPath();
-        BackgroundTaskHelper::start(self::TASK_UPDATE, "{$script} update");
+        \frieren\helper\BackgroundTaskHelper::start(self::TASK_UPDATE, "{$script} update");
 
         return self::setSuccess();
     }
 
     public function getUpdateStatus()
     {
-        return self::setSuccess(BackgroundTaskHelper::getStatus(self::TASK_UPDATE));
+        return self::setSuccess(\frieren\helper\BackgroundTaskHelper::getStatus(self::TASK_UPDATE));
     }
 
     public function getInstalledPackages()
     {
         $script = $this->getScriptPath();
-        $outputFile = BackgroundTaskHelper::getLogPath(self::TASK_INSTALLED);
+        $outputFile = \frieren\helper\BackgroundTaskHelper::getLogPath(self::TASK_INSTALLED);
         $command = "{$script} list-installed > {$outputFile} 2>&1";
         OpenWrtHelper::exec($command, true, true);
 
@@ -77,12 +76,12 @@ class PackagesController extends \frieren\core\Controller
 
     public function getInstalledPackagesStatus()
     {
-        $completed = BackgroundTaskHelper::isCompleted(self::TASK_INSTALLED);
+        $completed = \frieren\helper\BackgroundTaskHelper::isCompleted(self::TASK_INSTALLED);
 
         return self::setSuccess([
             'completed' => $completed,
             'packages' => $completed
-                ? self::setupModuleHelper()::parsePackageFile(BackgroundTaskHelper::getLogPath(self::TASK_INSTALLED))
+                ? self::setupModuleHelper()::parsePackageFile(\frieren\helper\BackgroundTaskHelper::getLogPath(self::TASK_INSTALLED))
                 : [],
         ]);
     }
@@ -90,19 +89,19 @@ class PackagesController extends \frieren\core\Controller
     public function getAvailablePackages()
     {
         $script = $this->getScriptPath();
-        BackgroundTaskHelper::start(self::TASK_AVAILABLE, "{$script} list-available");
+        \frieren\helper\BackgroundTaskHelper::start(self::TASK_AVAILABLE, "{$script} list-available");
 
         return self::setSuccess();
     }
 
     public function getAvailablePackagesStatus()
     {
-        $completed = BackgroundTaskHelper::isCompleted(self::TASK_AVAILABLE);
+        $completed = \frieren\helper\BackgroundTaskHelper::isCompleted(self::TASK_AVAILABLE);
 
         return self::setSuccess([
             'completed' => $completed,
             'packages' => $completed
-                ? self::setupModuleHelper()::parsePackageFile(BackgroundTaskHelper::getLogPath(self::TASK_AVAILABLE))
+                ? self::setupModuleHelper()::parsePackageFile(\frieren\helper\BackgroundTaskHelper::getLogPath(self::TASK_AVAILABLE))
                 : [],
         ]);
     }
@@ -119,14 +118,14 @@ class PackagesController extends \frieren\core\Controller
 
         $script = $this->getScriptPath();
         $packageName = escapeshellarg($this->request['packageName']);
-        BackgroundTaskHelper::start(self::TASK_INSTALL, "{$script} install {$packageName}");
+        \frieren\helper\BackgroundTaskHelper::start(self::TASK_INSTALL, "{$script} install {$packageName}");
 
         return self::setSuccess();
     }
 
     public function getInstallStatus()
     {
-        return self::setSuccess(BackgroundTaskHelper::getStatus(self::TASK_INSTALL));
+        return self::setSuccess(\frieren\helper\BackgroundTaskHelper::getStatus(self::TASK_INSTALL));
     }
 
     public function removePackage()
@@ -139,13 +138,13 @@ class PackagesController extends \frieren\core\Controller
         $packageName = escapeshellarg($this->request['packageName']);
         $autoremove = !empty($this->request['autoremove']);
         $flags = $autoremove ? '--force-removal-of-dependent-packages --autoremove ' : '';
-        BackgroundTaskHelper::start(self::TASK_REMOVE, "{$script} remove {$flags}{$packageName}");
+        \frieren\helper\BackgroundTaskHelper::start(self::TASK_REMOVE, "{$script} remove {$flags}{$packageName}");
 
         return self::setSuccess();
     }
 
     public function getRemoveStatus()
     {
-        return self::setSuccess(BackgroundTaskHelper::getStatus(self::TASK_REMOVE));
+        return self::setSuccess(\frieren\helper\BackgroundTaskHelper::getStatus(self::TASK_REMOVE));
     }
 }

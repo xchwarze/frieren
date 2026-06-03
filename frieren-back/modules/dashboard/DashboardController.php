@@ -8,7 +8,6 @@
 
 namespace frieren\modules\dashboard;
 
-use frieren\helper\BackgroundTaskHelper;
 
 class DashboardController extends \frieren\core\Controller
 {
@@ -70,13 +69,13 @@ class DashboardController extends \frieren\core\Controller
 
         $scriptPath = self::getModulePath() . '/bin/system-update.sh';
         $url = escapeshellarg($updateUrl);
-        BackgroundTaskHelper::start(self::TASK_UPDATE, "{$scriptPath} {$url}");
+        \frieren\helper\BackgroundTaskHelper::start(self::TASK_UPDATE, "{$scriptPath} {$url}");
 
         return self::setSuccess();
     }
 
     public function getSystemUpdateStatus()
     {
-        return self::setSuccess(BackgroundTaskHelper::getStatus(self::TASK_UPDATE));
+        return self::setSuccess(\frieren\helper\BackgroundTaskHelper::getStatus(self::TASK_UPDATE));
     }
 }

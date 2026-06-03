@@ -156,7 +156,7 @@ abstract class Controller
     }
 
     /**
-     * Install module dependencies using the packages package-manager-call.sh script.
+     * Install module dependencies using the packages dependency-installer.sh script.
      *
      * @return true A ResponseHandler object with the standard response.
      */
@@ -165,6 +165,10 @@ abstract class Controller
         $dependencies = implode(' ', $manifest['dependencies'] ?? []);
         if (empty($dependencies)) {
             return self::setError();
+        }
+
+        if (!self::setupCoreHelper()::hasInternetConnection()) {
+            return self::setError('No internet connection available.');
         }
 
         if (\frieren\helper\BackgroundTaskHelper::isRunning(self::TASK_DEPENDENCIES)) {
@@ -186,6 +190,7 @@ abstract class Controller
     {
         $status = \frieren\helper\BackgroundTaskHelper::getStatus(self::TASK_DEPENDENCIES);
         $status['output'] = $this->formatDependencyLog($status['output']);
+        $status['isRunning'] = \frieren\helper\BackgroundTaskHelper::isRunning(self::TASK_DEPENDENCIES);
 
         if ($status['completed']) {
             $manifest = $this->getModuleManifest();

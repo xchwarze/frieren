@@ -8,7 +8,6 @@
 
 namespace frieren\modules\hardware;
 
-use frieren\helper\BackgroundTaskHelper;
 
 class HardwareController extends \frieren\core\Controller
 {
@@ -56,7 +55,7 @@ class HardwareController extends \frieren\core\Controller
     public function startDiagnosticsScript()
     {
         $scriptPath = self::getModulePath() . '/bin/diagnostics.sh';
-        BackgroundTaskHelper::start(self::TASK_DIAGNOSTICS, $scriptPath);
+        \frieren\helper\BackgroundTaskHelper::start(self::TASK_DIAGNOSTICS, $scriptPath);
 
         self::setSuccess();
     }
@@ -64,8 +63,8 @@ class HardwareController extends \frieren\core\Controller
     public function getDiagnosticsStatus()
     {
         return self::setSuccess([
-            'status' => @file_get_contents(BackgroundTaskHelper::getLogPath(self::TASK_DIAGNOSTICS)),
-            'completed' => BackgroundTaskHelper::isCompleted(self::TASK_DIAGNOSTICS),
+            'status' => @file_get_contents(\frieren\helper\BackgroundTaskHelper::getLogPath(self::TASK_DIAGNOSTICS)),
+            'completed' => \frieren\helper\BackgroundTaskHelper::isCompleted(self::TASK_DIAGNOSTICS),
         ]);
     }
 

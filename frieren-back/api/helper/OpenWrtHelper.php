@@ -110,7 +110,7 @@ class OpenWrtHelper
     }
 
     /**
-     * Install dependencies using the packages package-manager-call.sh script.
+     * Install dependencies using the packages dependency-installer.sh script (streams output live).
      *
      * @param mixed $dependencies The dependencies to install.
      * @param bool $installToSD Flag indicating whether to install to SD card.
@@ -119,10 +119,10 @@ class OpenWrtHelper
      */
     public static function installDependency($dependencies, $installToSD = false, $taskName = 'module-dependencies') {
         if (!empty($dependencies)) {
-            $scriptPath = \DeviceConfig::MODULE_ROOT_FOLDER . '/packages/bin/package-manager-call.sh';
+            $scriptPath = \DeviceConfig::MODULE_ROOT_FOLDER . '/packages/bin/dependency-installer.sh';
             $dest = $installToSD ? '--dest sd ' : '';
             $escapedDeps = implode(' ', array_map('escapeshellarg', explode(' ', $dependencies)));
-            $command = sprintf('%s update > /dev/null 2>&1; %s install %s%s', $scriptPath, $scriptPath, $dest, $escapedDeps);
+            $command = sprintf('%s %s%s', $scriptPath, $dest, $escapedDeps);
             BackgroundTaskHelper::start($taskName, $command);
         }
 

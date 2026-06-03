@@ -8,7 +8,6 @@
 
 namespace frieren\modules\modules;
 
-use frieren\helper\BackgroundTaskHelper;
 
 class ModulesController extends \frieren\core\Controller
 {
@@ -167,7 +166,7 @@ class ModulesController extends \frieren\core\Controller
             return self::setError('No internet connection available.');
         }
 
-        $flagPath = BackgroundTaskHelper::getFlagPath(self::TASK_DOWNLOAD);
+        $flagPath = \frieren\helper\BackgroundTaskHelper::getFlagPath(self::TASK_DOWNLOAD);
         @unlink($flagPath);
 
         $remoteFileName = self::getModuleCompressName(
@@ -187,7 +186,7 @@ class ModulesController extends \frieren\core\Controller
     public function downloadStatus()
     {
         self::setSuccess([
-            'completed' => BackgroundTaskHelper::isCompleted(self::TASK_DOWNLOAD),
+            'completed' => \frieren\helper\BackgroundTaskHelper::isCompleted(self::TASK_DOWNLOAD),
         ]);
     }
 
@@ -213,7 +212,7 @@ class ModulesController extends \frieren\core\Controller
 
         $installPath = escapeshellarg($useSD ? $moduleSDDirPath : $moduleDirPath);
         $safeFilePath = escapeshellarg($filePath);
-        BackgroundTaskHelper::start(
+        \frieren\helper\BackgroundTaskHelper::start(
             self::TASK_INSTALL,
             "tar -xzC {$installPath} -f {$safeFilePath} && rm {$safeFilePath}"
         );
@@ -224,7 +223,7 @@ class ModulesController extends \frieren\core\Controller
     public function installStatus()
     {
         self::setSuccess([
-            'completed' => BackgroundTaskHelper::isCompleted(self::TASK_INSTALL),
+            'completed' => \frieren\helper\BackgroundTaskHelper::isCompleted(self::TASK_INSTALL),
         ]);
     }
 

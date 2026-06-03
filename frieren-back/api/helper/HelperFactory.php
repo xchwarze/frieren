@@ -45,8 +45,8 @@ class HelperFactory
 
         if (class_exists($className)) {
             return new $className();
-        } else {
-            throw new \Exception("Helper not found for module: {$module}, system: {$systemFamily}");
         }
+
+        throw new \Exception("Helper not found for module: {$module}, system: {$systemFamily}");
     }
 }
