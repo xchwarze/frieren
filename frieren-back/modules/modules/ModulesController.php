@@ -41,7 +41,7 @@ class ModulesController extends \frieren\core\Controller
             'external' => [],
             'externalWithSidebar' => []
         ];
-        $sidebarSettings = self::setupCoreHelper()::uciGetJson(self::UCI_SIDEBAR);
+        $sidebarSettings = self::setupCoreHelper()::uciGetJson(self::UCI_SIDEBAR, false);
 
         foreach ($modulesDir as $file) {
             if ($file->isDot() || !$file->isDir()) {
@@ -115,7 +115,7 @@ class ModulesController extends \frieren\core\Controller
 
         $moduleSizes = self::setupModuleHelper()::getAllModuleSizes($moduleRoot);
         $modules = [];
-        $sidebarSettings = self::setupCoreHelper()::uciGetJson(self::UCI_SIDEBAR);
+        $sidebarSettings = self::setupCoreHelper()::uciGetJson(self::UCI_SIDEBAR, false);
 
         foreach ($modulesDir as $file) {
             if ($file->isDot() || !$file->isDir()) {
@@ -275,7 +275,7 @@ class ModulesController extends \frieren\core\Controller
         self::setupCoreHelper();
         $moduleName = $this->request['moduleName'];
         $status = $this->request['status'];
-        $currentSettings = $this->coreHelper::uciGetJson(self::UCI_SIDEBAR);
+        $currentSettings = $this->coreHelper::uciGetJson(self::UCI_SIDEBAR, false);
 
         if ($status === 'pin') {
             $currentSettings[$moduleName] = true;

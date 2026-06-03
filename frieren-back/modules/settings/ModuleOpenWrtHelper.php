@@ -147,7 +147,7 @@ class ModuleOpenWrtHelper
      */
     public static function getTerminalAutologin()
     {
-        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_autologin') === true;
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_autologin', false) === true;
     }
 
     /**
@@ -157,7 +157,7 @@ class ModuleOpenWrtHelper
      */
     public static function getTerminalTheme()
     {
-        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_theme');
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_theme', false) ?? 'default';
     }
 
     /**
@@ -194,7 +194,7 @@ class ModuleOpenWrtHelper
      */
     public static function getTerminalFontSize()
     {
-        return (int) OpenWrtHelper::uciGet('frieren.@settings[0].terminal_font_size');
+        return (int) (OpenWrtHelper::uciGet('frieren.@settings[0].terminal_font_size', false) ?? 13);
     }
 
     /**
@@ -218,7 +218,7 @@ class ModuleOpenWrtHelper
      */
     public static function getTerminalCursorStyle()
     {
-        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_style');
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_style', false) ?? 'block';
     }
 
     /**
@@ -246,7 +246,7 @@ class ModuleOpenWrtHelper
      */
     public static function getTerminalCursorBlink()
     {
-        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_blink') === true;
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_cursor_blink', false) === true;
     }
 
     /**
@@ -277,7 +277,7 @@ class ModuleOpenWrtHelper
         return [
             'hostname' => gethostname(),
             'timezone' => self::getSystemTimeZone(),
-            'theme' => OpenWrtHelper::uciGet('frieren.@settings[0].theme'),
+            'theme' => OpenWrtHelper::uciGet('frieren.@settings[0].theme', false) ?? 'auto',
             'terminalAutologin' => self::getTerminalAutologin(),
             'terminalTheme' => self::getTerminalTheme(),
             'fontSize' => self::getTerminalFontSize(),

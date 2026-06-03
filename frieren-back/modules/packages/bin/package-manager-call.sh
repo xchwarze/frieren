@@ -62,6 +62,10 @@ case "$action" in
 							cmd="$cmd $1"
 							shift
 						;;
+						--dest)
+							# apk has no per-destination install, ignore target
+							shift 2
+						;;
 						-*)
 							shift
 						;;
@@ -76,6 +80,10 @@ case "$action" in
 						--autoremove|--force-overwrite|--force-removal-of-dependent-packages)
 							cmd="$cmd $1"
 							shift
+						;;
+						--dest)
+							cmd="$cmd --dest $2"
+							shift 2
 						;;
 						-*)
 							shift

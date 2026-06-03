@@ -32,11 +32,13 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
         useInstallModuleDependencies({ module, dependenciesQueryKey });
     const isLoading = isPending || isPolling;
 
+    const showLogPanel = (showLog || installFailed) && output.length > 0;
+
     useEffect(() => {
-        if (showLog && logRef.current) {
+        if (showLogPanel && logRef.current) {
             logRef.current.scrollTop = logRef.current.scrollHeight;
         }
-    }, [output, showLog]);
+    }, [output, showLogPanel]);
 
     const handleInstallToSDClick = useCallback(() => {
         setSelectedOption(MODULE_INSTALL_TYPE_SD);
@@ -61,7 +63,7 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
                     {message}
                 </p>
             )}
-            {isLoading && (
+            {(isLoading || output.length > 0) && (
                 <Form.Check
                     type={'switch'}
                     id={'show-install-log'}
@@ -71,7 +73,13 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
                     className={'mb-2'}
                 />
             )}
-            {showLog && isPolling && output.length > 0 && (
+            {installFailed && (
+                <>
+                    <hr/>
+                    <p>The installation process is completed, but the dependencies are not detected.</p>
+                </>
+            )}
+            {showLogPanel && (
                 <pre
                     ref={logRef}
                     className={'bg-dark text-light p-2 rounded small'}
@@ -79,13 +87,6 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
                 >
                     {output}
                 </pre>
-            )}
-            {installFailed && output.length > 0 && (
-                <>
-                    <hr/>
-                    <p>The installation process is completed, but the dependencies are not detected.</p>
-                    <pre>{output}</pre>
-                </>
             )}
             <hr />
             <div className={'d-flex justify-content-end gap-2'}>

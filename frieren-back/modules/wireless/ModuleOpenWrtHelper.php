@@ -273,7 +273,7 @@ class ModuleOpenWrtHelper
         $radio = preg_replace('/[^a-zA-Z0-9_]/', '', $radio);
 
         // Validate radio exists in UCI
-        $existing = OpenWrtHelper::uciGet("wireless.{$radio}");
+        $existing = OpenWrtHelper::uciGet("wireless.{$radio}", false);
         if ($existing === null || $existing === false) {
             throw new \Exception("Radio '{$radio}' not found in wireless config");
         }
@@ -436,7 +436,7 @@ class ModuleOpenWrtHelper
     {
         $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
 
-        $existing = OpenWrtHelper::uciGet("wireless.{$section}");
+        $existing = OpenWrtHelper::uciGet("wireless.{$section}", false);
         if ($existing === null || $existing === false) {
             throw new \Exception("Interface section '{$section}' not found in wireless config");
         }
@@ -461,7 +461,7 @@ class ModuleOpenWrtHelper
     {
         $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
 
-        $existing = OpenWrtHelper::uciGet("wireless.{$section}");
+        $existing = OpenWrtHelper::uciGet("wireless.{$section}", false);
         if ($existing === null || $existing === false) {
             throw new \Exception("Interface section '{$section}' not found in wireless config");
         }
@@ -515,7 +515,7 @@ class ModuleOpenWrtHelper
     {
         $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
 
-        $existing = OpenWrtHelper::uciGet("wireless.{$section}");
+        $existing = OpenWrtHelper::uciGet("wireless.{$section}", false);
         if ($existing === null || $existing === false) {
             throw new \Exception("Interface section '{$section}' not found in wireless config");
         }

@@ -37,8 +37,17 @@ class PackagesController extends \frieren\core\Controller
         return self::getModulePath() . '/bin/package-manager-call.sh';
     }
 
+    private function dependencyInstallInProgress()
+    {
+        return BackgroundTaskHelper::isRunning(self::TASK_DEPENDENCIES);
+    }
+
     public function updateLists()
     {
+        if ($this->dependencyInstallInProgress()) {
+            return self::setError('A module dependency installation is in progress. Please wait until it finishes.');
+        }
+
         if (!self::setupCoreHelper()::hasInternetConnection()) {
             return self::setError('No internet connection available.');
         }
@@ -100,6 +109,10 @@ class PackagesController extends \frieren\core\Controller
 
     public function installPackage()
     {
+        if ($this->dependencyInstallInProgress()) {
+            return self::setError('A module dependency installation is in progress. Please wait until it finishes.');
+        }
+
         if (!self::setupCoreHelper()::hasInternetConnection()) {
             return self::setError('No internet connection available.');
         }
@@ -118,6 +131,10 @@ class PackagesController extends \frieren\core\Controller
 
     public function removePackage()
     {
+        if ($this->dependencyInstallInProgress()) {
+            return self::setError('A module dependency installation is in progress. Please wait until it finishes.');
+        }
+
         $script = $this->getScriptPath();
         $packageName = escapeshellarg($this->request['packageName']);
         $autoremove = !empty($this->request['autoremove']);

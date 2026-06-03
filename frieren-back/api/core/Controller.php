@@ -156,7 +156,7 @@ abstract class Controller
     }
 
     /**
-     * Install module dependencies using dependency-installer.sh script.
+     * Install module dependencies using the packages package-manager-call.sh script.
      *
      * @return true A ResponseHandler object with the standard response.
      */
@@ -167,10 +167,12 @@ abstract class Controller
             return self::setError();
         }
 
-        $scriptPath = \DeviceConfig::MODULE_ROOT_FOLDER . '/modules/bin/dependency-installer.sh';
-        $installToSD = $this->request['destination'] === 'sd' ? 1 : 0;
-        $command = sprintf("%s install --sd %d --deps %s", $scriptPath, $installToSD, escapeshellarg($dependencies));
-        \frieren\helper\BackgroundTaskHelper::start(self::TASK_DEPENDENCIES, $command);
+        if (\frieren\helper\BackgroundTaskHelper::isRunning(self::TASK_DEPENDENCIES)) {
+            return self::setError('Installation in progress. Please wait until the current installation is finished.');
+        }
+
+        $installToSD = ($this->request['destination'] ?? null) === 'sd';
+        self::setupCoreHelper()::installDependency($dependencies, $installToSD, self::TASK_DEPENDENCIES);
 
         return self::setSuccess();
     }
@@ -183,13 +185,33 @@ abstract class Controller
     public function getDependencyInstallationStatus()
     {
         $status = \frieren\helper\BackgroundTaskHelper::getStatus(self::TASK_DEPENDENCIES);
+        $status['output'] = $this->formatDependencyLog($status['output']);
 
         if ($status['completed']) {
             $manifest = $this->getModuleManifest();
-            $status['hasDependencies'] = self::setupCoreHelper()::checkDependency($manifest['dependencies']);
+            $status['hasDependencies'] = self::setupCoreHelper()::checkDependency($manifest['dependencies'] ?? []);
         }
 
         return self::setSuccess($status);
+    }
+
+    /**
+     * Turns the package-manager-call.sh JSON output into a readable installation log.
+     * Falls back to the raw output when it is not valid JSON (e.g. still empty while running).
+     *
+     * @param string $output Raw captured task output.
+     * @return string Human readable log content.
+     */
+    private function formatDependencyLog($output)
+    {
+        $decoded = json_decode($output, true);
+        if (!is_array($decoded)) {
+            return $output;
+        }
+
+        $log = trim(($decoded['stdout'] ?? '') . "\n" . ($decoded['stderr'] ?? ''));
+
+        return $log === '' ? $output : $log;
     }
 
     /**
@@ -202,6 +224,13 @@ abstract class Controller
     {
         self::setupCoreHelper();
         $configName = "fmod_{$this->moduleName}";
+
+        // Module config file is created lazily on first setConfig(); until then there is
+        // nothing to read, so return empty instead of letting uciReadConfig() throw.
+        if (!file_exists("/etc/config/{$configName}")) {
+            return [];
+        }
+
         $config = $this->coreHelper::uciReadConfig($configName);
 
         // If $section is null, return the entire config.

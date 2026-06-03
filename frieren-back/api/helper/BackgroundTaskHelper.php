@@ -88,6 +88,18 @@ class BackgroundTaskHelper
     }
 
     /**
+     * Returns whether a background task is currently running.
+     * A task is running once its log file exists but the completion flag has not been set yet.
+     *
+     * @param string $taskName Unique identifier for the background task.
+     * @return bool True if the task is in progress.
+     */
+    public static function isRunning($taskName)
+    {
+        return file_exists(self::getLogPath($taskName)) && !file_exists(self::getFlagPath($taskName));
+    }
+
+    /**
      * Removes flag and log files for a background task.
      *
      * @param string $taskName Unique identifier for the background task.

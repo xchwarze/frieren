@@ -16,7 +16,7 @@ interface HelperInterface
      * @param string $command Command to execute.
      * @return string|false Output as string on success, or false on failure.
      */
-    public static function exec(string $command);
+    public static function exec($command);
 
     /**
      * Executes a command in the background.
@@ -24,7 +24,7 @@ interface HelperInterface
      * @param string $command The command to execute.
      * @return mixed The result of the command execution.
      */
-    public static function execBackground(string $command);
+    public static function execBackground($command);
 
     /**
      * Checks if a specific process is running.
@@ -33,24 +33,24 @@ interface HelperInterface
      * @param bool $isFullPath Set to true to check using the full path of the process.
      * @return bool True if the process is running, false otherwise.
      */
-    public static function checkRunning(string $processName, bool $isFullPath = false): bool;
+    public static function checkRunning($processName, $isFullPath = false);
 
     /**
-     * Checks if a dependency is installed.
+     * Checks if the given dependencies are installed.
      *
-     * @param string $dependencyName The name of the dependency to check.
-     * @return bool True if the dependency is installed, false otherwise.
+     * @param array $dependencies List of dependency names to check.
+     * @return string|bool A message listing missing dependencies, or true if all are installed.
      */
-    public static function checkDependency(string $dependencyName): bool;
+    public static function checkDependency($dependencies);
 
     /**
      * Retrieves a value from the UCI (Unified Configuration Interface).
      *
      * @param string $uciString The UCI string to retrieve.
-     * @param bool $autoBool If set to true, converts '0' and '1' strings to boolean value.
-     * @return mixed The value of the UCI string.
+     * @param bool $throwOnError If true, throws when the entry does not exist; if false, returns null instead.
+     * @return mixed The value of the UCI string, or null when the entry is missing and $throwOnError is false.
      */
-    public static function uciGet(string $uciString, bool $autoBool = true);
+    public static function uciGet($uciString, $throwOnError = true);
 
     /**
      * Sets a value in the UCI configuration.
@@ -60,7 +60,7 @@ interface HelperInterface
      * @param bool $isList If true, the value will be added to a list; otherwise, it will set the value.
      * @param bool $autoCommit If true, automatically commits the changes.
      */
-    public static function uciSet(string $settingString, $value, bool $isList = false, bool $autoCommit = true);
+    public static function uciSet($settingString, $value, $isList = false, $autoCommit = true);
 
     /**
      * Commits changes to the UCI (Unified Configuration Interface) configuration.
@@ -75,23 +75,24 @@ interface HelperInterface
      * @param string $savePath The path where the downloaded file should be saved.
      * @param string $flagPath The path to a flag file that is created upon successful download.
      */
-    public static function downloadFile(string $url, string $savePath, string $flagPath);
+    public static function downloadFile($url, $savePath, $flagPath);
 
     /**
      * Checks if an SD card is available in the system.
      *
      * @return bool True if an SD card is available, false otherwise.
      */
-    public static function isSDAvailable(): bool;
+    public static function isSDAvailable();
 
     /**
      * Installs a dependency, optionally to an SD card.
      *
-     * @param string $dependencyName The name of the dependency to install.
+     * @param string $dependencies Space-separated list of dependencies to install.
      * @param bool $installToSD Whether to install to the SD card (if available).
+     * @param string $taskName Background task name used for status polling and concurrency.
      * @return bool True if the dependency is installed successfully, false otherwise.
      */
-    public static function installDependency(string $dependencyName, bool $installToSD = false): bool;
+    public static function installDependency($dependencies, $installToSD = false, $taskName = 'module-dependencies');
 
     /**
      * Retrieves the contents of a file from a URL with SSL verification.
@@ -99,7 +100,7 @@ interface HelperInterface
      * @param string $url The URL of the file.
      * @return string The contents of the file.
      */
-    public static function fileGetContentsSSL(string $url);
+    public static function fileGetContentsSSL($url);
 
     /**
      * Verifies a user's password against the hash in /etc/shadow.
@@ -108,7 +109,7 @@ interface HelperInterface
      * @param string $password The password to verify.
      * @return bool True if password is correct, false otherwise.
      */
-    public static function verifyPassword(string $username, string $password): bool;
+    public static function verifyPassword($username, $password);
 
     /**
      * Executes a ubus call with the given command and returns the parsed response as an associative array.
@@ -118,5 +119,5 @@ interface HelperInterface
      * @param array $args Optional associative array of arguments.
      * @return mixed|false The parsed response as an associative array if the JSON decoding is successful, false otherwise.
      */
-    public static function execUbusCall(string $namespace, string $method, array $args = []);
+    public static function execUbusCall($namespace, $method, $args = []);
 }

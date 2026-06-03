@@ -153,14 +153,19 @@ class UciConfigHelper
      * Retrieves a value from the UCI (Unified Configuration Interface).
      *
      * @param string $uciString The UCI string to retrieve.
-     * @return mixed The value of the UCI string, with 'TRUE'/'FALSE' converted to boolean values, and 'UNSET' treated as null.
+     * @param bool $throwOnError If true, throws when the entry does not exist; if false, returns null instead.
+     * @return mixed The value of the UCI string, with 'TRUE'/'FALSE' converted to boolean values, and 'UNSET' treated as null. Returns null when the entry is missing and $throwOnError is false.
      */
-    public static function uciGet($uciString)
+    public static function uciGet($uciString, $throwOnError = true)
     {
-        $uciString = escapeshellarg($uciString);
-        $ret = exec("uci get {$uciString}", $output, $exitCode);
+        $escaped = escapeshellarg($uciString);
+        $ret = exec("uci -q get {$escaped}", $output, $exitCode);
         if ($exitCode !== 0) {
-            throw new \Exception("Failed to get UCI setting: {$uciString}");
+            if ($throwOnError) {
+                throw new \Exception("Failed to get UCI setting: {$uciString}");
+            }
+
+            return null;
         }
 
         return self::convertSpecialValues($ret);
@@ -200,11 +205,12 @@ class UciConfigHelper
      * Retrieves and deserializes a JSON value from UCI.
      *
      * @param string $uciString The UCI string to retrieve.
-     * @return mixed The deserialized JSON value.
+     * @param bool $throwOnError If true, throws when the entry does not exist; if false, returns an empty array instead.
+     * @return mixed The deserialized JSON value, or an empty array when the entry is missing and $throwOnError is false.
      */
-    public static function uciGetJson($uciString)
+    public static function uciGetJson($uciString, $throwOnError = true)
     {
-        $result = self::uciGet($uciString);
+        $result = self::uciGet($uciString, $throwOnError);
         $decodedResult = json_decode($result, true);
 
         return $decodedResult !== null || $result === 'null' ? $decodedResult : [];

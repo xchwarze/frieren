@@ -110,23 +110,20 @@ class OpenWrtHelper
     }
 
     /**
-     * Install dependencies using dependency-installer.sh script.
+     * Install dependencies using the packages package-manager-call.sh script.
      *
      * @param mixed $dependencies The dependencies to install.
      * @param bool $installToSD Flag indicating whether to install to SD card.
+     * @param string $taskName Background task name used for status polling and concurrency.
      * @return bool
-     * @throws \Exception Installation in progress. Please wait until the current installation is finished.
      */
-    public static function installDependency($dependencies, $installToSD = false) {
-        if (file_exists('/tmp/fm-dependencies.flag')) {
-            throw new \Exception('Installation in progress. Please wait until the current installation is finished.');
-        }
-
+    public static function installDependency($dependencies, $installToSD = false, $taskName = 'module-dependencies') {
         if (!empty($dependencies)) {
-            $scriptPath = \DeviceConfig::MODULE_ROOT_FOLDER . '/modules/bin/dependency-installer.sh';
-            $sdFlag = $installToSD ? 1 : 0;
-            $command = sprintf("%s install --sd %d --deps %s", $scriptPath, $sdFlag, escapeshellarg($dependencies));
-            self::execBackground($command);
+            $scriptPath = \DeviceConfig::MODULE_ROOT_FOLDER . '/packages/bin/package-manager-call.sh';
+            $dest = $installToSD ? '--dest sd ' : '';
+            $escapedDeps = implode(' ', array_map('escapeshellarg', explode(' ', $dependencies)));
+            $command = sprintf('%s update > /dev/null 2>&1; %s install %s%s', $scriptPath, $scriptPath, $dest, $escapedDeps);
+            BackgroundTaskHelper::start($taskName, $command);
         }
 
         return true;
@@ -148,22 +145,24 @@ class OpenWrtHelper
      * Retrieves a value from the UCI (Unified Configuration Interface).
      *
      * @param string $uciString The UCI string to retrieve.
-     * @return mixed The value of the UCI string, with 'TRUE'/'FALSE' converted to boolean values, and 'UNSET' treated as null.
+     * @param bool $throwOnError If true, throws when the entry does not exist; if false, returns null instead.
+     * @return mixed The value of the UCI string, with 'TRUE'/'FALSE' converted to boolean values, and 'UNSET' treated as null. Returns null when the entry is missing and $throwOnError is false.
      */
-    public static function uciGet($uciString)
+    public static function uciGet($uciString, $throwOnError = true)
     {
-        return UciConfigHelper::uciGet($uciString);
+        return UciConfigHelper::uciGet($uciString, $throwOnError);
     }
 
     /**
      * Retrieves and deserializes a JSON value from UCI.
      *
      * @param string $uciString The UCI string to retrieve.
-     * @return mixed The deserialized JSON value.
+     * @param bool $throwOnError If true, throws when the entry does not exist; if false, returns an empty array instead.
+     * @return mixed The deserialized JSON value, or an empty array when the entry is missing and $throwOnError is false.
      */
-    public static function uciGetJson($uciString)
+    public static function uciGetJson($uciString, $throwOnError = true)
     {
-        return UciConfigHelper::uciGetJson($uciString);
+        return UciConfigHelper::uciGetJson($uciString, $throwOnError);
     }
 
     /**
