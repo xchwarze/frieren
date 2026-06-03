@@ -172,7 +172,9 @@ External modules loaded dynamically:
 2. Route `/:moduleName` renders `<DynamicModule />`
 3. `useScript()` loads `/{VITE_WEB_MODULES_FOLDER}/{name}/module.umd.js`
 4. Module must export `window.FrierenModule{Name}()` function
-5. Shared libs exposed via `window.*` (React, ReactDOM, ReactQuery, Jotai, JotaiUtils, ReactHookForm, HookformResolvers, HookformResolversYup, ReactToastify, ReactBootstrap, PropTypes, Wouter, Yup)
+5. Shared libs exposed via `window.Frieren.*` (React, ReactDOM, ReactQuery, Jotai, JotaiUtils, ReactHookForm, HookformResolvers, HookformResolversYup, ReactToastify, ReactBootstrap, ReactContentLoader, PropTypes, Wouter, Yup, jsxRuntime) — set by `helpers/umdSupport.js` before render. Also exposes the `loadingImage` asset (see below).
+
+**Asset inlining gotcha:** Vite library mode inlines ALL imported assets as base64 (ignores `assetsInlineLimit`) — a lib can't reference separate asset files. Module UMDs bundle shared `@src` components (PanelCard, DependenciesAlert, Loading, …) into themselves, so any asset a shared component imports gets base64'd into EVERY module that uses it. Fix: externalize the asset through `window.Frieren` like a lib. `loading.png` is imported in `umdSupport.js` and exposed as `window.Frieren.loadingImage`; the `Loading` component reads that global instead of `import`-ing the PNG, so module bundles stay small. Route any new shared-component asset the same way.
 
 ### Theme
 
