@@ -13,6 +13,7 @@ import PanelCard from '@src/components/PanelCard';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import Button from '@src/components/Button';
 import { installModuleAtom } from '@src/features/modules/atoms/installModuleAtom.js';
+import sortModulesByName from '@src/features/modules/helpers/sortModulesByName.js';
 
 /**
  * Generates a card component displaying available modules. Handles click events for downloading modules.
@@ -49,6 +50,8 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
         }
 
         if (isSuccess) {
+            const modules = sortModulesByName(data);
+
             return (
                 <Table striped hover responsive>
                     <thead>
@@ -62,7 +65,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {data.map((module, index) => (
+                    {modules.map((module, index) => (
                         <tr key={index}>
                             <td>{module.title}</td>
                             <td>{module.description}</td>

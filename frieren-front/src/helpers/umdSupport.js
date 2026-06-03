@@ -19,6 +19,7 @@ import * as ReactBootstrap from 'react-bootstrap';
 import * as ReactToastify from 'react-toastify';
 import * as Wouter from 'wouter';
 import * as Yup from 'yup';
+import loadingImage from '@src/assets/loading.png';
 
 /**
  * Sets up UMD support by assigning global variables for various libraries.
@@ -40,6 +41,7 @@ const setupUMDSupport = () => {
         ReactToastify,
         Wouter,
         Yup,
+        loadingImage,
     };
 };
 

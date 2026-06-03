@@ -16,6 +16,7 @@ import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import Icon from '@src/components/Icon';
 import ModuleIcon from '@src/components/ModuleIcon';
 import selectedInstalledModuleAtom from '@src/features/modules/atoms/selectedInstalledModuleAtom.js';
+import sortModulesByName from '@src/features/modules/helpers/sortModulesByName.js';
 import usePinModule from '@src/features/modules/hooks/usePinModule.js';
 
 /**
@@ -57,6 +58,8 @@ const InstalledModulesCard = ({ installedQuery }) => {
         }
 
         if (isSuccess) {
+            const modules = sortModulesByName(data);
+
             return (
                 <Table striped hover responsive>
                     <thead>
@@ -70,7 +73,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {data.map((module, index) => {
+                    {modules.map((module, index) => {
                         const { name, title, icon, description, author, version, size, repository, bugs, sidebar, forceSidebar, system } = module;
                         return (
                             <tr key={index}>
@@ -135,7 +138,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                             </tr>
                         );
                     })}
-                    {data.length === 0 && (
+                    {modules.length === 0 && (
                         <tr>
                             <td colSpan={6}>There are no modules installed yet.</td>
                         </tr>

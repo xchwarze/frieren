@@ -6,29 +6,33 @@
  */
 import PropTypes from 'prop-types';
 
-import loadingImage from '@src/assets/loading.png';
-
 /**
  * Renders the spinning loading image.
  *
+ * The image asset is provided at runtime via window.Frieren.loadingImage (set by
+ * umdSupport on the host) instead of being imported here, so module UMD bundles
+ * that use this component don't each inline a base64 copy of the PNG.
+ *
  * @param {Number} size - Width and height in pixels (default 200).
+ * @param {String} spinClassName - Spin animation class (default 'icon-spin-slow', 4s).
  * @param {String} className - Extra classes appended to the spin animation.
  * @param {Object} rest - Additional props spread onto the image.
  * @return {ReactElement} The loading component.
  */
-const Loading = ({ size = 200, className = '', ...rest }) => (
+const Loading = ({ size = 200, spinClassName = 'icon-spin-slow', className = '', ...rest }) => (
     <img
-        src={loadingImage}
+        src={window.Frieren.loadingImage}
         alt={'Loading'}
         width={size}
         height={size}
-        className={`icon-spin loading-image ${className}`.trim()}
+        className={`${spinClassName} loading-image ${className}`.trim()}
         {...rest}
     />
 );
 
 Loading.propTypes = {
     size: PropTypes.number,
+    spinClassName: PropTypes.string,
     className: PropTypes.string,
 };
 

@@ -105,6 +105,11 @@
     animation: spin 2s linear infinite;
 }
 
+.icon-spin-slow {
+    display: inline-block;
+    animation: spin 5s linear infinite;
+}
+
 /* loading.png is white; invert it on light theme so it stays visible */
 [data-bs-theme="light"] .loading-image {
     filter: invert(1);

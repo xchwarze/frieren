@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import { MODULE_INSTALL_TYPE_INTERNAL, MODULE_INSTALL_TYPE_SD } from '@src/features/modules/helpers/constants.js';
 import useInstallModuleDependencies from '@src/hooks/useInstallModuleDependencies.js';
 import Button from '@src/components/Button';
+import Loading from '@src/components/Loading';
 
 /**
  * Render an alert for missing required dependencies.
@@ -32,7 +33,7 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
         useInstallModuleDependencies({ module, dependenciesQueryKey });
     const isLoading = isPending || isPolling;
 
-    const showLogPanel = (showLog || installFailed) && output.length > 0;
+    const showLogPanel = showLog || installFailed;
 
     useEffect(() => {
         if (showLogPanel && logRef.current) {
@@ -55,59 +56,70 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
             <Alert.Heading>
                 Required dependencies
             </Alert.Heading>
-            <p>
-                The required dependencies for this module were not found.
-            </p>
-            {message && (
-                <p>
-                    {message}
-                </p>
-            )}
-            {(isLoading || output.length > 0) && (
-                <Form.Check
-                    type={'switch'}
-                    id={'show-install-log'}
-                    label={'Show installation log'}
-                    checked={showLog}
-                    onChange={() => setShowLog(prev => !prev)}
-                    className={'mb-2'}
-                />
-            )}
-            {installFailed && (
+            {!isLoading && !installFailed && (
                 <>
-                    <hr/>
-                    <p>The installation process is completed, but the dependencies are not detected.</p>
+                    <p>
+                        The required dependencies for this module were not found.
+                    </p>
+                    {message && (
+                        <p>
+                            {message}
+                        </p>
+                    )}
                 </>
             )}
+            {isLoading && !showLog && (
+                <div className={'text-center'}>
+                    <Loading size={100} />
+                </div>
+            )}
+            {installFailed && (
+                <p>
+                    The installation process is completed, but the dependencies are not detected.
+                </p>
+            )}
             {showLogPanel && (
-                <pre
+                <Form.Control
+                    as={'textarea'}
                     ref={logRef}
-                    className={'bg-dark text-light p-2 rounded small'}
-                    style={{ maxHeight: '200px', overflowY: 'auto' }}
-                >
-                    {output}
-                </pre>
+                    value={output || 'Waiting for installation output…'}
+                    readOnly
+                    rows={7}
+                    className={'mt-2 font-monospace small'}
+                />
             )}
             <hr />
-            <div className={'d-flex justify-content-end gap-2'}>
-                {SDAvailable && (
+            <div className={'d-flex justify-content-between align-items-center gap-2'}>
+                <div>
+                    {(isLoading || installFailed) && (
+                        <Form.Check
+                            type={'switch'}
+                            label={'Show installation status'}
+                            checked={showLog}
+                            onChange={() => setShowLog(prev => !prev)}
+                        />
+                    )}
+                </div>
+                <div className={'d-flex gap-2'}>
+                    {SDAvailable && (
+                        <Button
+                            label={'Install to SD Card'}
+                            icon={'moon'}
+                            variant={'outline-primary'}
+                            disabled={isLoading && selectedOption === MODULE_INSTALL_TYPE_INTERNAL}
+                            loading={isLoading && selectedOption === MODULE_INSTALL_TYPE_SD}
+                            onClick={handleInstallToSDClick}
+                        />
+                    )}
                     <Button
-                        label={'Install to SD Card'}
-                        icon={'moon'}
+                        label={'Install Internally'}
+                        icon={'hard-drive'}
                         variant={'outline-primary'}
-                        disabled={isLoading && selectedOption === MODULE_INSTALL_TYPE_INTERNAL}
-                        loading={isLoading && selectedOption === MODULE_INSTALL_TYPE_SD}
-                        onClick={handleInstallToSDClick}
+                        disabled={!internalAvailable || isLoading && selectedOption === MODULE_INSTALL_TYPE_SD}
+                        loading={isLoading && selectedOption === MODULE_INSTALL_TYPE_INTERNAL}
+                        onClick={handleInstallInternallyClick}
                     />
-                )}
-                <Button
-                    label={'Install Internally'}
-                    icon={'hard-drive'}
-                    variant={'outline-primary'}
-                    disabled={!internalAvailable || isLoading && selectedOption === MODULE_INSTALL_TYPE_SD}
-                    loading={isLoading && selectedOption === MODULE_INSTALL_TYPE_INTERNAL}
-                    onClick={handleInstallInternallyClick}
-                />
+                </div>
             </div>
         </Alert>
     );
