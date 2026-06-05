@@ -8,7 +8,7 @@ import { Table } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
-import useGetFileSystemUsage from '@src/features/hardware/hooks/useGetFileSystemUsage.js';
+import useGetFileSystemUsage from '@src/features/system/hooks/useGetFileSystemUsage.js';
 
 /**
  * Render a panel card displaying an overview of storage usage across all mounted file systems.

@@ -6,7 +6,7 @@
  */
 import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
 import { fetchPost } from '@src/services/fetchService.js';
-import { HARDWARE_GET_SYSTEM_LOGS } from '@src/features/hardware/helpers/queryKeys.js';
+import { SYSTEM_GET_SYSTEM_LOGS } from '@src/features/system/helpers/queryKeys.js';
 
 /**
  * Retrieves system logs using an authenticated query.
@@ -15,9 +15,9 @@ import { HARDWARE_GET_SYSTEM_LOGS } from '@src/features/hardware/helpers/queryKe
  */
 const useGetSystemLogs = () => (
     useAuthenticatedQuery({
-        queryKey: [HARDWARE_GET_SYSTEM_LOGS],
+        queryKey: [SYSTEM_GET_SYSTEM_LOGS],
         queryFn: () => fetchPost({
-            module: 'hardware',
+            module: 'system',
             action: 'getSystemLogs',
         })
     })

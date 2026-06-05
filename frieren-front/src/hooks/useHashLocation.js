@@ -30,4 +30,12 @@ const useHashLocation = () => {
     return [location, hashNavigate];
 };
 
+/**
+ * Tells wouter how to render the `href` of <Link> anchors. Without this, wouter
+ * falls back to the identity transform and renders bare paths (e.g. "/wireless"),
+ * so "open in new tab" loads a hashless URL the SPA can't route. Prepending '#'
+ * keeps generated hrefs hash-based (e.g. "#/wireless").
+ */
+useHashLocation.hrefs = (href) => "#" + href;
+
 export default useHashLocation;

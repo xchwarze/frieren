@@ -8,7 +8,7 @@ import { Table } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
-import useGetUsbDevices from '@src/features/hardware/hooks/useGetUsbDevices.js';
+import useGetUsbDevices from '@src/features/system/hooks/useGetUsbDevices.js';
 
 /**
  * Renders a card displaying detailed information about connected USB devices.

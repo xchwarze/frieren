@@ -7,7 +7,7 @@
 import useBackgroundTask from '@src/hooks/useBackgroundTask.js';
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
-import { HARDWARE_GET_DIAGNOSTICS_STATUS } from '@src/features/hardware/helpers/queryKeys.js';
+import { SYSTEM_GET_DIAGNOSTICS_STATUS } from '@src/features/system/helpers/queryKeys.js';
 
 /**
  * Initializes the diagnostic script on the server and polls for completion.
@@ -16,14 +16,14 @@ import { HARDWARE_GET_DIAGNOSTICS_STATUS } from '@src/features/hardware/helpers/
  */
 const useStartDiagnosticsScript = () => {
     const taskStatus = useBackgroundTask({
-        queryKey: HARDWARE_GET_DIAGNOSTICS_STATUS,
-        module: 'hardware',
+        queryKey: SYSTEM_GET_DIAGNOSTICS_STATUS,
+        module: 'system',
         action: 'getDiagnosticsStatus',
     });
 
     const mutation = useAuthenticatedMutation({
         mutationFn: () => fetchPost({
-            module: 'hardware',
+            module: 'system',
             action: 'startDiagnosticsScript',
         }),
         onSuccess: () => {

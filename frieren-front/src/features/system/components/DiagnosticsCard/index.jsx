@@ -6,9 +6,9 @@
  */
 import Form from 'react-bootstrap/Form';
 
-import useDiagnosticsStatus from '@src/features/hardware/hooks/useDiagnosticsStatus.js';
-import useStartDiagnosticsScript from '@src/features/hardware/hooks/useStartDiagnosticsScript.js';
-import useDownloadDiagnosticsFile from '@src/features/hardware/hooks/useDownloadDiagnosticsFile.js';
+import useDiagnosticsStatus from '@src/features/system/hooks/useDiagnosticsStatus.js';
+import useStartDiagnosticsScript from '@src/features/system/hooks/useStartDiagnosticsScript.js';
+import useDownloadDiagnosticsFile from '@src/features/system/hooks/useDownloadDiagnosticsFile.js';
 import PanelCard from '@src/components/PanelCard';
 import SkeletonBar from '@src/components/SkeletonBar';
 import Button from '@src/components/Button';

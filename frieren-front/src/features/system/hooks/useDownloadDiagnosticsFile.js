@@ -15,7 +15,7 @@ import { fetchPostDownload } from '@src/services/fetchService.js';
 const useDownloadDiagnosticsFile = () => (
     useAuthenticatedMutation({
         mutationFn: () => fetchPostDownload({
-            module: 'hardware',
+            module: 'system',
             action: 'downloadDiagnosticsFile',
         })
     })

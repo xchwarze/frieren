@@ -6,21 +6,21 @@
  */
 import useAuthenticatedQuery from '@src/hooks/useAuthenticatedQuery.js';
 import { fetchPost } from '@src/services/fetchService.js';
-import { HARDWARE_GET_FILE_SYSTEM_USAGE } from '@src/features/hardware/helpers/queryKeys.js';
+import { SYSTEM_GET_USB_DEVICES } from '@src/features/system/helpers/queryKeys.js';
 
 /**
- * Retrieves the file system usage by making an authenticated query to the server.
+ * Returns a hook that fetches USB devices using an authenticated query.
  *
  * @return {Object} The result of the query.
  */
-const useGetFileSystemUsage = () => (
+const useGetUsbDevices = () => (
     useAuthenticatedQuery({
-        queryKey: [HARDWARE_GET_FILE_SYSTEM_USAGE],
+        queryKey: [SYSTEM_GET_USB_DEVICES],
         queryFn: () => fetchPost({
-            module: 'hardware',
-            action: 'getFileSystemUsage',
+            module: 'system',
+            action: 'getUsbDevices',
         })
     })
 );
 
-export default useGetFileSystemUsage;
+export default useGetUsbDevices;

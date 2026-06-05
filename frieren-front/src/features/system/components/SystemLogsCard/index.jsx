@@ -11,7 +11,7 @@ import PanelCard from '@src/components/PanelCard';
 import SkeletonBar from '@src/components/SkeletonBar';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import SearchInput from '@src/components/SearchInput';
-import useGetSystemLogs from '@src/features/hardware/hooks/useGetSystemLogs.js';
+import useGetSystemLogs from '@src/features/system/hooks/useGetSystemLogs.js';
 import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
 
 /**
