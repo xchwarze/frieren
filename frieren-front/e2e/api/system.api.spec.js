@@ -1,8 +1,8 @@
 import { test, expect } from './api-fixture.js';
 
-test.describe('API: Hardware', () => {
+test.describe('API: System', () => {
     test('getUsbDevices returns device list', async ({ api }) => {
-        const { response, json } = await api.post('hardware', 'getUsbDevices');
+        const { response, json } = await api.post('system', 'getUsbDevices');
         expect(response.ok()).toBeTruthy();
         expect(json).not.toHaveProperty('error');
         expect(Array.isArray(json)).toBe(true);
@@ -17,7 +17,7 @@ test.describe('API: Hardware', () => {
     });
 
     test('getFileSystemUsage returns filesystem data', async ({ api }) => {
-        const { response, json } = await api.post('hardware', 'getFileSystemUsage');
+        const { response, json } = await api.post('system', 'getFileSystemUsage');
         expect(response.ok()).toBeTruthy();
         expect(json).not.toHaveProperty('error');
         expect(Array.isArray(json)).toBe(true);
@@ -34,7 +34,7 @@ test.describe('API: Hardware', () => {
     });
 
     test('getSystemLogs returns structured log entries', async ({ api }) => {
-        const { response, json } = await api.post('hardware', 'getSystemLogs');
+        const { response, json } = await api.post('system', 'getSystemLogs');
         expect(response.ok()).toBeTruthy();
         expect(json).not.toHaveProperty('error');
         expect(Array.isArray(json)).toBe(true);
@@ -48,7 +48,7 @@ test.describe('API: Hardware', () => {
     });
 
     test('getSystemLogs with search filter works', async ({ api }) => {
-        const { response, json } = await api.post('hardware', 'getSystemLogs', {
+        const { response, json } = await api.post('system', 'getSystemLogs', {
             search: 'kern',
         });
         expect(response.ok()).toBeTruthy();

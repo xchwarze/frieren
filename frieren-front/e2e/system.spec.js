@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Hardware', () => {
+test.describe('System', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/#/hardware');
+        await page.goto('/#/system');
     });
 
     test('has three tabs: Info, Logs, Diagnostics', async ({ page }) => {

@@ -6,7 +6,7 @@ test.describe('Navigation', () => {
     });
 
     test('sidebar shows all core navigation links', async ({ page }) => {
-        const expectedLinks = ['Dashboard', 'Packages', 'Hardware', 'Modules', 'Wireless', 'Settings'];
+        const expectedLinks = ['Dashboard', 'Packages', 'System', 'Modules', 'Wireless', 'Settings'];
         for (const link of expectedLinks) {
             await expect(page.getByRole('link', { name: link })).toBeVisible();
         }
@@ -15,7 +15,7 @@ test.describe('Navigation', () => {
     test('sidebar navigation changes route', async ({ page }) => {
         const routes = [
             { name: 'Packages', hash: '#/packages' },
-            { name: 'Hardware', hash: '#/hardware' },
+            { name: 'System', hash: '#/system' },
             { name: 'Modules', hash: '#/modules' },
             { name: 'Wireless', hash: '#/wireless' },
             { name: 'Settings', hash: '#/settings' },
@@ -29,7 +29,7 @@ test.describe('Navigation', () => {
     });
 
     test('sidebar shows dynamic module links', async ({ page }) => {
-        const moduleLinks = page.locator('nav a, [class*="sidebar"] a').filter({ hasNotText: /Dashboard|Packages|Hardware|Modules|Wireless|Settings/ });
+        const moduleLinks = page.locator('nav a, [class*="sidebar"] a').filter({ hasNotText: /Dashboard|Packages|System|Modules|Wireless|Settings/ });
         const count = await moduleLinks.count();
         expect(count).toBeGreaterThan(0);
     });
@@ -57,7 +57,7 @@ test.describe('Navigation', () => {
         await page.waitForLoadState('networkidle');
         await expect(page.getByText('Change Timezone')).toBeVisible();
 
-        await page.goto('/#/hardware');
+        await page.goto('/#/system');
         await page.waitForLoadState('networkidle');
         await expect(page.getByRole('tab', { name: /Info/ })).toBeVisible();
 
@@ -67,7 +67,7 @@ test.describe('Navigation', () => {
     });
 
     test('page title is Frieren on all routes', async ({ page }) => {
-        const routes = ['/#/dashboard', '/#/packages', '/#/hardware', '/#/modules', '/#/wireless', '/#/settings'];
+        const routes = ['/#/dashboard', '/#/packages', '/#/system', '/#/modules', '/#/wireless', '/#/settings'];
         for (const route of routes) {
             await page.goto(route);
             await expect(page).toHaveTitle('Frieren');

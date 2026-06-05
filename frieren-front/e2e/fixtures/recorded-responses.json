@@ -64,7 +64,7 @@
       }
     }
   },
-  "hardware": {
+  "system": {
     "getUsbDevices": [
       {
         "bus": "001",
@@ -224,10 +224,10 @@
           "icon": "box"
         },
         {
-          "name": "hardware",
-          "title": "Hardware",
+          "name": "system",
+          "title": "System",
           "version": "1.0.0",
-          "icon": "hard-drive"
+          "icon": "cpu"
         },
         {
           "name": "modules",

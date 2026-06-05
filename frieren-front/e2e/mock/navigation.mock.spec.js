@@ -4,7 +4,7 @@ test.describe('Mock: Navigation', () => {
     test('sidebar shows all core links', async ({ mockPage: page }) => {
         await page.goto('/#/dashboard');
 
-        const expectedLinks = ['Dashboard', 'Packages', 'Hardware', 'Modules', 'Wireless', 'Settings'];
+        const expectedLinks = ['Dashboard', 'Packages', 'System', 'Modules', 'Wireless', 'Settings'];
         for (const link of expectedLinks) {
             await expect(page.getByRole('link', { name: link })).toBeVisible();
         }
@@ -15,7 +15,7 @@ test.describe('Mock: Navigation', () => {
 
         const routes = [
             { name: 'Packages', hash: '#/packages' },
-            { name: 'Hardware', hash: '#/hardware' },
+            { name: 'System', hash: '#/system' },
             { name: 'Modules', hash: '#/modules' },
             { name: 'Wireless', hash: '#/wireless' },
             { name: 'Settings', hash: '#/settings' },
@@ -34,7 +34,7 @@ test.describe('Mock: Navigation', () => {
     });
 
     test('page title is Frieren on all routes', async ({ mockPage: page }) => {
-        const routes = ['/#/dashboard', '/#/packages', '/#/hardware', '/#/modules', '/#/wireless', '/#/settings'];
+        const routes = ['/#/dashboard', '/#/packages', '/#/system', '/#/modules', '/#/wireless', '/#/settings'];
         for (const route of routes) {
             await page.goto(route);
             await expect(page).toHaveTitle('Frieren');

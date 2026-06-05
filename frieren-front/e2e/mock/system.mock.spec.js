@@ -1,8 +1,8 @@
 import { test, expect } from './mock-fixture.js';
 
-test.describe('Mock: Hardware', () => {
+test.describe('Mock: System', () => {
     test('Info tab renders USB and filesystem tables', async ({ mockPage: page }) => {
-        await page.goto('/#/hardware');
+        await page.goto('/#/system');
 
         await expect(page.getByRole('tab', { name: /Info/ })).toBeVisible();
         await expect(page.getByRole('tab', { name: /Logs/ })).toBeVisible();
@@ -16,7 +16,7 @@ test.describe('Mock: Hardware', () => {
     });
 
     test('Logs tab renders system logs', async ({ mockPage: page }) => {
-        await page.goto('/#/hardware');
+        await page.goto('/#/system');
         await page.getByRole('tab', { name: /Logs/ }).click();
         await expect(page.getByText('System Log')).toBeVisible();
     });
