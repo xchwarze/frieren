@@ -77,8 +77,8 @@ const DiagnosticsCard = () => {
             title={'Diagnostics'}
             subtitle={'Comprehensive system analysis covering logs, configurations, and vital stats for ' +
                 'troubleshooting and performance assessment.'}
-            isFetching={query.isFetching}
-            refetch={query.refetch}
+            showRefresh={false}
+            className={'mt-4'}
         >
             {renderContent()}
         </PanelCard>

@@ -26,6 +26,7 @@ const System = () => (
             <ConditionalTabContent id={'system'} eventKey={'info'}>
                 <UsbDevicesCard />
                 <FileSystemUsageCard />
+                <DiagnosticsCard />
             </ConditionalTabContent>
         </Tab>
         <Tab eventKey={'services'} title={<TabTitle title={'Services'} icon={'server'} />}>
@@ -36,11 +37,6 @@ const System = () => (
         <Tab eventKey={'logs'} title={<TabTitle title={'Logs'} icon={'file-text'} />}>
             <ConditionalTabContent id={'system'} eventKey={'logs'}>
                 <SystemLogsCard />
-            </ConditionalTabContent>
-        </Tab>
-        <Tab eventKey={'diagnostics'} title={<TabTitle title={'Diagnostics'} icon={'thermometer'} />}>
-            <ConditionalTabContent id={'system'} eventKey={'diagnostics'}>
-                <DiagnosticsCard />
             </ConditionalTabContent>
         </Tab>
     </PanelTabs>

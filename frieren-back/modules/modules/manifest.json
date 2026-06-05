@@ -2,7 +2,7 @@
   "title": "Modules",
   "name": "modules",
   "description": "Adds support for third party modules to Frieren.",
-  "icon": "package",
+  "icon": "grid",
   "author": {
     "name": "DSR!",
     "email": "xchwarze@gmail.com"

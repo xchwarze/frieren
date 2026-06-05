@@ -2,7 +2,7 @@
   "title": "Packages",
   "name": "packages",
   "description": "System package management for OpenWrt.",
-  "icon": "box",
+  "icon": "package",
   "author": {
     "name": "DSR!",
     "email": "xchwarze@gmail.com"
