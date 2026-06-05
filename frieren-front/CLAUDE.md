@@ -99,14 +99,14 @@ features/{name}/
 └── helpers/queryKeys.js          # Query key constants
 ```
 
-**Built-in features:** dashboard, login, modules, packages, hardware, settings, terminal, wireless
+**Built-in features:** dashboard, login, modules, packages, system, settings, terminal, wireless
 
 ### Routes (hash-based)
 
 Authenticated (`LoginStack`):
 - `#/dashboard` — system stats + info
 - `#/modules` — install/remove/pin modules
-- `#/hardware` — USB, filesystem, logs, diagnostics
+- `#/system` — USB, filesystem, logs, diagnostics, init.d services
 - `#/settings` — hostname, timezone, password, theme
 - `#/wireless` — AP config, scan, client connect
 - `#/about` — about page
@@ -218,12 +218,15 @@ All requests: `POST {apiPath}` with JSON body `{ module, action, ...params }`.
 | header | serverPing | Connectivity check |
 | header | installModuleDependencies | Install module deps |
 | header | getDependencyInstallationStatus | Poll dep install status |
-| hardware | getUsbDevices | List USB devices |
-| hardware | getFileSystemUsage | Disk usage |
-| hardware | getSystemLogs | Syslog (optional search) |
-| hardware | startDiagnosticsScript | Run diagnostics |
-| hardware | getDiagnosticsStatus | Poll diagnostics |
-| hardware | downloadDiagnosticsFile | Download report |
+| system | getUsbDevices | List USB devices |
+| system | getFileSystemUsage | Disk usage |
+| system | getSystemLogs | Syslog (optional search) |
+| system | startDiagnosticsScript | Run diagnostics |
+| system | getDiagnosticsStatus | Poll diagnostics |
+| system | downloadDiagnosticsFile | Download report |
+| system | getServices | List init.d services (enabled/running) |
+| system | controlService | start/stop/restart a service |
+| system | toggleEnabled | Enable/disable a service on boot |
 | modules | getModuleList | Installed modules (sidebar/external) |
 | modules | getAvailableModules | Remote module catalog |
 | modules | getInstalledModules | Installed with sizes |

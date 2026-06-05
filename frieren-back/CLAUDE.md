@@ -25,7 +25,7 @@ frieren-back/
     ├── login/         # Auth (verifyPassword via /etc/shadow)
     ├── dashboard/     # System stats (ubus system board/info, CPU, memory)
     ├── header/        # Shutdown, reboot, ping
-    ├── hardware/      # USB devices, filesystem, logs, diagnostics
+    ├── system/        # USB devices, filesystem, logs, diagnostics, init.d service control
     ├── modules/       # Module manager (install/remove/pin from remote repo)
     ├── settings/      # Hostname, timezone, password, theme
     ├── terminal/      # ttyd web terminal start/stop
@@ -141,7 +141,7 @@ class ModuleOpenWrtHelper {
 | login | login, logout | Auth via /etc/shadow |
 | dashboard | getSystemStats, getSystemResume, getNews | CPU, memory, uptime, board info, remote news |
 | header | shutDownHardware, resetHardware, serverPing | System control |
-| hardware | getUsbDevices, getFileSystemUsage, getSystemLogs, startDiagnosticsScript, getDiagnosticsStatus, downloadDiagnosticsFile | Hardware monitoring |
+| system | getUsbDevices, getFileSystemUsage, getSystemLogs, startDiagnosticsScript, getDiagnosticsStatus, downloadDiagnosticsFile, getServices, controlService, toggleEnabled | System monitoring + init.d service control |
 | modules | getModuleList, getAvailableModules, getInstalledModules, downloadModule, downloadStatus, installModule, installStatus, checkDestination, removeModule, pinModule | Module management |
 | settings | getSectionData, setHostname, setTimezone, setDatetimeFromBrowser, setUserPassword, setPanelTheme | System config |
 | terminal | startTerminal, stopTerminal, getStatus | ttyd on port 1477 |
@@ -163,7 +163,7 @@ class ModuleOpenWrtHelper {
 }
 ```
 
-System modules: dashboard (1), modules (2), wireless (3), hardware (4), settings (5), login, header, terminal.
+System modules: dashboard (1), system (2), wireless (3), modules (4), packages (5), settings (6), login, header, terminal. (`services` is not a module — its actions live in the `system` module.)
 
 ## Config (`api/config/config.php`)
 
