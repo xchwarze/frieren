@@ -1,8 +1,8 @@
 {
-  "title": "Packages",
-  "name": "packages",
-  "description": "System package management for OpenWrt.",
-  "icon": "package",
+  "title": "Network",
+  "name": "network",
+  "description": "Network interfaces, DHCP leases and diagnostics.",
+  "icon": "share-2",
   "author": {
     "name": "DSR!",
     "email": "xchwarze@gmail.com"
@@ -15,5 +15,5 @@
   "system": true,
   "forceSidebar": true,
   "version": "1.0.0",
-  "order": 6
+  "order": 4
 }

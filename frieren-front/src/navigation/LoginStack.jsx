@@ -16,6 +16,7 @@ import Dashboard from '@src/features/dashboard/containers/Dashboard';
 import Modules from '@src/features/modules/containers/Modules';
 import Packages from '@src/features/packages/containers/Packages';
 import System from '@src/features/system/containers/System';
+import Network from '@src/features/network/containers/Network';
 import Settings from '@src/features/settings/containers/Settings';
 import Wireless from '@src/features/wireless/containers/Wireless';
 
@@ -46,6 +47,7 @@ const LoginStack = () => {
                     <Route path='/modules' component={Modules} />
                     <Route path='/packages' component={Packages} />
                     <Route path='/system' component={System} />
+                    <Route path='/network' component={Network} />
                     <Route path='/settings' component={Settings} />
                     <Route path='/wireless' component={Wireless} />
                     <Route component={NotFoundPage} />
