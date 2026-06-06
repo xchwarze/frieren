@@ -24,5 +24,8 @@ dist-ssr
 *.sw?
 
 /.env
+
+# Agent tooling + roadmap specs — never commit
 .claude/
 .nelson/
+/specs/
