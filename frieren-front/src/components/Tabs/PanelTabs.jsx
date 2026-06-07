@@ -55,10 +55,15 @@ const PanelTabs = ({ id, defaultTab, children }) => {
         }
     }, [location, activeTab]);
 
+    // Wrap in a div so react-bootstrap's Tabs fragment (Nav + TabContent) is a
+    // single child of the page container — otherwise the container's `gap-*`
+    // leaks between the tab nav and the tab content.
     return (
-        <Tabs activeKey={activeTab} onSelect={(key) => setActiveTab(key)} fill={true}>
-            {children}
-        </Tabs>
+        <div>
+            <Tabs activeKey={activeTab} onSelect={(key) => setActiveTab(key)} fill={true}>
+                {children}
+            </Tabs>
+        </div>
     );
 };
 
