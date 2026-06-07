@@ -27,6 +27,12 @@
     align-items: center;
 }
 
+/* Optical centering: an icon-font glyph centered by its box reads slightly high
+   next to text (whose visual mass sits lower, on the baseline). Nudge it down. */
+.panel-card-title [class^="icon-"] {
+    transform: translateY(0.06em);
+}
+
 .btn-icon {
     border: unset;
 }
