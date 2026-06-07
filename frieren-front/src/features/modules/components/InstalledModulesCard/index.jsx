@@ -11,6 +11,7 @@ import { useLocation } from 'wouter';
 import PropTypes from 'prop-types';
 
 import { openLink } from '@src/helpers/actionsHelper.js';
+import ActionButtons from '@src/components/ActionButtons';
 import PanelCard from '@src/components/PanelCard';
 import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
@@ -104,6 +105,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                                 <td>{version}</td>
                                 <td>{size}</td>
                                 <td>
+                                    <ActionButtons>
                                     <Button
                                         aria-label={'Open repository'}
                                         variant={'outline-secondary'}
@@ -116,7 +118,6 @@ const InstalledModulesCard = ({ installedQuery }) => {
                                         aria-label={'Report bug'}
                                         variant={'outline-secondary'}
                                         size={'sm'}
-                                        className={'ms-2'}
                                         onClick={() => openLink(bugs)}
                                     >
                                         <Icon name={'alert-circle'}/>
@@ -126,7 +127,6 @@ const InstalledModulesCard = ({ installedQuery }) => {
                                             aria-label={sidebar ? 'Unpin' : 'Pin'}
                                             variant={'outline-primary'}
                                             size={'sm'}
-                                            className={'ms-2'}
                                             disabled={isPinPending}
                                             onClick={() => handlePinClick(module)}
                                         >
@@ -138,12 +138,12 @@ const InstalledModulesCard = ({ installedQuery }) => {
                                             aria-label={'Remove'}
                                             variant={'outline-danger'}
                                             size={'sm'}
-                                            className={'ms-2'}
                                             onClick={() => handleRemoveClick(module)}
                                         >
                                             <Icon name={'trash-2'}/>
                                         </Button>
                                     )}
+                                    </ActionButtons>
                                 </td>
                             </tr>
                         );

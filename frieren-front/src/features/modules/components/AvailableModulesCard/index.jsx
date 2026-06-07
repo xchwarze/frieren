@@ -9,6 +9,7 @@ import { useSetAtom } from 'jotai';
 import PropTypes from 'prop-types';
 
 import { openLink } from '@src/helpers/actionsHelper.js';
+import ActionButtons from '@src/components/ActionButtons';
 import PanelCard from '@src/components/PanelCard';
 import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
@@ -99,6 +100,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                             <td>{module.version}</td>
                             <td>{module.sizeHuman}</td>
                             <td>
+                                <ActionButtons>
                                 <Button
                                     aria-label={'Open repository'}
                                     icon={'external-link'}
@@ -112,7 +114,6 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                                         icon={'download-cloud'}
                                         variant={'outline-primary'}
                                         size={'sm'}
-                                        className={'ms-2'}
                                         onClick={() => handleDownloadClick(module)}
                                     />
                                 )}
@@ -122,10 +123,10 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                                         icon={'download-cloud'}
                                         variant={'outline-warning'}
                                         size={'sm'}
-                                        className={'ms-2'}
                                         onClick={() => handleDownloadClick(module)}
                                     />
                                 )}
+                                </ActionButtons>
                             </td>
                         </tr>
                     ))}
