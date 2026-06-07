@@ -34,7 +34,7 @@ const FormDemoCard = () => {
     };
 
     return (
-        <PanelCard title={'Form Demo'} showRefresh={false}>
+        <PanelCard title={'Form Demo'} icon={'edit-3'} showRefresh={false}>
             <FormProvider schema={schema} onSubmit={handleSubmit} defaultValues={defaultValues}>
                 <InputField name={'name'} label={'Name'} placeholder={'Enter a name'} />
                 <SwitchField name={'enabled'} label={'Enable feature'} />

@@ -19,15 +19,17 @@ const SystemStatsCard = () => {
     return (
         <PanelCard
             title={'System Stats'}
-            query={query}
+            icon={'cpu'}
+            refetch={query.refetch}
+            isFetching={query.isFetching}
         >
             {isSuccess && !isFetching && (
-                <div className={'d-flex justify-content-evenly mt-2'}>
+                <div className={'d-flex justify-content-evenly'}>
                     <div className={'text-center'}>
                         <p className={'fs-4 mb-0'}>
                             {data?.cpu_usage ?? ''}
                         </p>
-                        <span className={'text-muted text-uppercase'}>
+                        <span className={'text-body-secondary text-uppercase'}>
                             cpu usage
                         </span>
                     </div>
@@ -35,7 +37,7 @@ const SystemStatsCard = () => {
                         <p className={'fs-4 mb-0'}>
                             {data?.memory_used ?? ''}
                         </p>
-                        <span className={'text-muted text-uppercase'}>
+                        <span className={'text-body-secondary text-uppercase'}>
                             memory
                         </span>
                     </div>
@@ -43,7 +45,7 @@ const SystemStatsCard = () => {
                         <p className={'fs-4 mb-0'}>
                             {data?.swap_used ?? ''}
                         </p>
-                        <span className={'text-muted text-uppercase'}>
+                        <span className={'text-body-secondary text-uppercase'}>
                             swap
                         </span>
                     </div>
@@ -51,7 +53,7 @@ const SystemStatsCard = () => {
                         <p className={'fs-4 mb-0'}>
                             {data?.uptime ?? ''}
                         </p>
-                        <span className={'text-muted text-uppercase'}>
+                        <span className={'text-body-secondary text-uppercase'}>
                             uptime
                         </span>
                     </div>

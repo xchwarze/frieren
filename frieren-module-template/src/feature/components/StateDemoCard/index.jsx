@@ -22,8 +22,8 @@ const StateDemoCard = () => {
     const [location] = useLocation();
 
     return (
-        <PanelCard title={'State & Routing Demo'} showRefresh={false}>
-            <div className={'mt-3'}>
+        <PanelCard title={'State & Routing Demo'} icon={'navigation'} showRefresh={false}>
+            <div>
                 <div className={'d-flex align-items-center mb-3'}>
                     <strong className={'me-2'}>Jotai atom:</strong>
                     <span className={'me-2'}>Counter: {counter}</span>
