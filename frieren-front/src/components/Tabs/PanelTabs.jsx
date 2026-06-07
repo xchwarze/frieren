@@ -21,11 +21,9 @@ const PanelTabs = ({ id, defaultTab, children }) => {
     const { activeTab, setActiveTab } = useActiveTab(id, defaultTab);
 
     return (
-        <div>
-            <Tabs activeKey={activeTab} onSelect={setActiveTab} fill={true}>
-                {children}
-            </Tabs>
-        </div>
+        <Tabs activeKey={activeTab} onSelect={setActiveTab} fill={true}>
+            {children}
+        </Tabs>
     );
 };
 

@@ -43,12 +43,12 @@ const TablePagination = ({ currentPage, totalPages, onPageChange, totalItems, pa
 
     const showStartEllipsis = pageNumbers[0] > 1;
     const showEndEllipsis = pageNumbers[pageNumbers.length - 1] < totalPages;
-    const firstItemValue = Math.min((currentPage - 1) * pageSize + 1, totalItems)
+    const firstItemValue = Math.min((currentPage - 1) * pageSize + 1, totalItems);
     const lastItemValue = Math.min(currentPage * pageSize, totalItems);
 
     return (
-        <div className={'d-flex justify-content-between align-items-center mt-2'}>
-            <small className={'text-muted'}>
+        <div className={'d-flex justify-content-between align-items-center mt-3'}>
+            <small className={'text-body-secondary'}>
                 {firstItemValue}-{lastItemValue} of {totalItems} items
             </small>
             <Pagination className={'mb-0'}>

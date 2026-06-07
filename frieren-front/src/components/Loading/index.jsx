@@ -22,7 +22,8 @@ import PropTypes from 'prop-types';
 const Loading = ({ size = 200, spinClassName = 'icon-spin-slow', className = '', ...rest }) => (
     <img
         src={window.Frieren.loadingImage}
-        alt={'Loading'}
+        alt={''}
+        aria-hidden={'true'}
         width={size}
         height={size}
         className={`${spinClassName} loading-image ${className}`.trim()}

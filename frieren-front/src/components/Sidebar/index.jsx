@@ -29,12 +29,12 @@ const Sidebar = () => {
 
     return (
         <Nav id={'sidebar'} className={`flex-column sidebar bg-dark py-2 ${sidebarStatus ? 'active' : ''}`}>
-            {modules.map(({ name, title, icon }, index) => {
+            {modules.map(({ name, title, icon }) => {
                 const href = `/${name}`;
 
                 return (
                     <OverlayTrigger
-                        key={index}
+                        key={name}
                         delay={555}
                         show={sidebarStatus ? undefined : false}
                         placement={'right'}
@@ -43,7 +43,7 @@ const Sidebar = () => {
                         }
                     >
                         <NavItem>
-                            <Link to={href} className={`nav-link ${href.includes(location) ? 'active' : ''}`}>
+                            <Link to={href} className={`nav-link ${location === href ? 'active' : ''}`}>
                                 <ModuleIcon name={icon} module={name} />
                                 <span>{title}</span>
                             </Link>

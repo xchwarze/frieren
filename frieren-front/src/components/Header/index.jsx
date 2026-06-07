@@ -25,7 +25,6 @@ const Header = () => {
     const { mutate: openTerminalMutation } = useOpenTerminalMutation();
     const terminalStatus = useAtomValue(terminalStatusAtom);
 
-    // <Navbar bg="dark" variant="dark" fixed="top" className="px-3">
     return (
         <Navbar id={'header'} className={'bg-body-tertiary px-3'}>
             <Navbar.Brand>
@@ -34,8 +33,8 @@ const Header = () => {
                     src={logoImage}
                     width={'32'}
                     height={'32'}
-                    className={'d-inline-block align-top'}
-                />{' '}
+                    className={'d-inline-block align-top me-2'}
+                />
                 Frieren
             </Navbar.Brand>
             <div className={'navbar-nav flex-row flex-wrap ms-auto'}>
@@ -43,6 +42,7 @@ const Header = () => {
                     <Button
                         variant={'outline-primary'}
                         className={'btn-icon fs-5'}
+                        aria-label={'Open terminal'}
                         disabled={terminalStatus}
                         onClick={openTerminalMutation}
                     >

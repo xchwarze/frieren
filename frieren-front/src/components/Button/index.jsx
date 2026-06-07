@@ -27,12 +27,14 @@ const Button = ({ label, icon, disabled, loading, 'aria-label': ariaLabel, ...re
         aria-label={ariaLabel || label || icon}
         {...rest}
     >
-        {loading ? (
-            <Spinner animation={'border'} size={'sm'} />
-        ) : (
-            <Icon name={icon}/>
-        )}
-        {label && ` ${label}`}
+        <span className={'d-inline-flex align-items-center gap-1'}>
+            {loading ? (
+                <Spinner animation={'border'} size={'sm'} />
+            ) : (
+                <Icon name={icon}/>
+            )}
+            {label && <span>{label}</span>}
+        </span>
     </BaseButton>
 );
 

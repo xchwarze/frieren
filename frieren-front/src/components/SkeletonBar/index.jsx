@@ -23,6 +23,7 @@ const SkeletonBar = ({ width = 80, height = 18, barHeight = 12 }) => {
 
     return (
         <ContentLoader
+            aria-hidden={'true'}
             width={width}
             height={height}
             backgroundColor={colors.background}

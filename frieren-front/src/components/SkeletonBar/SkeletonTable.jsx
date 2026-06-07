@@ -19,7 +19,7 @@ import SkeletonBar from '@src/components/SkeletonBar';
  * @return {ReactElement}
  */
 const SkeletonTable = ({ headers, widths, rows = 3, className }) => (
-    <Table className={className} striped hover responsive>
+    <Table className={className} aria-hidden={'true'} striped hover responsive>
         {headers && (
             <thead>
                 <tr>
