@@ -73,10 +73,10 @@ const InstalledModulesCard = ({ installedQuery }) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {modules.map((module, index) => {
+                    {modules.map((module) => {
                         const { name, title, icon, description, author, version, size, repository, bugs, sidebar, forceSidebar, system } = module;
                         return (
-                            <tr key={index}>
+                            <tr key={name}>
                                 <td>
                                     {!system && (
                                         <Button
@@ -99,6 +99,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                                 <td>{size}</td>
                                 <td>
                                     <Button
+                                        aria-label={'Open repository'}
                                         variant={'outline-secondary'}
                                         size={'sm'}
                                         onClick={() => openLink(repository)}
@@ -106,6 +107,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                                         <Icon name={'external-link'}/>
                                     </Button>
                                     <Button
+                                        aria-label={'Report bug'}
                                         variant={'outline-secondary'}
                                         size={'sm'}
                                         className={'ms-2'}
@@ -115,6 +117,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                                     </Button>
                                     {!system && !forceSidebar && (
                                         <Button
+                                            aria-label={sidebar ? 'Unpin' : 'Pin'}
                                             variant={'outline-primary'}
                                             size={'sm'}
                                             className={'ms-2'}
@@ -126,6 +129,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                                     )}
                                     {!system && (
                                         <Button
+                                            aria-label={'Remove'}
                                             variant={'outline-danger'}
                                             size={'sm'}
                                             className={'ms-2'}
@@ -152,7 +156,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
     };
 
     return (
-        <PanelCard title={'Installed Modules'} isFetching={isFetching} refetch={refetch}>
+        <PanelCard title={'Installed Modules'} subtitle={'Installed modules'} isFetching={isFetching} refetch={refetch}>
             {renderContent()}
         </PanelCard>
     );

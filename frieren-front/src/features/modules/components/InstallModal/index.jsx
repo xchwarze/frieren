@@ -61,9 +61,9 @@ const InstallModal = () => {
                 )}
                 {!isProcessing && (
                     <>
-                        <p>This community module was developed by: <b>{author}</b></p>
+                        <p>This community module was developed by: <strong className={'ms-1'}>{author}</strong></p>
                         <p>If you have any problem or comment about the module you can leave it to the developer at the
-                            &nbsp;<a href={repository} target={'_blank'} rel={'noopener noreferrer'}>following link</a></p>
+                            <a className={'mx-1'} href={repository} target={'_blank'} rel={'noopener noreferrer'}>following link</a></p>
                     </>
                 )}
             </Modal.Body>

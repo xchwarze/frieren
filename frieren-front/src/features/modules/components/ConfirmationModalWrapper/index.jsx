@@ -17,7 +17,7 @@ import useRemoveModule from '@src/features/modules/hooks/useRemoveModule';
  */
 const ConfirmationModalWrapper = () => {
     const [selectedInstalledModule, setSelectedInstalledModule] = useAtom(selectedInstalledModuleAtom);
-    const { mutate: removeModule, isLoading: isRemovingModule } = useRemoveModule();
+    const { mutate: removeModule, isPending: isRemovingModule } = useRemoveModule();
 
     const handleClose = () => {
         setSelectedInstalledModule(false);
@@ -32,7 +32,7 @@ const ConfirmationModalWrapper = () => {
 
     return (
         <ConfirmationModal
-            show={selectedInstalledModule}
+            show={!!selectedInstalledModule}
             onHide={handleClose}
             onConfirm={handleConfirm}
             title={'Confirm Deletion'}

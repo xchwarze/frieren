@@ -65,8 +65,8 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {modules.map((module, index) => (
-                        <tr key={index}>
+                    {modules.map((module) => (
+                        <tr key={module.name}>
                             <td>{module.title}</td>
                             <td>{module.description}</td>
                             <td>{module.author}</td>
@@ -74,7 +74,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                             <td>{module.sizeHuman}</td>
                             <td>
                                 <Button
-                                    label={''}
+                                    aria-label={'Open repository'}
                                     icon={'external-link'}
                                     variant={'outline-secondary'}
                                     size={'sm'}
@@ -82,7 +82,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                                 />
                                 {!checkInstalled(module) && (
                                     <Button
-                                        label={''}
+                                        aria-label={'Download module'}
                                         icon={'download-cloud'}
                                         variant={'outline-primary'}
                                         size={'sm'}
@@ -92,7 +92,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                                 )}
                                 {checkUpdateable(module) && (
                                     <Button
-                                        label={''}
+                                        aria-label={'Update module'}
                                         icon={'download-cloud'}
                                         variant={'outline-warning'}
                                         size={'sm'}
@@ -103,6 +103,11 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                             </td>
                         </tr>
                     ))}
+                    {modules.length === 0 && (
+                        <tr>
+                            <td colSpan={6}>No modules found.</td>
+                        </tr>
+                    )}
                     </tbody>
                 </Table>
             );

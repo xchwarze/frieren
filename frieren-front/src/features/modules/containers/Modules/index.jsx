@@ -22,8 +22,10 @@ const Modules = () => {
 
     return (
         <>
-            <AvailableModulesCard availableQuery={availableQuery} installedQuery={installedQuery} />
-            <InstalledModulesCard installedQuery={installedQuery} />
+            <div className="d-flex flex-column gap-4">
+                <AvailableModulesCard availableQuery={availableQuery} installedQuery={installedQuery} />
+                <InstalledModulesCard installedQuery={installedQuery} />
+            </div>
             <InstallModal />
             <ConfirmationModalWrapper />
         </>
