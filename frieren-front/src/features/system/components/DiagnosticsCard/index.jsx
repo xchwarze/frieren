@@ -49,7 +49,8 @@ const DiagnosticsCard = () => {
                         rows={6}
                         readOnly={true}
                         value={resume}
-                        className={'text-muted'}
+                        className={'text-body-secondary'}
+                        aria-label={'Diagnostics report status'}
                     />
                 </Form.Group>
                 <div className={'d-flex justify-content-end gap-2'}>
@@ -78,7 +79,6 @@ const DiagnosticsCard = () => {
             subtitle={'Comprehensive system analysis covering logs, configurations, and vital stats for ' +
                 'troubleshooting and performance assessment.'}
             showRefresh={false}
-            className={'mt-4'}
         >
             {renderContent()}
         </PanelCard>

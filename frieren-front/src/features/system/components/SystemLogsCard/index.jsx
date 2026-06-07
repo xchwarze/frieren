@@ -40,7 +40,7 @@ const SystemLogsCard = () => {
         if (isLoading) {
             return (
                 <>
-                    <div className={'mb-3 mt-3'}>
+                    <div className={'mb-3'}>
                         <SkeletonBar width={250} height={38} barHeight={34} />
                     </div>
                     <SkeletonTable
@@ -59,7 +59,7 @@ const SystemLogsCard = () => {
                         value={searchTerm}
                         onChange={setSearchTerm}
                         placeholder={'Search logs...'}
-                        className={'mb-3 mt-3'}
+                        className={'mb-3'}
                     />
                     <Table striped hover responsive>
                         <thead>
@@ -71,15 +71,15 @@ const SystemLogsCard = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {filteredLogs.map(({ timestamp, tag, process, message }, index) => (
-                            <tr key={index}>
+                        {(filteredLogs ?? []).map(({ timestamp, tag, process, message }) => (
+                            <tr key={`${timestamp}-${tag}-${process}-${message}`}>
                                 <td>{timestamp}</td>
                                 <td>{tag}</td>
                                 <td>{process}</td>
                                 <td>{message}</td>
                             </tr>
                         ))}
-                        {filteredLogs.length === 0 && (
+                        {(filteredLogs ?? []).length === 0 && (
                             <tr>
                                 <td colSpan={4}>No logs found.</td>
                             </tr>

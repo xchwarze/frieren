@@ -22,16 +22,15 @@ const FileSystemUsageCard = () => {
         if (isLoading) {
             return (
                 <SkeletonTable
-                    headers={['Filesystem', 'Type', 'Size', 'Used', 'Available', 'Used', 'Mounted on']}
+                    headers={['Filesystem', 'Type', 'Size', 'Used', 'Available', 'Use%', 'Mounted on']}
                     widths={[100, 50, 50, 50, 60, 40, 80]}
-                    className={'mt-3'}
                 />
             );
         }
 
         if (isSuccess) {
             return (
-                <Table className={'mt-3'} striped hover responsive>
+                <Table striped hover responsive>
                     <thead>
                     <tr>
                         <th>Filesystem</th>
@@ -39,7 +38,7 @@ const FileSystemUsageCard = () => {
                         <th>Size</th>
                         <th>Used</th>
                         <th>Available</th>
-                        <th>Used</th>
+                        <th>Use%</th>
                         <th>Mounted on</th>
                     </tr>
                     </thead>
@@ -49,8 +48,8 @@ const FileSystemUsageCard = () => {
                             <td colSpan={7}>No file systems found.</td>
                         </tr>
                     )}
-                    {data.map(({ filesystem, type, size, used, available, usePercent, mountedOn }, index) => (
-                        <tr key={index}>
+                    {data.map(({ filesystem, type, size, used, available, usePercent, mountedOn }) => (
+                        <tr key={filesystem}>
                             <td>{filesystem}</td>
                             <td>{type}</td>
                             <td>{size}</td>
@@ -75,7 +74,6 @@ const FileSystemUsageCard = () => {
                 'space allocation and utilization.'}
             isFetching={isFetching}
             refetch={refetch}
-            className={'mt-4'}
         >
             {renderContent()}
         </PanelCard>

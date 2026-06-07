@@ -24,9 +24,11 @@ const System = () => (
     <PanelTabs id={'system'} defaultTab={'info'}>
         <Tab eventKey={'info'} title={<TabTitle title={'Info'} icon={'info'} />}>
             <ConditionalTabContent id={'system'} eventKey={'info'}>
-                <UsbDevicesCard />
-                <FileSystemUsageCard />
-                <DiagnosticsCard />
+                <div className={'d-flex flex-column gap-4'}>
+                    <UsbDevicesCard />
+                    <FileSystemUsageCard />
+                    <DiagnosticsCard />
+                </div>
             </ConditionalTabContent>
         </Tab>
         <Tab eventKey={'services'} title={<TabTitle title={'Services'} icon={'server'} />}>

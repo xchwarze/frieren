@@ -24,14 +24,13 @@ const UsbDevicesCard = () => {
                 <SkeletonTable
                     headers={['Bus', 'Device', 'ID', 'Name']}
                     widths={[40, 50, 80, 200]}
-                    className={'mt-4'}
                 />
             );
         }
 
         if (isSuccess) {
             return (
-                <Table className={'mt-4'} striped hover responsive>
+                <Table striped hover responsive>
                     <thead>
                     <tr>
                         <th>Bus</th>
@@ -46,8 +45,8 @@ const UsbDevicesCard = () => {
                             <td colSpan={4}>No USB devices detected.</td>
                         </tr>
                     )}
-                    {data.map(({ id, name, device, bus }, index) => (
-                        <tr key={index}>
+                    {data.map(({ id, name, device, bus }) => (
+                        <tr key={`${bus}-${device}`}>
                             <td>{bus}</td>
                             <td>{device}</td>
                             <td>{id}</td>
