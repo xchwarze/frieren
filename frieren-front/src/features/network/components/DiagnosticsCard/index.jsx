@@ -83,7 +83,7 @@ const DiagnosticsCard = () => {
     };
 
     return (
-        <>
+        <div className={'d-flex flex-column gap-4'}>
             <PanelCard
                 title={'Diagnostics'}
                 subtitle={'Run network reachability and name resolution tools'}
@@ -126,12 +126,14 @@ const DiagnosticsCard = () => {
                 </div>
 
                 <Form.Group>
+                    <Form.Label htmlFor={'diagnostics-output'}>Output</Form.Label>
                     <Form.Control
+                        id={'diagnostics-output'}
                         as={'textarea'}
                         rows={10}
                         readOnly={true}
                         value={output || 'No output yet.'}
-                        className={'text-muted font-monospace'}
+                        className={'text-body-secondary font-monospace'}
                     />
                 </Form.Group>
             </PanelCard>
@@ -141,11 +143,10 @@ const DiagnosticsCard = () => {
                 subtitle={'Discovered neighbors'}
                 refetch={arpQuery.refetch}
                 isFetching={arpQuery.isFetching}
-                className={'mt-4'}
             >
                 {renderArpTable()}
             </PanelCard>
-        </>
+        </div>
     );
 };
 

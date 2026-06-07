@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 
 import PanelCard from '@src/components/PanelCard';
@@ -61,6 +61,10 @@ const DhcpCard = () => {
     }, [leases, debouncedSearch]);
 
     const { pageData, currentPage, totalPages, setCurrentPage } = usePagination(filteredLeases);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [debouncedSearch, setCurrentPage]);
 
     const confirmDelete = async () => {
         const mac = pendingDelete?.mac;
@@ -174,32 +178,33 @@ const DhcpCard = () => {
 
     return (
         <>
-            <PanelCard
-                title={'DHCP Leases'}
-                subtitle={'Active DHCP leases'}
-                refetch={leasesQuery.refetch}
-                isFetching={leasesQuery.isFetching}
-            >
-                {renderLeases()}
-            </PanelCard>
+            <div className={'d-flex flex-column gap-4'}>
+                <PanelCard
+                    title={'DHCP Leases'}
+                    subtitle={'Active DHCP leases'}
+                    refetch={leasesQuery.refetch}
+                    isFetching={leasesQuery.isFetching}
+                >
+                    {renderLeases()}
+                </PanelCard>
 
-            <PanelCard
-                title={'Static Leases'}
-                subtitle={'Reserved address assignments'}
-                refetch={staticLeasesQuery.refetch}
-                isFetching={staticLeasesQuery.isFetching}
-                className={'mt-4'}
-            >
-                <div className={'d-flex justify-content-end mb-3'}>
-                    <Button
-                        icon={'plus'}
-                        label={'Add'}
-                        onClick={() => setAdding(true)}
-                    />
-                </div>
+                <PanelCard
+                    title={'Static Leases'}
+                    subtitle={'Reserved address assignments'}
+                    refetch={staticLeasesQuery.refetch}
+                    isFetching={staticLeasesQuery.isFetching}
+                >
+                    <div className={'d-flex justify-content-end mb-3'}>
+                        <Button
+                            icon={'plus'}
+                            label={'Add'}
+                            onClick={() => setAdding(true)}
+                        />
+                    </div>
 
-                {renderStaticLeases()}
-            </PanelCard>
+                    {renderStaticLeases()}
+                </PanelCard>
+            </div>
 
             <AddStaticLeaseModal
                 show={adding}

@@ -41,7 +41,7 @@ const InterfaceForm = ({ name, defaultValues, onHide }) => {
         >
             <Form.Group className={'mb-3'}>
                 <Form.Label>Interface</Form.Label>
-                <Form.Control value={name} disabled readOnly />
+                <Form.Control value={name} readOnly plaintext />
             </Form.Group>
             <SelectField
                 name={'proto'}
