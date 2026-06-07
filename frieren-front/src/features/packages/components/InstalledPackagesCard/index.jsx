@@ -58,45 +58,45 @@ const InstalledPackagesCard = () => {
         return (
             <>
                 <SearchInput
-                        value={searchTerm}
-                        onChange={setSearchTerm}
-                        placeholder={'Search installed packages...'}
-                    />
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                    placeholder={'Search installed packages...'}
+                />
 
-                    <Table striped hover responsive>
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Version</th>
-                            <th>Description</th>
-                            <th>Action</th>
+                <Table striped hover responsive>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Version</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {pageData.map((pkg) => (
+                        <tr key={pkg.name}>
+                            <td>{pkg.name}</td>
+                            <td>{pkg.version}</td>
+                            <td>{pkg.description}</td>
+                            <td>
+                                <Button
+                                    variant={'outline-danger'}
+                                    size={'sm'}
+                                    icon={'trash-2'}
+                                    loading={removingName === pkg.name}
+                                    disabled={!!removingName}
+                                    onClick={() => setSelectedPackage(pkg)}
+                                />
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        {pageData.map((pkg) => (
-                            <tr key={pkg.name}>
-                                <td>{pkg.name}</td>
-                                <td>{pkg.version}</td>
-                                <td>{pkg.description}</td>
-                                <td>
-                                    <Button
-                                        variant={'outline-danger'}
-                                        size={'sm'}
-                                        icon={'trash-2'}
-                                        loading={removingName === pkg.name}
-                                        disabled={!!removingName}
-                                        onClick={() => setSelectedPackage(pkg)}
-                                    />
-                                </td>
-                            </tr>
-                        ))}
-                        {filteredPackages.length === 0 && (
-                            <tr>
-                                <td colSpan={4}>No packages found.</td>
-                            </tr>
-                        )}
-                        </tbody>
-                    </Table>
+                    ))}
+                    {filteredPackages.length === 0 && (
+                        <tr>
+                            <td colSpan={4}>No packages found.</td>
+                        </tr>
+                    )}
+                    </tbody>
+                </Table>
 
                 <TablePagination
                     currentPage={currentPage}
@@ -111,6 +111,7 @@ const InstalledPackagesCard = () => {
     return (
         <PanelCard
             title={'Installed Packages'}
+            subtitle={'Currently installed packages'}
             showRefresh={true}
             refetch={load}
             isFetching={isPolling}

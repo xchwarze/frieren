@@ -15,8 +15,10 @@ import ConfirmationModalWrapper from '@src/features/packages/components/Confirma
  */
 const Packages = () => (
     <>
-        <AvailablePackagesCard />
-        <InstalledPackagesCard />
+        <div className="d-flex flex-column gap-4">
+            <AvailablePackagesCard />
+            <InstalledPackagesCard />
+        </div>
         <ConfirmationModalWrapper />
     </>
 );
