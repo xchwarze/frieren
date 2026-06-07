@@ -55,6 +55,7 @@ const WirelessAdvancedCard = () => {
     return (
         <PanelCard
             title={'Raw Wireless Config'}
+            icon={'sliders'}
             subtitle={'Edit /etc/config/wireless directly. Changes are applied immediately via wifi reload.'}
             showRefresh={true}
             refetch={refetch}

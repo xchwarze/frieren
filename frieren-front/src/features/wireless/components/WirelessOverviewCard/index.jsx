@@ -100,6 +100,7 @@ const WirelessOverviewCard = () => {
     return (
         <PanelCard
             title={'Wireless Overview'}
+            icon={'wifi'}
             subtitle={'Radios and configured interfaces'}
             isFetching={isFetching}
             refetch={refetch}

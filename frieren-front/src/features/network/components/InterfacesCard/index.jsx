@@ -130,6 +130,7 @@ const InterfacesCard = () => {
 
     return (
         <PanelCard
+            icon={'share-2'}
             title={'Interfaces'}
             subtitle={'Network interfaces and addressing'}
             refetch={interfacesQuery.refetch}

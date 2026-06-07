@@ -162,6 +162,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
     return (
         <PanelCard
             title={'Available Modules'}
+            icon={'download'}
             subtitle={'Expand the possibilities of your Frieren installation through our module community.'}
             showRefresh={isSuccess}
             isFetching={isFetching}

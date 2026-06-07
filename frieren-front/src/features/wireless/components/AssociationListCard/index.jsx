@@ -67,6 +67,7 @@ const AssociationListCard = () => {
     return (
         <PanelCard
             title={'Associated Stations'}
+            icon={'users'}
             subtitle={'Associated clients'}
             isFetching={isFetching}
             refetch={refetch}

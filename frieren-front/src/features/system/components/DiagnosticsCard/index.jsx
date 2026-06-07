@@ -78,6 +78,7 @@ const DiagnosticsCard = () => {
     return (
         <PanelCard
             title={'Diagnostics'}
+            icon={'activity'}
             subtitle={'Comprehensive system analysis covering logs, configurations, and vital stats for ' +
                 'troubleshooting and performance assessment.'}
             showRefresh={false}

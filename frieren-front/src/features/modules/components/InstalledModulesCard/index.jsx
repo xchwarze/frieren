@@ -170,7 +170,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
     };
 
     return (
-        <PanelCard title={'Installed Modules'} subtitle={'Installed modules'} isFetching={isFetching} refetch={refetch}>
+        <PanelCard title={'Installed Modules'} icon={'grid'} subtitle={'Installed modules'} isFetching={isFetching} refetch={refetch}>
             {renderContent()}
         </PanelCard>
     );

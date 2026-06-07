@@ -86,6 +86,7 @@ const DiagnosticsCard = () => {
     return (
         <PanelStack>
             <PanelCard
+                icon={'activity'}
                 title={'Diagnostics'}
                 subtitle={'Run network reachability and name resolution tools'}
                 showRefresh={false}

@@ -177,6 +177,7 @@ const DhcpCard = () => {
         <>
             <PanelStack>
                 <PanelCard
+                    icon={'users'}
                     title={'DHCP Leases'}
                     subtitle={'Active DHCP leases'}
                     refetch={leasesQuery.refetch}
@@ -186,6 +187,7 @@ const DhcpCard = () => {
                 </PanelCard>
 
                 <PanelCard
+                    icon={'bookmark'}
                     title={'Static Leases'}
                     subtitle={'Reserved address assignments'}
                     refetch={staticLeasesQuery.refetch}

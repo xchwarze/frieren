@@ -61,7 +61,7 @@ const TimezoneCard = ({ query }) => {
     };
 
     return (
-        <PanelCard title={'Change Timezone'} showRefresh={false}>
+        <PanelCard title={'Change Timezone'} icon={'clock'} showRefresh={false}>
             {renderContent()}
         </PanelCard>
     );

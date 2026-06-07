@@ -63,6 +63,7 @@ const UsbDevicesCard = () => {
     return (
         <PanelCard
             title={'USB Devices'}
+            icon={'hard-drive'}
             subtitle={'Detailed tracking of connected USB devices, facilitating device identification ' +
                 'and resolving USB-related issues'}
             isFetching={isFetching}

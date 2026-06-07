@@ -35,6 +35,7 @@ const UpdateUserPasswordCard = () => {
     return (
         <PanelCard
             title={'User Management'}
+            icon={'lock'}
             showRefresh={false}
         >
             <FormProvider autoComplete={'off'} schema={updatePasswordSchema} onSubmit={handleSubmit} defaultValues={defaultValues}>

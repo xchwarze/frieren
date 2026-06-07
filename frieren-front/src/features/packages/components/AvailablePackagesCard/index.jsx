@@ -117,6 +117,7 @@ const AvailablePackagesCard = () => {
     return (
         <PanelCard
             title={'Available Packages'}
+            icon={'download'}
             subtitle={'Update the package lists and browse available packages for installation.'}
             showRefresh={isLoaded}
             refetch={() => update()}

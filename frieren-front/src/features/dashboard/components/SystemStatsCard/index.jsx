@@ -56,7 +56,7 @@ const SystemStatsCard = () => {
     };
 
     return (
-        <PanelCard title={'System Stats'} isFetching={isFetching} refetch={refetch}>
+        <PanelCard icon={'cpu'} title={'System Stats'} isFetching={isFetching} refetch={refetch}>
             {renderContent()}
         </PanelCard>
     );

@@ -96,6 +96,7 @@ const SystemLogsCard = () => {
     return (
         <PanelCard
             title={'System Log'}
+            icon={'file-text'}
             subtitle={'For performance reasons only the last 1000 events are shown. If you want to see more you ' +
                 'can use the terminal or the diagnostics section.'}
             isFetching={isFetching}

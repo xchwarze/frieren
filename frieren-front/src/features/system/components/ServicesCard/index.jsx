@@ -209,6 +209,7 @@ const ServicesCard = () => {
     return (
         <PanelCard
             title={'Init Services'}
+            icon={'server'}
             subtitle={'Manage init.d services'}
             refetch={servicesQuery.refetch}
             isFetching={servicesQuery.isFetching}

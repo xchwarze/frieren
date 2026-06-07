@@ -90,7 +90,7 @@ const TerminalSettingsCard = ({ query }) => {
     };
 
     return (
-        <PanelCard title={'Terminal'} showRefresh={false}>
+        <PanelCard title={'Terminal'} icon={'terminal'} showRefresh={false}>
             {renderContent()}
         </PanelCard>
     );

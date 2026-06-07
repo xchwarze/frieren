@@ -18,6 +18,7 @@
 .panel-card {
     --bs-card-spacer-y: 1.25rem;
     --bs-card-spacer-x: 1.25rem;
+    box-shadow: var(--bs-box-shadow-sm);
 }
 
 .panel-card-title {

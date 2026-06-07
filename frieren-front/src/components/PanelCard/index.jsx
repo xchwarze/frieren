@@ -18,6 +18,7 @@ import Icon from '@src/components/Icon';
  * spacing is the container's job (use a `gap-*` wrapper), not the card's.
  *
  * @param {String} title - The title of the panel card.
+ * @param {String} [icon] - Optional leading icon name (feather) shown before the title.
  * @param {String} [subtitle] - Optional descriptive subtitle.
  * @param {Boolean} [showRefresh=true] - Whether to show the refresh button.
  * @param {Function} [refetch] - Refetch handler for the refresh button.
@@ -28,6 +29,7 @@ import Icon from '@src/components/Icon';
  */
 const PanelCard = ({
                        title,
+                       icon,
                        subtitle,
                        showRefresh = true,
                        refetch,
@@ -40,7 +42,10 @@ const PanelCard = ({
         <Card.Body>
             <div className={'mb-4'}>
                 <Card.Title className={'panel-card-title'}>
-                    {title}
+                    <span className={'d-inline-flex align-items-center gap-2'}>
+                        {icon && <Icon name={icon} />}
+                        {title}
+                    </span>
                     {showRefresh && (
                         <Button
                             variant={'outline-secondary'}
@@ -68,6 +73,7 @@ const PanelCard = ({
 
 PanelCard.propTypes = {
     title: PropTypes.string.isRequired,
+    icon: PropTypes.string,
     subtitle: PropTypes.node,
     showRefresh: PropTypes.bool,
     refetch: PropTypes.func,

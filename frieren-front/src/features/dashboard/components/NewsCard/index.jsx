@@ -63,6 +63,7 @@ const NewsCard = () => {
 
     return (
         <PanelCard
+            icon={'rss'}
             title={'News'}
             subtitle={'Latest updates from the Frieren project.'}
             isFetching={isFetching}

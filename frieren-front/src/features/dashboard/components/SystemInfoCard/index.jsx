@@ -59,7 +59,7 @@ const SystemInfoCard = () => {
     };
 
     return (
-        <PanelCard title={'System Information'} showRefresh={false}>
+        <PanelCard icon={'info'} title={'System Information'} showRefresh={false}>
             {renderContent()}
         </PanelCard>
     );

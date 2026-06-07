@@ -69,6 +69,7 @@ const FileSystemUsageCard = () => {
     return (
         <PanelCard
             title={'Resources'}
+            icon={'pie-chart'}
             subtitle={'Overview of storage usage across all mounted file systems, providing insights into ' +
                 'space allocation and utilization.'}
             isFetching={isFetching}

@@ -112,6 +112,7 @@ const InstalledPackagesCard = () => {
     return (
         <PanelCard
             title={'Installed Packages'}
+            icon={'box'}
             subtitle={'Currently installed packages'}
             showRefresh={true}
             refetch={load}
