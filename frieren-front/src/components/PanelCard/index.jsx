@@ -38,7 +38,7 @@ const PanelCard = ({
                    }) => (
     <Card className={`panel-card ${className}`.trim()} {...rest}>
         <Card.Body>
-            <div className={'mb-3'}>
+            <div className={'mb-4'}>
                 <Card.Title className={'panel-card-title'}>
                     {title}
                     {showRefresh && (
