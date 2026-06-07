@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import Tab from 'react-bootstrap/Tab';
-
-import PanelTabs from '@src/components/Tabs/PanelTabs';
-import TabTitle from '@src/components/Tabs/TabTitle';
-import ConditionalTabContent from '@src/components/Tabs/ConditionalTabContent';
+import PanelTabs, { renderPanelTab } from '@src/components/Tabs/PanelTabs';
 import WirelessOverviewCard from '@src/features/wireless/components/WirelessOverviewCard';
 import AssociationListCard from '@src/features/wireless/components/AssociationListCard';
 import WirelessAdvancedCard from '@src/features/wireless/components/WirelessAdvancedCard';
@@ -35,13 +31,7 @@ const TABS = [
  */
 const Wireless = () => (
     <PanelTabs id={'wireless'} defaultTab={'overview'}>
-        {TABS.map(({ key, title, icon, content }) => (
-            <Tab key={key} eventKey={key} title={<TabTitle title={title} icon={icon} />}>
-                <ConditionalTabContent id={'wireless'} eventKey={key}>
-                    {content}
-                </ConditionalTabContent>
-            </Tab>
-        ))}
+        {TABS.map((tab) => renderPanelTab('wireless', tab))}
     </PanelTabs>
 );
 

@@ -46,10 +46,10 @@ const LoginStack = () => {
                     <Route path='/dashboard' component={Dashboard} />
                     <Route path='/modules' component={Modules} />
                     <Route path='/packages' component={Packages} />
-                    <Route path='/system' component={System} />
-                    <Route path='/network' component={Network} />
+                    <Route path='/system/:tab?' component={System} />
+                    <Route path='/network/:tab?' component={Network} />
                     <Route path='/settings' component={Settings} />
-                    <Route path='/wireless' component={Wireless} />
+                    <Route path='/wireless/:tab?' component={Wireless} />
                     <Route component={NotFoundPage} />
                 </Switch>
             </ErrorBoundary>

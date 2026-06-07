@@ -4,14 +4,10 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import Tab from 'react-bootstrap/Tab';
-
 import InterfacesCard from '@src/features/network/components/InterfacesCard';
 import DhcpCard from '@src/features/network/components/DhcpCard';
 import DiagnosticsCard from '@src/features/network/components/DiagnosticsCard';
-import PanelTabs from '@src/components/Tabs/PanelTabs';
-import TabTitle from '@src/components/Tabs/TabTitle';
-import ConditionalTabContent from '@src/components/Tabs/ConditionalTabContent';
+import PanelTabs, { renderPanelTab } from '@src/components/Tabs/PanelTabs';
 
 const TABS = [
     { key: 'interfaces', title: 'Interfaces', icon: 'share-2', content: <InterfacesCard /> },
@@ -26,13 +22,7 @@ const TABS = [
  */
 const Network = () => (
     <PanelTabs id={'network'} defaultTab={'interfaces'}>
-        {TABS.map(({ key, title, icon, content }) => (
-            <Tab key={key} eventKey={key} title={<TabTitle title={title} icon={icon} />}>
-                <ConditionalTabContent id={'network'} eventKey={key}>
-                    {content}
-                </ConditionalTabContent>
-            </Tab>
-        ))}
+        {TABS.map((tab) => renderPanelTab('network', tab))}
     </PanelTabs>
 );
 

@@ -4,35 +4,24 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { atom, useAtom } from 'jotai';
-
-const atomCache = {};
+import { useLocation } from 'wouter';
 
 /**
- * Creates a tab atom if it doesn't already exist in the cache.
+ * Reads/writes the active tab from the URL so tabs are deep-linkable and can be
+ * opened in a separate window. The active tab is the path segment after the
+ * container base, e.g. `#/network/dhcp` → id 'network', tab 'dhcp'.
  *
- * @param {any} id - The identifier of the tab atom.
- * @param {any} defaultValue - The default value for the tab atom.
- * @return {any} The tab atom corresponding to the provided id.
- */
-export const createTabAtom = (id, defaultValue) => {
-    if (!atomCache[id]) {
-        atomCache[id] = atom(defaultValue);
-    }
-
-    return atomCache[id];
-};
-
-/**
- * Creates a custom hook that manages the active tab state for a given ID and default value.
- *
- * @param {String} id - The ID of the tab.
- * @param {String} defaultValue - The default value for the active tab.
- * @return {Object} An object containing the activeTab state and setActiveTab function.
+ * @param {String} id - The container base path segment (e.g. 'network').
+ * @param {String} defaultValue - Tab used when the URL carries no tab segment.
+ * @return {Object} { activeTab, setActiveTab } where setActiveTab(tab, options)
+ *                   navigates to `#/<id>/<tab>` (pass { replace: true } to avoid a history entry).
  */
 const useActiveTab = (id, defaultValue) => {
-    const activeTabAtom = createTabAtom(id, defaultValue);
-    const [activeTab, setActiveTab] = useAtom(activeTabAtom);
+    const [location, navigate] = useLocation();
+    const prefix = `/${id}/`;
+    const segment = location.startsWith(prefix) ? location.slice(prefix.length).split('/')[0] : '';
+    const activeTab = segment || defaultValue;
+    const setActiveTab = (tab, options) => navigate(`/${id}/${tab}`, options);
 
     return { activeTab, setActiveTab };
 };

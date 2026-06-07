@@ -31,6 +31,7 @@ const Sidebar = () => {
         <Nav id={'sidebar'} className={`flex-column sidebar bg-dark py-2 ${sidebarStatus ? 'active' : ''}`}>
             {modules.map(({ name, title, icon }) => {
                 const href = `/${name}`;
+                const isActive = location === href || location.startsWith(`${href}/`);
 
                 return (
                     <OverlayTrigger
@@ -43,7 +44,7 @@ const Sidebar = () => {
                         }
                     >
                         <NavItem>
-                            <Link to={href} className={`nav-link ${location === href ? 'active' : ''}`}>
+                            <Link to={href} className={`nav-link ${isActive ? 'active' : ''}`}>
                                 <ModuleIcon name={icon} module={name} />
                                 <span>{title}</span>
                             </Link>
