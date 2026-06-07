@@ -32,6 +32,7 @@ const SearchInput = ({ value, onChange, placeholder = 'Search...', className = '
         />
         {value && (
             <Button
+                type={'button'}
                 variant={'outline-secondary'}
                 aria-label={'Clear search'}
                 onClick={() => onChange('')}
