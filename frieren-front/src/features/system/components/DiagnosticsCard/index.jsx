@@ -12,6 +12,7 @@ import useDownloadDiagnosticsFile from '@src/features/system/hooks/useDownloadDi
 import PanelCard from '@src/components/PanelCard';
 import SkeletonBar from '@src/components/SkeletonBar';
 import Button from '@src/components/Button';
+import FormActions from '@src/components/FormActions';
 
 /**
  * Renders a Diagnostics card component with information and actions related to system diagnostics.
@@ -33,10 +34,10 @@ const DiagnosticsCard = () => {
                     <div className={'mb-3'}>
                         <SkeletonBar width={400} height={120} barHeight={116} />
                     </div>
-                    <div className={'d-flex justify-content-end gap-2'}>
+                    <FormActions>
                         <SkeletonBar width={140} height={38} barHeight={34} />
                         <SkeletonBar width={110} height={38} barHeight={34} />
-                    </div>
+                    </FormActions>
                 </>
             );
         }
@@ -44,16 +45,17 @@ const DiagnosticsCard = () => {
         return (
             <>
                 <Form.Group className={'mb-3'}>
+                    <Form.Label htmlFor={'diagnostics-status'}>Report status</Form.Label>
                     <Form.Control
+                        id={'diagnostics-status'}
                         as={'textarea'}
                         rows={6}
                         readOnly={true}
                         value={resume}
                         className={'text-body-secondary'}
-                        aria-label={'Diagnostics report status'}
                     />
                 </Form.Group>
-                <div className={'d-flex justify-content-end gap-2'}>
+                <FormActions>
                     <Button
                         label={'Generate Report'}
                         icon={'play'}
@@ -68,7 +70,7 @@ const DiagnosticsCard = () => {
                         loading={downloadDiagnosticsRunning}
                         onClick={downloadDiagnostics}
                     />
-                </div>
+                </FormActions>
             </>
         );
     };
