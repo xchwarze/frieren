@@ -68,7 +68,7 @@ const PanelCard = ({
 
 PanelCard.propTypes = {
     title: PropTypes.string.isRequired,
-    subtitle: PropTypes.string,
+    subtitle: PropTypes.node,
     showRefresh: PropTypes.bool,
     refetch: PropTypes.func,
     isFetching: PropTypes.bool,
