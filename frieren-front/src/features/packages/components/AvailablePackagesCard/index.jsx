@@ -107,7 +107,8 @@ const AvailablePackagesCard = () => {
         }
         const term = debouncedSearch.toLowerCase();
         return availablePackages.filter((pkg) =>
-            pkg.name.toLowerCase().includes(term)
+            pkg.name.toLowerCase().includes(term) ||
+            (pkg.description ?? '').toLowerCase().includes(term)
         );
     }, [availablePackages, debouncedSearch]);
 

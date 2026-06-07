@@ -39,7 +39,8 @@ const InstalledPackagesCard = () => {
         }
         const term = debouncedSearch.toLowerCase();
         return installedPackages.filter((pkg) =>
-            pkg.name.toLowerCase().includes(term)
+            pkg.name.toLowerCase().includes(term) ||
+            (pkg.description ?? '').toLowerCase().includes(term)
         );
     }, [installedPackages, debouncedSearch]);
 
