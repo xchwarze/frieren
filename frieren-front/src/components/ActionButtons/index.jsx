@@ -7,7 +7,7 @@
 import PropTypes from 'prop-types';
 
 const ActionButtons = ({ children }) => (
-    <div className={'d-flex gap-2'}>
+    <div className={'d-flex gap-1'}>
         {children}
     </div>
 );
