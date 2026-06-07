@@ -30,7 +30,7 @@ const SwitchField = ({ name, label, ...rest }) => {
                 {...rest}
             />
             {errors[name] && (
-                <Form.Control.Feedback type={'invalid'}>
+                <Form.Control.Feedback type={'invalid'} className={'d-block'}>
                     {errors[name].message}
                 </Form.Control.Feedback>
             )}

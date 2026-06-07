@@ -22,7 +22,7 @@ const PasswordHelper = ({ children, errorMessage }) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <InputGroup>
+        <InputGroup hasValidation>
             {children(showPassword)}
             <InputGroup.Text
                 role={'button'}
@@ -31,7 +31,7 @@ const PasswordHelper = ({ children, errorMessage }) => {
                 <Icon name={showPassword ? 'eye-off' : 'eye'} />
             </InputGroup.Text>
             {errorMessage && (
-                <Form.Control.Feedback type={'invalid'}>
+                <Form.Control.Feedback type={'invalid'} className={'d-block'}>
                     {errorMessage}
                 </Form.Control.Feedback>
             )}
