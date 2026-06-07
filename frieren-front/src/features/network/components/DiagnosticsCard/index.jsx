@@ -6,9 +6,9 @@
  */
 import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
-import Table from 'react-bootstrap/Table';
 
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import Button from '@src/components/Button';
 import useRunPing from '@src/features/network/hooks/useRunPing.js';
@@ -54,7 +54,7 @@ const DiagnosticsCard = () => {
         }
 
         return (
-            <Table striped hover responsive>
+            <PanelTable>
                 <thead>
                     <tr>
                         <th>IP</th>
@@ -78,7 +78,7 @@ const DiagnosticsCard = () => {
                         </tr>
                     )}
                 </tbody>
-            </Table>
+            </PanelTable>
         );
     };
 

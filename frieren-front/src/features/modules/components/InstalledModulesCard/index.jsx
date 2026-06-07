@@ -5,7 +5,6 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useMemo } from 'react';
-import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import { useSetAtom } from 'jotai';
 import { useLocation } from 'wouter';
@@ -13,6 +12,7 @@ import PropTypes from 'prop-types';
 
 import { openLink } from '@src/helpers/actionsHelper.js';
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import TablePagination from '@src/components/TablePagination';
 import SearchInput from '@src/components/SearchInput';
@@ -86,7 +86,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                         placeholder={'Search installed modules...'}
                     />
 
-                    <Table striped hover responsive>
+                    <PanelTable>
                     <thead>
                     <tr>
                         <th>Module</th>
@@ -173,7 +173,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                         </tr>
                     )}
                     </tbody>
-                    </Table>
+                    </PanelTable>
 
                     <TablePagination
                         currentPage={currentPage}

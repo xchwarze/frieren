@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { Table } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import SkeletonBar from '@src/components/SkeletonBar';
+import PanelTable from '@src/components/PanelTable';
 
 /**
  * Renders a skeleton placeholder table with animated bars in each cell.
@@ -19,7 +19,7 @@ import SkeletonBar from '@src/components/SkeletonBar';
  * @return {ReactElement}
  */
 const SkeletonTable = ({ headers, widths, rows = 3, className }) => (
-    <Table className={className} aria-hidden={'true'} striped hover responsive>
+    <PanelTable className={className} aria-hidden={'true'}>
         {headers && (
             <thead>
                 <tr>
@@ -38,7 +38,7 @@ const SkeletonTable = ({ headers, widths, rows = 3, className }) => (
                 </tr>
             ))}
         </tbody>
-    </Table>
+    </PanelTable>
 );
 
 SkeletonTable.propTypes = {

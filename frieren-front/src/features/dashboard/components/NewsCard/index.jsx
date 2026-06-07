@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { Table } from 'react-bootstrap';
-
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import useNews from '@src/features/dashboard/hooks/useNews.js';
 
@@ -33,7 +32,7 @@ const NewsCard = () => {
             const news = data.news ?? [];
 
             return (
-                <Table striped hover responsive>
+                <PanelTable>
                     <thead>
                     <tr>
                         <th>Date</th>
@@ -55,7 +54,7 @@ const NewsCard = () => {
                         </tr>
                     ))}
                     </tbody>
-                </Table>
+                </PanelTable>
             );
         }
 

@@ -5,11 +5,11 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useMemo, useState } from 'react';
-import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import Badge from 'react-bootstrap/Badge';
 
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import TablePagination from '@src/components/TablePagination';
 import SearchInput from '@src/components/SearchInput';
@@ -111,7 +111,7 @@ const ServicesCard = () => {
                     placeholder={'Search services...'}
                 />
 
-                <Table striped hover responsive>
+                <PanelTable>
                     <thead>
                         <tr>
                             <th>Service</th>
@@ -193,7 +193,7 @@ const ServicesCard = () => {
                             </tr>
                         )}
                     </tbody>
-                </Table>
+                </PanelTable>
 
                 <TablePagination
                     currentPage={currentPage}

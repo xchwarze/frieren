@@ -5,10 +5,11 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useCallback } from 'react';
-import { Table, Badge } from 'react-bootstrap';
+import { Badge } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Button from '@src/components/Button';
+import PanelTable from '@src/components/PanelTable';
 import ConfirmationModal from '@src/components/ConfirmationModal';
 import useRemoveInterface from '@src/features/wireless/hooks/useRemoveInterface.js';
 import useToggleInterface from '@src/features/wireless/hooks/useToggleInterface.js';
@@ -78,7 +79,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
             </div>
 
             {radio.interfaces?.length > 0 || hasNewInterface ? (
-                <Table striped hover responsive>
+                <PanelTable>
                     <thead>
                         <tr>
                             <th>Interface</th>
@@ -138,7 +139,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                         ))}
                         {hasNewInterface && <InterfaceSkeletonRow />}
                     </tbody>
-                </Table>
+                </PanelTable>
             ) : (
                 <p className={'text-body-secondary'}>No interfaces configured</p>
             )}

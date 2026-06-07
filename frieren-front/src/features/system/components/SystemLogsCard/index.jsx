@@ -5,9 +5,9 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useMemo } from 'react';
-import { Table } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import SkeletonBar from '@src/components/SkeletonBar';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import SearchInput from '@src/components/SearchInput';
@@ -61,7 +61,7 @@ const SystemLogsCard = () => {
                         placeholder={'Search logs...'}
                         className={'mb-3'}
                     />
-                    <Table striped hover responsive>
+                    <PanelTable>
                         <thead>
                         <tr>
                             <th>Date</th>
@@ -85,7 +85,7 @@ const SystemLogsCard = () => {
                             </tr>
                         )}
                         </tbody>
-                    </Table>
+                    </PanelTable>
                 </>
             );
         }

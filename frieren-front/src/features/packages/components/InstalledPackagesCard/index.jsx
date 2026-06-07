@@ -5,10 +5,10 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useMemo } from 'react';
-import Table from 'react-bootstrap/Table';
 import { useAtomValue, useSetAtom } from 'jotai';
 
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import TablePagination from '@src/components/TablePagination';
 import SearchInput from '@src/components/SearchInput';
@@ -63,7 +63,7 @@ const InstalledPackagesCard = () => {
                     placeholder={'Search installed packages...'}
                 />
 
-                <Table striped hover responsive>
+                <PanelTable>
                     <thead>
                     <tr>
                         <th>Name</th>
@@ -96,7 +96,7 @@ const InstalledPackagesCard = () => {
                         </tr>
                     )}
                     </tbody>
-                </Table>
+                </PanelTable>
 
                 <TablePagination
                     currentPage={currentPage}

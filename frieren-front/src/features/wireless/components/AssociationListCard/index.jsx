@@ -5,9 +5,10 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useMemo } from 'react';
-import { Table, Form, Badge } from 'react-bootstrap';
+import { Form, Badge } from 'react-bootstrap';
 
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import { getSignalVariant } from '@src/features/wireless/helpers/signalHelper.js';
 import useGetWirelessOverview from '@src/features/wireless/hooks/useGetWirelessOverview.js';
 import useGetAssociationList from '@src/features/wireless/hooks/useGetAssociationList.js';
@@ -81,7 +82,7 @@ const AssociationListCard = () => {
                 </Form.Group>
             )}
             {sorted.length > 0 ? (
-                <Table striped hover responsive>
+                <PanelTable>
                     <thead>
                         <tr>
                             {renderSortHeader('mac', 'MAC Address')}
@@ -106,7 +107,7 @@ const AssociationListCard = () => {
                             </tr>
                         ))}
                     </tbody>
-                </Table>
+                </PanelTable>
             ) : (
                 <p className={'text-body-secondary'}>No associated stations</p>
             )}

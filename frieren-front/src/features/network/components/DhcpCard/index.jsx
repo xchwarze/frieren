@@ -5,9 +5,9 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useEffect, useMemo, useState } from 'react';
-import Table from 'react-bootstrap/Table';
 
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import TablePagination from '@src/components/TablePagination';
 import SearchInput from '@src/components/SearchInput';
@@ -93,7 +93,7 @@ const DhcpCard = () => {
                     placeholder={'Search leases...'}
                 />
 
-                <Table striped hover responsive>
+                <PanelTable>
                     <thead>
                         <tr>
                             <th>Hostname</th>
@@ -117,7 +117,7 @@ const DhcpCard = () => {
                             </tr>
                         )}
                     </tbody>
-                </Table>
+                </PanelTable>
 
                 <TablePagination
                     currentPage={currentPage}
@@ -140,7 +140,7 @@ const DhcpCard = () => {
         }
 
         return (
-            <Table striped hover responsive>
+            <PanelTable>
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -172,7 +172,7 @@ const DhcpCard = () => {
                         </tr>
                     )}
                 </tbody>
-            </Table>
+            </PanelTable>
         );
     };
 

@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { Table } from 'react-bootstrap';
-
 import SkeletonBar from '@src/components/SkeletonBar';
+import PanelTable from '@src/components/PanelTable';
 import InterfaceSkeletonRow from './InterfaceSkeletonRow';
 
 const RadioSectionSkeleton = () => (
@@ -16,7 +15,7 @@ const RadioSectionSkeleton = () => (
                 <SkeletonBar width={200} />
             </h6>
         </div>
-        <Table striped hover responsive>
+        <PanelTable>
             <thead>
                 <tr>
                     <th>Interface</th>
@@ -32,7 +31,7 @@ const RadioSectionSkeleton = () => (
                 <InterfaceSkeletonRow />
                 <InterfaceSkeletonRow />
             </tbody>
-        </Table>
+        </PanelTable>
     </div>
 );
 

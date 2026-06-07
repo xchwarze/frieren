@@ -5,10 +5,11 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Modal, Table, Badge, Spinner } from 'react-bootstrap';
+import { Modal, Badge, Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Button from '@src/components/Button';
+import PanelTable from '@src/components/PanelTable';
 import Loading from '@src/components/Loading';
 import { getSignalVariant } from '@src/features/wireless/helpers/signalHelper.js';
 import useScanRadio from '@src/features/wireless/hooks/useScanRadio.js';
@@ -85,7 +86,7 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
         }
 
         return (
-            <Table striped hover responsive>
+            <PanelTable>
                 <thead>
                     <tr>
                         {renderSortHeader('ssid', 'SSID')}
@@ -119,7 +120,7 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
                         </tr>
                     ))}
                 </tbody>
-            </Table>
+            </PanelTable>
         );
     };
 

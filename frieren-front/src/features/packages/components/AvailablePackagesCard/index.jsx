@@ -5,11 +5,11 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState, useMemo, useCallback, memo } from 'react';
-import Table from 'react-bootstrap/Table';
 import { useAtomValue } from 'jotai';
 import PropTypes from 'prop-types';
 
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import SkeletonBar from '@src/components/SkeletonBar';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import TablePagination from '@src/components/TablePagination';
@@ -24,7 +24,7 @@ import availablePackagesAtom from '@src/features/packages/atoms/availablePackage
 import installedPackagesAtom from '@src/features/packages/atoms/installedPackagesAtom.js';
 
 const PackageTable = memo(({ packages, isInstalling, installingName, installedNames, onInstall }) => (
-    <Table striped hover responsive>
+    <PanelTable>
         <thead>
         <tr>
             <th>Name</th>
@@ -59,7 +59,7 @@ const PackageTable = memo(({ packages, isInstalling, installingName, installedNa
             </tr>
         )}
         </tbody>
-    </Table>
+    </PanelTable>
 ));
 
 PackageTable.displayName = 'PackageTable';

@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { Table } from 'react-bootstrap';
-
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import useSystemResume from '@src/features/dashboard/hooks/useSystemResume.js';
 
@@ -25,7 +24,7 @@ const SystemInfoCard = () => {
 
         if (isSuccess) {
             return (
-                <Table striped hover responsive>
+                <PanelTable>
                     <tbody>
                     <tr>
                         <td>Hostname</td>
@@ -52,7 +51,7 @@ const SystemInfoCard = () => {
                         <td>{data.kernel}</td>
                     </tr>
                     </tbody>
-                </Table>
+                </PanelTable>
             );
         }
 

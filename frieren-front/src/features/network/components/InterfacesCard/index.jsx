@@ -5,10 +5,10 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState } from 'react';
-import Table from 'react-bootstrap/Table';
 import Badge from 'react-bootstrap/Badge';
 
 import PanelCard from '@src/components/PanelCard';
+import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import Button from '@src/components/Button';
 import useGetInterfaces from '@src/features/network/hooks/useGetInterfaces.js';
@@ -50,7 +50,7 @@ const InterfacesCard = () => {
         }
 
         return (
-            <Table striped hover responsive>
+            <PanelTable>
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -123,7 +123,7 @@ const InterfacesCard = () => {
                         </tr>
                     )}
                 </tbody>
-            </Table>
+            </PanelTable>
         );
     };
 
