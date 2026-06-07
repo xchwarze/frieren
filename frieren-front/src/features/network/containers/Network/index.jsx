@@ -13,6 +13,12 @@ import PanelTabs from '@src/components/Tabs/PanelTabs';
 import TabTitle from '@src/components/Tabs/TabTitle';
 import ConditionalTabContent from '@src/components/Tabs/ConditionalTabContent';
 
+const TABS = [
+    { key: 'interfaces', title: 'Interfaces', icon: 'share-2', content: <InterfacesCard /> },
+    { key: 'dhcp', title: 'DHCP', icon: 'users', content: <DhcpCard /> },
+    { key: 'diagnostics', title: 'Diagnostics', icon: 'activity', content: <DiagnosticsCard /> },
+];
+
 /**
  * Renders the Network component: interfaces, DHCP leases and diagnostics in tabs.
  *
@@ -20,21 +26,13 @@ import ConditionalTabContent from '@src/components/Tabs/ConditionalTabContent';
  */
 const Network = () => (
     <PanelTabs id={'network'} defaultTab={'interfaces'}>
-        <Tab eventKey={'interfaces'} title={<TabTitle title={'Interfaces'} icon={'share-2'} />}>
-            <ConditionalTabContent id={'network'} eventKey={'interfaces'}>
-                <InterfacesCard />
-            </ConditionalTabContent>
-        </Tab>
-        <Tab eventKey={'dhcp'} title={<TabTitle title={'DHCP'} icon={'users'} />}>
-            <ConditionalTabContent id={'network'} eventKey={'dhcp'}>
-                <DhcpCard />
-            </ConditionalTabContent>
-        </Tab>
-        <Tab eventKey={'diagnostics'} title={<TabTitle title={'Diagnostics'} icon={'activity'} />}>
-            <ConditionalTabContent id={'network'} eventKey={'diagnostics'}>
-                <DiagnosticsCard />
-            </ConditionalTabContent>
-        </Tab>
+        {TABS.map(({ key, title, icon, content }) => (
+            <Tab key={key} eventKey={key} title={<TabTitle title={title} icon={icon} />}>
+                <ConditionalTabContent id={'network'} eventKey={key}>
+                    {content}
+                </ConditionalTabContent>
+            </Tab>
+        ))}
     </PanelTabs>
 );
 

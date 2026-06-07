@@ -13,6 +13,21 @@ import WirelessOverviewCard from '@src/features/wireless/components/WirelessOver
 import AssociationListCard from '@src/features/wireless/components/AssociationListCard';
 import WirelessAdvancedCard from '@src/features/wireless/components/WirelessAdvancedCard';
 
+const TABS = [
+    {
+        key: 'overview',
+        title: 'Overview',
+        icon: 'wifi',
+        content: (
+            <div className={'d-flex flex-column gap-4'}>
+                <WirelessOverviewCard />
+                <AssociationListCard />
+            </div>
+        ),
+    },
+    { key: 'advanced', title: 'Advanced Config', icon: 'sliders', content: <WirelessAdvancedCard /> },
+];
+
 /**
  * Renders the Wireless feature with Overview and Advanced Config tabs.
  *
@@ -20,19 +35,13 @@ import WirelessAdvancedCard from '@src/features/wireless/components/WirelessAdva
  */
 const Wireless = () => (
     <PanelTabs id={'wireless'} defaultTab={'overview'}>
-        <Tab eventKey={'overview'} title={<TabTitle title={'Overview'} icon={'wifi'} />}>
-            <ConditionalTabContent id={'wireless'} eventKey={'overview'}>
-                <div className={'d-flex flex-column gap-4'}>
-                    <WirelessOverviewCard />
-                    <AssociationListCard />
-                </div>
-            </ConditionalTabContent>
-        </Tab>
-        <Tab eventKey={'advanced'} title={<TabTitle title={'Advanced Config'} icon={'sliders'} />}>
-            <ConditionalTabContent id={'wireless'} eventKey={'advanced'}>
-                <WirelessAdvancedCard />
-            </ConditionalTabContent>
-        </Tab>
+        {TABS.map(({ key, title, icon, content }) => (
+            <Tab key={key} eventKey={key} title={<TabTitle title={title} icon={icon} />}>
+                <ConditionalTabContent id={'wireless'} eventKey={key}>
+                    {content}
+                </ConditionalTabContent>
+            </Tab>
+        ))}
     </PanelTabs>
 );
 
