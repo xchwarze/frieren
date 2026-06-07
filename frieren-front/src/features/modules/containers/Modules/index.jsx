@@ -22,7 +22,7 @@ const Modules = () => {
 
     return (
         <>
-            <div className="d-flex flex-column gap-4">
+            <div className="d-flex flex-column gap-3">
                 <AvailableModulesCard availableQuery={availableQuery} installedQuery={installedQuery} />
                 <InstalledModulesCard installedQuery={installedQuery} />
             </div>

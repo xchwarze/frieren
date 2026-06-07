@@ -17,7 +17,7 @@ const TABS = [
         title: 'Info',
         icon: 'info',
         content: (
-            <div className={'d-flex flex-column gap-4'}>
+            <div className={'d-flex flex-column gap-3'}>
                 <UsbDevicesCard />
                 <FileSystemUsageCard />
                 <DiagnosticsCard />

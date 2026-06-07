@@ -83,7 +83,7 @@ const DiagnosticsCard = () => {
     };
 
     return (
-        <div className={'d-flex flex-column gap-4'}>
+        <div className={'d-flex flex-column gap-3'}>
             <PanelCard
                 title={'Diagnostics'}
                 subtitle={'Run network reachability and name resolution tools'}

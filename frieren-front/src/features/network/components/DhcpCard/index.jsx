@@ -174,7 +174,7 @@ const DhcpCard = () => {
 
     return (
         <>
-            <div className={'d-flex flex-column gap-4'}>
+            <div className={'d-flex flex-column gap-3'}>
                 <PanelCard
                     title={'DHCP Leases'}
                     subtitle={'Active DHCP leases'}

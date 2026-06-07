@@ -17,7 +17,7 @@ import NewsCard from '@src/features/dashboard/components/NewsCard';
 const Dashboard = () => (
     <>
         <UpdateAlert />
-        <div className={'d-flex flex-column gap-4'}>
+        <div className={'d-flex flex-column gap-3'}>
             <SystemStatsCard />
             <SystemInfoCard />
             <NewsCard />
