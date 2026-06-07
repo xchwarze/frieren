@@ -22,7 +22,6 @@ const SyncFromBrowserButton = () => {
             variant={'secondary'}
             onClick={mutate}
             loading={isPending}
-            className={'ms-2'}
         />
     );
 };

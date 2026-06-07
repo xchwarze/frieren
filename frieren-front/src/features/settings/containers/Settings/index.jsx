@@ -31,16 +31,12 @@ const Settings = () => {
                 <Col md={6}>
                     <HostnameCard query={query} />
                 </Col>
-            </Row>
-            <Row className={'g-3'}>
                 <Col md={6}>
                     <TerminalSettingsCard query={query} />
                 </Col>
                 <Col md={6}>
                     <UpdateUserPasswordCard />
                 </Col>
-            </Row>
-            <Row className={'g-3'}>
                 <Col md={6}>
                     <PanelThemeCard query={query} />
                 </Col>

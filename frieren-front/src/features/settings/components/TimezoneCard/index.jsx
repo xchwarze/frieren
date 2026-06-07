@@ -52,7 +52,7 @@ const TimezoneCard = ({ query }) => {
                     label={'Timezone'}
                     options={TIMEZONES}
                 />
-                <div className={'d-flex'}>
+                <div className={'d-flex gap-2'}>
                     <SubmitButton />
                     <SyncFromBrowserButton />
                 </div>
