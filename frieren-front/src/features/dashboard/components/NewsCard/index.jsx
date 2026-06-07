@@ -29,7 +29,9 @@ const NewsCard = () => {
             );
         }
 
-        if (isSuccess && data.news?.length > 0) {
+        if (isSuccess) {
+            const news = data.news ?? [];
+
             return (
                 <Table striped hover responsive>
                     <thead>
@@ -40,8 +42,13 @@ const NewsCard = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {data.news.map((item, index) => (
-                        <tr key={index}>
+                    {news.length === 0 && (
+                        <tr>
+                            <td colSpan={3}>No news found.</td>
+                        </tr>
+                    )}
+                    {news.map((item) => (
+                        <tr key={`${item.date}-${item.title}`}>
                             <td>{item.date}</td>
                             <td>{item.title}</td>
                             <td dangerouslySetInnerHTML={{ __html: item.description }} />

@@ -20,12 +20,12 @@ const SystemInfoCard = () => {
 
     const renderContent = () => {
         if (isLoading) {
-            return <SkeletonTable widths={[120, 180]} rows={6} className={'mt-4'} />;
+            return <SkeletonTable widths={[120, 180]} rows={6} />;
         }
 
         if (isSuccess) {
             return (
-                <Table className={'mt-4'} striped hover responsive>
+                <Table striped hover responsive>
                     <tbody>
                     <tr>
                         <td>Hostname</td>

@@ -26,13 +26,13 @@ const SystemStatsCard = () => {
     const renderContent = () => {
         if (isLoading) {
             return (
-                <div className={'d-flex justify-content-evenly mt-2'}>
+                <div className={'d-flex justify-content-evenly'}>
                     {STATS.map(({ label, width }) => (
                         <div key={label} className={'text-center'}>
                             <p className={'fs-4 mb-0'}>
                                 <SkeletonBar width={width} />
                             </p>
-                            <span className={'text-muted text-uppercase'}>{label}</span>
+                            <span className={'text-body-secondary text-uppercase'}>{label}</span>
                         </div>
                     ))}
                 </div>
@@ -41,11 +41,11 @@ const SystemStatsCard = () => {
 
         if (isSuccess) {
             return (
-                <div className={'d-flex justify-content-evenly mt-2'}>
+                <div className={'d-flex justify-content-evenly'}>
                     {STATS.map(({ key, label }) => (
                         <div key={label} className={'text-center'}>
                             <p className={'fs-4 mb-0'}>{data?.[key] ?? ''}</p>
-                            <span className={'text-muted text-uppercase'}>{label}</span>
+                            <span className={'text-body-secondary text-uppercase'}>{label}</span>
                         </div>
                     ))}
                 </div>
