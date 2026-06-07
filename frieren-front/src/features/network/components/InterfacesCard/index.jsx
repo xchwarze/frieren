@@ -5,7 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useState } from 'react';
-import Badge from 'react-bootstrap/Badge';
+import StatusBadge from '@src/components/StatusBadge';
 
 import PanelCard from '@src/components/PanelCard';
 import PanelTable from '@src/components/PanelTable';
@@ -79,9 +79,9 @@ const InterfacesCard = () => {
                                 </td>
                                 <td>{iface.gateway || '-'}</td>
                                 <td>
-                                    <Badge bg={iface.up ? 'success' : 'secondary'}>
+                                    <StatusBadge status={iface.up ? 'up' : 'down'}>
                                         {iface.up ? 'Up' : 'Down'}
-                                    </Badge>
+                                    </StatusBadge>
                                 </td>
                                 <td>{iface.device || '-'}</td>
                                 <td>{iface.uptime || '-'}</td>

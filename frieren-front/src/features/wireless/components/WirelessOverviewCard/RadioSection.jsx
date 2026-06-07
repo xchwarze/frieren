@@ -9,6 +9,7 @@ import { Badge } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Button from '@src/components/Button';
+import StatusBadge from '@src/components/StatusBadge';
 import ActionButtons from '@src/components/ActionButtons';
 import PanelTable from '@src/components/PanelTable';
 import ConfirmationModal from '@src/components/ConfirmationModal';
@@ -48,9 +49,9 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                 <h6 className={'mb-0'}>
                     {radioName.toUpperCase()}
                     <Badge bg={'secondary'} className={'ms-2'}>{radio.band || 'Unknown'}</Badge>
-                    <Badge bg={radio.disabled ? 'danger' : (radio.up ? 'success' : 'warning')} className={'ms-1'}>
+                    <StatusBadge status={radio.disabled ? 'disabled' : (radio.up ? 'up' : 'degraded')} className={'ms-1'}>
                         {radio.disabled ? 'Disabled' : (radio.up ? 'Up' : 'Down')}
-                    </Badge>
+                    </StatusBadge>
                     <small className={'text-body-secondary ms-2'}>
                         {radio.hardware ? `${radio.hardware} | ` : ''}
                         Channel {radio.channel} | {radio.htmode}
@@ -104,9 +105,9 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                                     <td><code>{iface.bssid || '-'}</code></td>
                                     <td>{iface.encryption || 'None'}</td>
                                     <td>
-                                        <Badge bg={iface.disabled ? 'secondary' : (iface.up ? 'success' : 'danger')}>
+                                        <StatusBadge status={iface.disabled ? 'disabled' : (iface.up ? 'up' : 'degraded')}>
                                             {iface.disabled ? 'Disabled' : (iface.up ? 'Up' : 'Down')}
-                                        </Badge>
+                                        </StatusBadge>
                                     </td>
                                     <td>
                                         <ActionButtons>

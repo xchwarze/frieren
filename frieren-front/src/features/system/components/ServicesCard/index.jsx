@@ -7,6 +7,7 @@
 import { useMemo, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Badge from 'react-bootstrap/Badge';
+import StatusBadge from '@src/components/StatusBadge';
 
 import PanelCard from '@src/components/PanelCard';
 import PanelTable from '@src/components/PanelTable';
@@ -150,9 +151,9 @@ const ServicesCard = () => {
                                         />
                                     </td>
                                     <td>
-                                        <Badge bg={svc.running ? 'success' : 'secondary'}>
+                                        <StatusBadge status={svc.running ? 'running' : 'stopped'}>
                                             {svc.running ? 'Running' : 'Stopped'}
-                                        </Badge>
+                                        </StatusBadge>
                                     </td>
                                     <td>
                                         <ActionButtons>
