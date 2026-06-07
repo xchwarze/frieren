@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import FormProvider from '@src/components/Form/FormProvider';
 import InputField from '@src/components/Form/InputField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import FormActions from '@src/components/FormActions';
 import useAddStaticLease from '@src/features/network/hooks/useAddStaticLease.js';
 import { staticLeaseSchema } from '@src/features/network/helpers/validationSchemas.js';
 
@@ -47,12 +48,12 @@ const AddStaticLeaseModal = ({ show, onHide }) => {
                         <InputField name={'name'} label={'Name'} placeholder={'my-device'} />
                         <InputField name={'mac'} label={'MAC Address'} placeholder={'00:11:22:33:44:55'} />
                         <InputField name={'ip'} label={'IP Address'} placeholder={'192.168.1.50'} />
-                        <div className={'d-flex justify-content-end gap-2'}>
+                        <FormActions>
                             <SubmitButton label={'Add'} icon={'plus'} />
                             <BaseButton variant={'secondary'} onClick={onHide}>
                                 Cancel
                             </BaseButton>
-                        </div>
+                        </FormActions>
                     </FormProvider>
                 )}
             </Modal.Body>

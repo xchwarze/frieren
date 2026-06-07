@@ -13,6 +13,7 @@ import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import FormActions from '@src/components/FormActions';
 import { radioConfigSchema } from '@src/features/wireless/helpers/validationSchemas.js';
 import useGetRadioConfig from '@src/features/wireless/hooks/useGetRadioConfig.js';
 import useSetRadioConfig from '@src/features/wireless/hooks/useSetRadioConfig.js';
@@ -75,12 +76,12 @@ const RadioConfigForm = ({ radio, onHide }) => {
             <SelectField name={'htmode'} label={'Mode / Bandwidth'} options={htmodeOptions} />
             <SelectField name={'country'} label={'Country'} options={countryOptions} />
             <SwitchField name={'disabled'} label={'Disabled'} />
-            <div className={'d-flex justify-content-end gap-2'}>
+            <FormActions>
                 <SubmitButton />
                 <BaseButton variant={'secondary'} onClick={onHide}>
                     Cancel
                 </BaseButton>
-            </div>
+            </FormActions>
         </FormProvider>
     );
 };

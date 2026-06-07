@@ -12,6 +12,7 @@ import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import FormActions from '@src/components/FormActions';
 import { MODE_OPTIONS } from '@src/features/wireless/helpers/constants.js';
 import { interfaceSchema } from '@src/features/wireless/helpers/validationSchemas.js';
 import useAddInterface from '@src/features/wireless/hooks/useAddInterface.js';
@@ -61,12 +62,12 @@ const InterfaceForm = ({ radio, section, onHide, defaultValues, onInterfaceSaved
                 name={'disabled'}
                 label={'Disabled'}
             />
-            <div className={'d-flex justify-content-end gap-2'}>
+            <FormActions>
                 <SubmitButton label={isEditMode ? 'Save' : 'Add Interface'} />
                 <BaseButton variant={'secondary'} onClick={onHide}>
                     Cancel
                 </BaseButton>
-            </div>
+            </FormActions>
         </FormProvider>
     );
 };

@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import FormActions from '@src/components/FormActions';
 import useSetInterface from '@src/features/network/hooks/useSetInterface.js';
 import { PROTO_OPTIONS } from '@src/features/network/helpers/constants.js';
 import { interfaceSchema } from '@src/features/network/helpers/validationSchemas.js';
@@ -49,12 +50,12 @@ const InterfaceForm = ({ name, defaultValues, onHide }) => {
                 options={PROTO_OPTIONS}
             />
             <ProtoAwareFields />
-            <div className={'d-flex justify-content-end gap-2'}>
+            <FormActions>
                 <SubmitButton label={'Save'} />
                 <BaseButton variant={'secondary'} onClick={onHide}>
                     Cancel
                 </BaseButton>
-            </div>
+            </FormActions>
         </FormProvider>
     );
 };
