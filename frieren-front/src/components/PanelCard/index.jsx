@@ -32,10 +32,11 @@ const PanelCard = ({
                        showRefresh = true,
                        refetch,
                        isFetching,
+                       className = '',
                        children,
                        ...rest
                    }) => (
-    <Card {...rest}>
+    <Card className={`panel-card ${className}`.trim()} {...rest}>
         <Card.Body>
             <div className={'mb-3'}>
                 <Card.Title className={'panel-card-title'}>
@@ -71,6 +72,7 @@ PanelCard.propTypes = {
     showRefresh: PropTypes.bool,
     refetch: PropTypes.func,
     isFetching: PropTypes.bool,
+    className: PropTypes.string,
     children: PropTypes.node.isRequired,
 };
 
