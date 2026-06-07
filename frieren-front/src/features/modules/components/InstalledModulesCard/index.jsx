@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
+import { useState, useMemo } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import { useSetAtom } from 'jotai';
@@ -13,8 +14,12 @@ import PropTypes from 'prop-types';
 import { openLink } from '@src/helpers/actionsHelper.js';
 import PanelCard from '@src/components/PanelCard';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
+import TablePagination from '@src/components/TablePagination';
+import SearchInput from '@src/components/SearchInput';
 import Icon from '@src/components/Icon';
 import ModuleIcon from '@src/components/ModuleIcon';
+import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
+import usePagination from '@src/hooks/usePagination.js';
 import selectedInstalledModuleAtom from '@src/features/modules/atoms/selectedInstalledModuleAtom.js';
 import sortModulesByName from '@src/features/modules/helpers/sortModulesByName.js';
 import usePinModule from '@src/features/modules/hooks/usePinModule.js';
@@ -30,6 +35,21 @@ const InstalledModulesCard = ({ installedQuery }) => {
     const { mutate: pinModuleMutation, isPending: isPinPending } = usePinModule();
     const [, navigate] = useLocation();
     const { data, isSuccess, isLoading, isFetching, refetch } = installedQuery;
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearch = useDebouncedValue(searchTerm);
+
+    const filteredModules = useMemo(() => {
+        const modules = sortModulesByName(data ?? []);
+        if (!debouncedSearch) {
+            return modules;
+        }
+        const term = debouncedSearch.toLowerCase();
+        return modules.filter((module) =>
+            module.title.toLowerCase().includes(term)
+        );
+    }, [data, debouncedSearch]);
+
+    const { pageData, currentPage, totalPages, setCurrentPage } = usePagination(filteredModules);
 
     const handleLaunchClick = ({ name }) => {
         navigate(`/${name}`);
@@ -58,10 +78,15 @@ const InstalledModulesCard = ({ installedQuery }) => {
         }
 
         if (isSuccess) {
-            const modules = sortModulesByName(data);
-
             return (
-                <Table striped hover responsive>
+                <>
+                    <SearchInput
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        placeholder={'Search installed modules...'}
+                    />
+
+                    <Table striped hover responsive>
                     <thead>
                     <tr>
                         <th>Module</th>
@@ -73,7 +98,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {modules.map((module) => {
+                    {pageData.map((module) => {
                         const { name, title, icon, description, author, version, size, repository, bugs, sidebar, forceSidebar, system } = module;
                         return (
                             <tr key={name}>
@@ -142,13 +167,21 @@ const InstalledModulesCard = ({ installedQuery }) => {
                             </tr>
                         );
                     })}
-                    {modules.length === 0 && (
+                    {filteredModules.length === 0 && (
                         <tr>
                             <td colSpan={6}>There are no modules installed yet.</td>
                         </tr>
                     )}
                     </tbody>
-                </Table>
+                    </Table>
+
+                    <TablePagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                        totalItems={filteredModules.length}
+                    />
+                </>
             );
         }
 

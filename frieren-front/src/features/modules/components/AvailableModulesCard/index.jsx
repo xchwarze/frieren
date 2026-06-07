@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
+import { useState, useMemo } from 'react';
 import { Table } from 'react-bootstrap';
 import { useSetAtom } from 'jotai';
 import PropTypes from 'prop-types';
@@ -11,7 +12,11 @@ import PropTypes from 'prop-types';
 import { openLink } from '@src/helpers/actionsHelper.js';
 import PanelCard from '@src/components/PanelCard';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
+import TablePagination from '@src/components/TablePagination';
+import SearchInput from '@src/components/SearchInput';
 import Button from '@src/components/Button';
+import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
+import usePagination from '@src/hooks/usePagination.js';
 import { installModuleAtom } from '@src/features/modules/atoms/installModuleAtom.js';
 import sortModulesByName from '@src/features/modules/helpers/sortModulesByName.js';
 
@@ -26,6 +31,21 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
     const setSelectedRemoteModule = useSetAtom(installModuleAtom);
     const { data, isSuccess, isFetching, refetch } = availableQuery;
     const { data: installedModules = [] } = installedQuery;
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearch = useDebouncedValue(searchTerm);
+
+    const filteredModules = useMemo(() => {
+        const modules = sortModulesByName(data ?? []);
+        if (!debouncedSearch) {
+            return modules;
+        }
+        const term = debouncedSearch.toLowerCase();
+        return modules.filter((module) =>
+            module.title.toLowerCase().includes(term)
+        );
+    }, [data, debouncedSearch]);
+
+    const { pageData, currentPage, totalPages, setCurrentPage } = usePagination(filteredModules);
 
     const checkInstalled = (newModule) => (
         installedModules.some((module) => module.name === newModule.name)
@@ -50,10 +70,15 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
         }
 
         if (isSuccess) {
-            const modules = sortModulesByName(data);
-
             return (
-                <Table striped hover responsive>
+                <>
+                    <SearchInput
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        placeholder={'Search available modules...'}
+                    />
+
+                    <Table striped hover responsive>
                     <thead>
                     <tr>
                         <th>Module</th>
@@ -65,7 +90,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {modules.map((module) => (
+                    {pageData.map((module) => (
                         <tr key={module.name}>
                             <td>{module.title}</td>
                             <td>{module.description}</td>
@@ -103,13 +128,21 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                             </td>
                         </tr>
                     ))}
-                    {modules.length === 0 && (
+                    {filteredModules.length === 0 && (
                         <tr>
                             <td colSpan={6}>No modules found.</td>
                         </tr>
                     )}
                     </tbody>
-                </Table>
+                    </Table>
+
+                    <TablePagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                        totalItems={filteredModules.length}
+                    />
+                </>
             );
         }
 
