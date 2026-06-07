@@ -10,6 +10,7 @@ import SystemLogsCard from '@src/features/system/components/SystemLogsCard';
 import DiagnosticsCard from '@src/features/system/components/DiagnosticsCard';
 import ServicesCard from '@src/features/system/components/ServicesCard';
 import PanelTabs, { renderPanelTab } from '@src/components/Tabs/PanelTabs';
+import PanelStack from '@src/components/PanelCard/PanelStack';
 
 const TABS = [
     {
@@ -17,11 +18,11 @@ const TABS = [
         title: 'Info',
         icon: 'info',
         content: (
-            <div className={'d-flex flex-column gap-3'}>
+            <PanelStack>
                 <UsbDevicesCard />
                 <FileSystemUsageCard />
                 <DiagnosticsCard />
-            </div>
+            </PanelStack>
         ),
     },
     { key: 'services', title: 'Services', icon: 'server', content: <ServicesCard /> },

@@ -8,6 +8,7 @@ import UpdateAlert from '@src/features/dashboard/components/UpdateAlert';
 import SystemStatsCard from '@src/features/dashboard/components/SystemStatsCard';
 import SystemInfoCard from '@src/features/dashboard/components/SystemInfoCard';
 import NewsCard from '@src/features/dashboard/components/NewsCard';
+import PanelStack from '@src/components/PanelCard/PanelStack';
 
 /**
  * Renders the Dashboard component, displaying system stats, system info, and news.
@@ -17,11 +18,11 @@ import NewsCard from '@src/features/dashboard/components/NewsCard';
 const Dashboard = () => (
     <>
         <UpdateAlert />
-        <div className={'d-flex flex-column gap-3'}>
+        <PanelStack>
             <SystemStatsCard />
             <SystemInfoCard />
             <NewsCard />
-        </div>
+        </PanelStack>
     </>
 );
 

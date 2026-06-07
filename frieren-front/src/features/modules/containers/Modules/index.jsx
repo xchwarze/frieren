@@ -10,6 +10,7 @@ import AvailableModulesCard from '@src/features/modules/components/AvailableModu
 import InstalledModulesCard from '@src/features/modules/components/InstalledModulesCard';
 import InstallModal from '@src/features/modules/components/InstallModal';
 import ConfirmationModalWrapper from '@src/features/modules/components/ConfirmationModalWrapper';
+import PanelStack from '@src/components/PanelCard/PanelStack';
 
 /**
  * Creates and returns the Modules component, which renders various module related cards and modals.
@@ -22,10 +23,10 @@ const Modules = () => {
 
     return (
         <>
-            <div className="d-flex flex-column gap-3">
+            <PanelStack>
                 <AvailableModulesCard availableQuery={availableQuery} installedQuery={installedQuery} />
                 <InstalledModulesCard installedQuery={installedQuery} />
-            </div>
+            </PanelStack>
             <InstallModal />
             <ConfirmationModalWrapper />
         </>

@@ -7,6 +7,7 @@
 import AvailablePackagesCard from '@src/features/packages/components/AvailablePackagesCard';
 import InstalledPackagesCard from '@src/features/packages/components/InstalledPackagesCard';
 import ConfirmationModalWrapper from '@src/features/packages/components/ConfirmationModalWrapper';
+import PanelStack from '@src/components/PanelCard/PanelStack';
 
 /**
  * Main packages container.
@@ -15,10 +16,10 @@ import ConfirmationModalWrapper from '@src/features/packages/components/Confirma
  */
 const Packages = () => (
     <>
-        <div className="d-flex flex-column gap-3">
+        <PanelStack>
             <AvailablePackagesCard />
             <InstalledPackagesCard />
-        </div>
+        </PanelStack>
         <ConfirmationModalWrapper />
     </>
 );

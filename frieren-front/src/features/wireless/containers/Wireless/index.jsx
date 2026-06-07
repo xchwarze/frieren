@@ -5,6 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import PanelTabs, { renderPanelTab } from '@src/components/Tabs/PanelTabs';
+import PanelStack from '@src/components/PanelCard/PanelStack';
 import WirelessOverviewCard from '@src/features/wireless/components/WirelessOverviewCard';
 import AssociationListCard from '@src/features/wireless/components/AssociationListCard';
 import WirelessAdvancedCard from '@src/features/wireless/components/WirelessAdvancedCard';
@@ -15,10 +16,10 @@ const TABS = [
         title: 'Overview',
         icon: 'wifi',
         content: (
-            <div className={'d-flex flex-column gap-3'}>
+            <PanelStack>
                 <WirelessOverviewCard />
                 <AssociationListCard />
-            </div>
+            </PanelStack>
         ),
     },
     { key: 'advanced', title: 'Advanced Config', icon: 'sliders', content: <WirelessAdvancedCard /> },

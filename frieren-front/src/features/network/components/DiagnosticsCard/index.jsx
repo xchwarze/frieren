@@ -11,6 +11,7 @@ import PanelCard from '@src/components/PanelCard';
 import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import Button from '@src/components/Button';
+import PanelStack from '@src/components/PanelCard/PanelStack';
 import useRunPing from '@src/features/network/hooks/useRunPing.js';
 import useRunTraceroute from '@src/features/network/hooks/useRunTraceroute.js';
 import useRunNslookup from '@src/features/network/hooks/useRunNslookup.js';
@@ -83,7 +84,7 @@ const DiagnosticsCard = () => {
     };
 
     return (
-        <div className={'d-flex flex-column gap-3'}>
+        <PanelStack>
             <PanelCard
                 title={'Diagnostics'}
                 subtitle={'Run network reachability and name resolution tools'}
@@ -146,7 +147,7 @@ const DiagnosticsCard = () => {
             >
                 {renderArpTable()}
             </PanelCard>
-        </div>
+        </PanelStack>
     );
 };
 

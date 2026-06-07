@@ -13,6 +13,7 @@ import TablePagination from '@src/components/TablePagination';
 import SearchInput from '@src/components/SearchInput';
 import Button from '@src/components/Button';
 import ConfirmationModal from '@src/components/ConfirmationModal';
+import PanelStack from '@src/components/PanelCard/PanelStack';
 import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
 import usePagination from '@src/hooks/usePagination.js';
 import useGetDhcpLeases from '@src/features/network/hooks/useGetDhcpLeases.js';
@@ -174,7 +175,7 @@ const DhcpCard = () => {
 
     return (
         <>
-            <div className={'d-flex flex-column gap-3'}>
+            <PanelStack>
                 <PanelCard
                     title={'DHCP Leases'}
                     subtitle={'Active DHCP leases'}
@@ -200,7 +201,7 @@ const DhcpCard = () => {
 
                     {renderStaticLeases()}
                 </PanelCard>
-            </div>
+            </PanelStack>
 
             <AddStaticLeaseModal
                 show={adding}
