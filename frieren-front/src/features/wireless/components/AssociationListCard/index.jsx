@@ -47,7 +47,18 @@ const AssociationListCard = () => {
     ), [clientList, sortField]);
 
     const renderSortHeader = (field, label) => (
-        <th role={'button'} onClick={() => setSortField(field)}>
+        <th
+            role={'button'}
+            tabIndex={0}
+            aria-sort={sortField === field ? 'descending' : 'none'}
+            onClick={() => setSortField(field)}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSortField(field);
+                }
+            }}
+        >
             {label} {sortField === field && '▼'}
         </th>
     );
@@ -55,9 +66,9 @@ const AssociationListCard = () => {
     return (
         <PanelCard
             title={'Associated Stations'}
+            subtitle={'Associated clients'}
             isFetching={isFetching}
             refetch={refetch}
-            className={'mt-4'}
         >
             {allInterfaces.length > 0 && (
                 <Form.Group className={'mb-3'}>
@@ -81,8 +92,8 @@ const AssociationListCard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {sorted.map((client, idx) => (
-                            <tr key={idx}>
+                        {sorted.map((client) => (
+                            <tr key={client.mac}>
                                 <td><code>{client.mac}</code></td>
                                 <td>
                                     <Badge bg={getSignalVariant(client.signal)}>
@@ -97,7 +108,7 @@ const AssociationListCard = () => {
                     </tbody>
                 </Table>
             ) : (
-                <p className={'text-muted'}>No associated stations</p>
+                <p className={'text-body-secondary'}>No associated stations</p>
             )}
         </PanelCard>
     );

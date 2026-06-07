@@ -41,7 +41,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
     }, [removeInterface, confirmRemove]);
 
     return (
-        <div className={'mb-5'}>
+        <div className={'mb-4'}>
             <div className={'d-flex align-items-center justify-content-between mb-2'}>
                 <h6 className={'mb-0'}>
                     {radioName.toUpperCase()}
@@ -49,7 +49,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                     <Badge bg={radio.disabled ? 'danger' : (radio.up ? 'success' : 'warning')} className={'ms-1'}>
                         {radio.disabled ? 'Disabled' : (radio.up ? 'Up' : 'Down')}
                     </Badge>
-                    <small className={'text-muted ms-2'}>
+                    <small className={'text-body-secondary ms-2'}>
                         {radio.hardware ? `${radio.hardware} | ` : ''}
                         Channel {radio.channel} | {radio.htmode}
                         {radio.hwmodes ? ` | ${radio.hwmodes}` : ''}
@@ -91,11 +91,11 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                         </tr>
                     </thead>
                     <tbody>
-                        {radio.interfaces?.map((iface, idx) => (
+                        {radio.interfaces?.map((iface) => (
                             isCheckingRadio && checkingSection === iface.section ? (
-                                <InterfaceSkeletonRow key={idx} />
+                                <InterfaceSkeletonRow key={iface.section} />
                             ) : (
-                                <tr key={idx}>
+                                <tr key={iface.section}>
                                     <td>{iface.ifname || iface.section}</td>
                                     <td>{iface.ssid || '-'}</td>
                                     <td>{iface.mode}</td>
@@ -140,7 +140,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                     </tbody>
                 </Table>
             ) : (
-                <p className={'text-muted'}>No interfaces configured</p>
+                <p className={'text-body-secondary'}>No interfaces configured</p>
             )}
 
             <ConfirmationModal

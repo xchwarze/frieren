@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Modal, Table, Badge, Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
@@ -45,12 +45,31 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
         }
     }, [scanData, mergeResults]);
 
-    const sortedResults = results.slice().sort((left, right) => {
-        if (sortField === 'signal') return (right.signal ?? -999) - (left.signal ?? -999);
-        if (sortField === 'channel') return (left.channel ?? 0) - (right.channel ?? 0);
-        if (sortField === 'ssid') return (left.ssid || '').localeCompare(right.ssid || '');
-        return 0;
-    });
+    const sortedResults = useMemo(() => (
+        results.slice().sort((left, right) => {
+            if (sortField === 'signal') return (right.signal ?? -999) - (left.signal ?? -999);
+            if (sortField === 'channel') return (left.channel ?? 0) - (right.channel ?? 0);
+            if (sortField === 'ssid') return (left.ssid || '').localeCompare(right.ssid || '');
+            return 0;
+        })
+    ), [results, sortField]);
+
+    const renderSortHeader = (field, label) => (
+        <th
+            role={'button'}
+            tabIndex={0}
+            aria-sort={sortField === field ? (field === 'channel' ? 'ascending' : 'descending') : 'none'}
+            onClick={() => setSortField(field)}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSortField(field);
+                }
+            }}
+        >
+            {label}
+        </th>
+    );
 
     const renderBody = () => {
         if (results.length === 0 && isFetching) {
@@ -62,24 +81,24 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
         }
 
         if (results.length === 0) {
-            return <p className={'text-muted'}>No networks found.</p>;
+            return <p className={'text-body-secondary'}>No networks found.</p>;
         }
 
         return (
             <Table striped hover responsive>
                 <thead>
                     <tr>
-                        <th role={'button'} onClick={() => setSortField('ssid')}>SSID</th>
+                        {renderSortHeader('ssid', 'SSID')}
                         <th>BSSID</th>
-                        <th role={'button'} onClick={() => setSortField('channel')}>Ch</th>
-                        <th role={'button'} onClick={() => setSortField('signal')}>Signal</th>
+                        {renderSortHeader('channel', 'Ch')}
+                        {renderSortHeader('signal', 'Signal')}
                         <th>Security</th>
-                        <th></th>
+                        <th className={'visually-hidden'}>Connect</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedResults.map((net, idx) => (
-                        <tr key={idx}>
+                    {sortedResults.map((net) => (
+                        <tr key={net.bssid}>
                             <td>{net.ssid || '(hidden)'}</td>
                             <td><code>{net.bssid}</code></td>
                             <td>{net.channel}</td>
@@ -109,7 +128,7 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
             <Modal.Header closeButton>
                 <Modal.Title>
                     Scan Results
-                    {radioName && <small className={'text-muted ms-2 fs-6'}>{radioName}</small>}
+                    {radioName && <small className={'text-body-secondary ms-2 fs-6'}>{radioName}</small>}
                     {isFetching && results.length > 0 && (
                         <Spinner animation={'border'} size={'sm'} className={'ms-2'} />
                     )}
@@ -119,7 +138,7 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
                 {renderBody()}
             </Modal.Body>
             <Modal.Footer>
-                <small className={'text-muted me-auto'}>
+                <small className={'text-body-secondary me-auto'}>
                     {results.length} network{results.length !== 1 ? 's' : ''} found
                     {isFetching ? ' · scanning…' : ''}
                 </small>

@@ -98,7 +98,12 @@ const WirelessOverviewCard = () => {
     };
 
     return (
-        <PanelCard title={'Wireless Overview'} isFetching={isFetching} refetch={refetch}>
+        <PanelCard
+            title={'Wireless Overview'}
+            subtitle={'Radios and configured interfaces'}
+            isFetching={isFetching}
+            refetch={refetch}
+        >
             {renderContent()}
 
             <ScanModal

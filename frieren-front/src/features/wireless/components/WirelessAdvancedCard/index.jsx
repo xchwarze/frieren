@@ -53,52 +53,48 @@ const WirelessAdvancedCard = () => {
     };
 
     return (
-        <>
-            <PanelCard
-                title={'Raw Wireless Config'}
-                subtitle={'Edit /etc/config/wireless directly. Changes are applied immediately via wifi reload.'}
-                showRefresh={true}
-                refetch={refetch}
-                isFetching={isBusy}
-            >
-                <Form.Control
-                    as={'textarea'}
-                    rows={20}
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
+        <PanelCard
+            title={'Raw Wireless Config'}
+            subtitle={'Edit /etc/config/wireless directly. Changes are applied immediately via wifi reload.'}
+            showRefresh={true}
+            refetch={refetch}
+            isFetching={isBusy}
+        >
+            <Form.Control
+                as={'textarea'}
+                rows={20}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                disabled={isBusy}
+                className={'font-monospace'}
+                spellCheck={false}
+            />
+            <div className={'d-flex justify-content-end gap-2 mt-3'}>
+                <Button
+                    icon={'save'}
+                    label={'Save & Reload'}
+                    loading={isSaving}
                     disabled={isBusy}
-                    className={'font-monospace'}
-                    spellCheck={false}
+                    onClick={handleSave}
                 />
-                <div className={'d-flex justify-content-end gap-2 mt-3'}>
-                    <Button
-                        icon={'save'}
-                        label={'Save & Reload'}
-                        loading={isSaving}
-                        disabled={isBusy}
-                        onClick={handleSave}
-                    />
-                    <Button
-                        icon={'rotate-ccw'}
-                        label={'Reset to Defaults'}
-                        variant={'outline-danger'}
-                        loading={isResetting}
-                        disabled={isBusy}
-                        onClick={() => setShowResetModal(true)}
-                    />
-                </div>
-                <ConfirmationModal
-                    show={showResetModal}
-                    onHide={() => setShowResetModal(false)}
-                    onConfirm={handleReset}
-                    title={'Reset Wireless Config'}
-                    description={'This will regenerate /etc/config/wireless from hardware defaults using "wifi config". All custom configuration will be lost. Are you sure?'}
-                    isConfirmLoading={isResetting}
+                <Button
+                    icon={'rotate-ccw'}
+                    label={'Reset to Defaults'}
+                    variant={'outline-danger'}
+                    loading={isResetting}
+                    disabled={isBusy}
+                    onClick={() => setShowResetModal(true)}
                 />
-            </PanelCard>
-
-
-        </>
+            </div>
+            <ConfirmationModal
+                show={showResetModal}
+                onHide={() => setShowResetModal(false)}
+                onConfirm={handleReset}
+                title={'Reset Wireless Config'}
+                description={'This will regenerate /etc/config/wireless from hardware defaults using "wifi config". All custom configuration will be lost. Are you sure?'}
+                isConfirmLoading={isResetting}
+            />
+        </PanelCard>
     );
 };
 

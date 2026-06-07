@@ -22,8 +22,10 @@ const Wireless = () => (
     <PanelTabs id={'wireless'} defaultTab={'overview'}>
         <Tab eventKey={'overview'} title={<TabTitle title={'Overview'} icon={'wifi'} />}>
             <ConditionalTabContent id={'wireless'} eventKey={'overview'}>
-                <WirelessOverviewCard />
-                <AssociationListCard />
+                <div className={'d-flex flex-column gap-4'}>
+                    <WirelessOverviewCard />
+                    <AssociationListCard />
+                </div>
             </ConditionalTabContent>
         </Tab>
         <Tab eventKey={'advanced'} title={<TabTitle title={'Advanced Config'} icon={'sliders'} />}>

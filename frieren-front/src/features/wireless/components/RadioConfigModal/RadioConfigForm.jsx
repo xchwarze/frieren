@@ -5,6 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useCallback } from 'react';
+import { Button as BaseButton } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Loading from '@src/components/Loading';
@@ -76,6 +77,9 @@ const RadioConfigForm = ({ radio, onHide }) => {
             <SwitchField name={'disabled'} label={'Disabled'} />
             <div className={'d-flex justify-content-end gap-2'}>
                 <SubmitButton />
+                <BaseButton variant={'secondary'} onClick={onHide}>
+                    Cancel
+                </BaseButton>
             </div>
         </FormProvider>
     );
