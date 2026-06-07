@@ -14,6 +14,7 @@ import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import TablePagination from '@src/components/TablePagination';
 import SearchInput from '@src/components/SearchInput';
 import Button from '@src/components/Button';
+import ActionButtons from '@src/components/ActionButtons';
 import ConfirmationModal from '@src/components/ConfirmationModal';
 import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
 import usePagination from '@src/hooks/usePagination.js';
@@ -154,7 +155,7 @@ const ServicesCard = () => {
                                         </Badge>
                                     </td>
                                     <td>
-                                        <div className={'d-flex gap-1'}>
+                                        <ActionButtons>
                                             <Button
                                                 icon={'play'}
                                                 variant={'outline-success'}
@@ -182,7 +183,7 @@ const ServicesCard = () => {
                                                 disabled={busy}
                                                 onClick={() => requestAction({ type: 'control', name: svc.name, command: 'restart' })}
                                             />
-                                        </div>
+                                        </ActionButtons>
                                     </td>
                                 </tr>
                             );

@@ -9,6 +9,7 @@ import { Badge } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Button from '@src/components/Button';
+import ActionButtons from '@src/components/ActionButtons';
 import PanelTable from '@src/components/PanelTable';
 import ConfirmationModal from '@src/components/ConfirmationModal';
 import useRemoveInterface from '@src/features/wireless/hooks/useRemoveInterface.js';
@@ -56,7 +57,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                         {radio.hwmodes ? ` | ${radio.hwmodes}` : ''}
                     </small>
                 </h6>
-                <div className={'d-flex gap-1'}>
+                <ActionButtons>
                     <Button
                         size={'sm'}
                         variant={'outline-secondary'}
@@ -75,7 +76,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                         icon={'plus'}
                         onClick={() => onAdd(radioName)}
                     />
-                </div>
+                </ActionButtons>
             </div>
 
             {radio.interfaces?.length > 0 || hasNewInterface ? (
@@ -108,7 +109,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                                         </Badge>
                                     </td>
                                     <td>
-                                        <div className={'d-flex gap-1'}>
+                                        <ActionButtons>
                                             <Button
                                                 size={'sm'}
                                                 variant={'outline-primary'}
@@ -132,7 +133,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                                                 loading={isRemoving && removingSection === iface.section}
                                                 disabled={!iface.section || isBusy}
                                             />
-                                        </div>
+                                        </ActionButtons>
                                     </td>
                                 </tr>
                             )

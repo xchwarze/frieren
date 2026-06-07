@@ -11,6 +11,7 @@ import PanelCard from '@src/components/PanelCard';
 import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import Button from '@src/components/Button';
+import ActionButtons from '@src/components/ActionButtons';
 import useGetInterfaces from '@src/features/network/hooks/useGetInterfaces.js';
 import useToggleInterface from '@src/features/network/hooks/useToggleInterface.js';
 import InterfaceFormModal from '@src/features/network/components/InterfaceFormModal';
@@ -85,7 +86,7 @@ const InterfacesCard = () => {
                                 <td>{iface.device || '-'}</td>
                                 <td>{iface.uptime || '-'}</td>
                                 <td>
-                                    <div className={'d-flex gap-1'}>
+                                    <ActionButtons>
                                         <Button
                                             icon={'arrow-up'}
                                             variant={'outline-success'}
@@ -112,7 +113,7 @@ const InterfacesCard = () => {
                                             disabled={busy}
                                             onClick={() => setEditing(iface)}
                                         />
-                                    </div>
+                                    </ActionButtons>
                                 </td>
                             </tr>
                         );
