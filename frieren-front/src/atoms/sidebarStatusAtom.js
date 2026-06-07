@@ -6,6 +6,8 @@
  */
 import { atomWithStorage } from 'jotai/utils';
 
-const sidebarStatusAtom = atomWithStorage('sidebar-status', false);
+// getOnInit reads localStorage synchronously at init, so the first paint already
+// reflects the stored collapsed state — no width animation flashing on load.
+const sidebarStatusAtom = atomWithStorage('sidebar-status', false, undefined, { getOnInit: true });
 
 export default sidebarStatusAtom;
