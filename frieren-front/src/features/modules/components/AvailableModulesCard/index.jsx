@@ -41,7 +41,8 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
         }
         const term = debouncedSearch.toLowerCase();
         return modules.filter((module) =>
-            module.title.toLowerCase().includes(term)
+            module.title.toLowerCase().includes(term) ||
+            (module.description ?? '').toLowerCase().includes(term)
         );
     }, [data, debouncedSearch]);
 
