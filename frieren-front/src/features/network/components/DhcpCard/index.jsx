@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import PanelCard from '@src/components/PanelCard';
 import PanelTable from '@src/components/PanelTable';
@@ -61,10 +61,6 @@ const DhcpCard = () => {
     }, [leases, debouncedSearch]);
 
     const { pageData, currentPage, totalPages, setCurrentPage } = usePagination(filteredLeases);
-
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [debouncedSearch, setCurrentPage]);
 
     const confirmDelete = async () => {
         const mac = pendingDelete?.mac;
