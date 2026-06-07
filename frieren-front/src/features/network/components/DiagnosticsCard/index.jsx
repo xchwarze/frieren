@@ -142,6 +142,7 @@ const DiagnosticsCard = () => {
 
             <PanelCard
                 title={'ARP Table'}
+                icon={'link-2'}
                 subtitle={'Discovered neighbors'}
                 refetch={arpQuery.refetch}
                 isFetching={arpQuery.isFetching}

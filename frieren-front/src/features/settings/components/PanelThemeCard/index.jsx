@@ -59,7 +59,7 @@ const PanelThemeCard = ({ query }) => {
     };
 
     return (
-        <PanelCard title={'Change Panel Theme'} icon={'droplet'} showRefresh={false}>
+        <PanelCard title={'Change Panel Theme'} icon={'aperture'} showRefresh={false}>
             {renderContent()}
         </PanelCard>
     );

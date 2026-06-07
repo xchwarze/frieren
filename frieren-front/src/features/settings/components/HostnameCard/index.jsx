@@ -53,7 +53,7 @@ const HostnameCard = ({ query }) => {
     };
 
     return (
-        <PanelCard title={'Change Hostname'} icon={'tag'} showRefresh={false}>
+        <PanelCard title={'Change Hostname'} icon={'server'} showRefresh={false}>
             {renderContent()}
         </PanelCard>
     );
