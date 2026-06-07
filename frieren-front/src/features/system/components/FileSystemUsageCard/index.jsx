@@ -48,7 +48,7 @@ const FileSystemUsageCard = () => {
                         </tr>
                     )}
                     {data.map(({ filesystem, type, size, used, available, usePercent, mountedOn }) => (
-                        <tr key={filesystem}>
+                        <tr key={`${filesystem}-${mountedOn}`}>
                             <td>{filesystem}</td>
                             <td>{type}</td>
                             <td>{size}</td>
