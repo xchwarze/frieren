@@ -57,13 +57,12 @@ class ModulesController extends \frieren\core\Controller
             $this->categorizeModule($info, $sidebarSettings, $modules);
         }
 
-        // fix array order
-        $modules['sidebar'] = array_merge($modules['sidebar'], $modules['externalWithSidebar']);
-        ksort($modules['sidebar']);
+        // sort by the explicit "order" field, keeping unordered items at the end
+        $sidebar = array_merge($modules['sidebar'], $modules['externalWithSidebar']);
 
         self::setSuccess([
-            'external' => $modules['external'],
-            'sidebar' => array_values($modules['sidebar']),
+            'external' => $this->sortModulesByOrder($modules['external']),
+            'sidebar' => $this->sortModulesByOrder($sidebar),
         ]);
     }
 
@@ -72,21 +71,51 @@ class ModulesController extends \frieren\core\Controller
             'name'    => $info['name'],
             'title'   => $info['title'],
             'version' => $info['version'] ?? '0.0.0',
+            'order'   => (isset($info['order']) && is_numeric($info['order'])) ? (int)$info['order'] : null,
         ];
 
         if ($info['forceSidebar'] || isset($sidebarSettings[$module['name']])) {
             $variant = $info['system'] ? 'sidebar' : 'externalWithSidebar';
             $module['icon'] = $info['icon'] ?? 'package';
-            if (isset($info['order']) && !isset($modules['sidebar'][$info['order']])) {
-                $modules[$variant][$info['order']] = $module;
-            } else {
-                $modules[$variant][] = $module;
-            }
+            $modules[$variant][] = $module;
         }
 
         if (!$info['system']) {
             $modules['external'][] = $module;
         }
+    }
+
+    private function sortModulesByOrder($modules)
+    {
+        // decorate with a sequence index so equal/null "order" values keep
+        // their original relative order (usort is not stable before PHP 8.0)
+        $seq = 0;
+        foreach ($modules as &$module) {
+            $module['_seq'] = $seq++;
+        }
+        unset($module);
+
+        usort($modules, function ($a, $b) {
+            $aHasOrder = $a['order'] !== null;
+            $bHasOrder = $b['order'] !== null;
+            if ($aHasOrder !== $bHasOrder) {
+                // unordered items go to the end
+                return $aHasOrder ? -1 : 1;
+            }
+            if ($aHasOrder && $a['order'] !== $b['order']) {
+                return $a['order'] <=> $b['order'];
+            }
+
+            return $a['_seq'] <=> $b['_seq'];
+        });
+
+        // strip the helper fields so the API response shape is unchanged
+        foreach ($modules as &$module) {
+            unset($module['order'], $module['_seq']);
+        }
+        unset($module);
+
+        return $modules;
     }
 
     public function getAvailableModules()
