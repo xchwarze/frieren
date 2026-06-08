@@ -5,7 +5,6 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import BaseButton from 'react-bootstrap/Button';
-import Spinner from 'react-bootstrap/Spinner';
 import PropTypes from 'prop-types';
 
 import Icon from '@src/components/Icon';
@@ -36,7 +35,7 @@ const Button = ({ label, title, icon, disabled, loading, children, ...rest}) => 
     >
         <span className={'d-inline-flex align-items-center gap-1'}>
             {loading ? (
-                <Spinner animation={'border'} size={'sm'} />
+                <Icon name={'loader icon-spin'} />
             ) : (
                 icon && <Icon name={icon}/>
             )}
