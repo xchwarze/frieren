@@ -5,9 +5,10 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useCallback } from 'react';
-import { Modal, Button as BaseButton } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
+import Button from '@src/components/Button';
 import FormProvider from '@src/components/Form/FormProvider';
 import InputField from '@src/components/Form/InputField';
 import SubmitButton from '@src/components/Form/SubmitButton';
@@ -50,9 +51,7 @@ const AddStaticLeaseModal = ({ show, onHide }) => {
                         <InputField name={'ip'} label={'IP Address'} placeholder={'192.168.1.50'} />
                         <FormActions>
                             <SubmitButton label={'Add'} icon={'plus'} />
-                            <BaseButton variant={'secondary'} onClick={onHide}>
-                                Cancel
-                            </BaseButton>
+                            <Button variant={'secondary'} onClick={onHide} label={'Cancel'} />
                         </FormActions>
                     </FormProvider>
                 )}

@@ -5,10 +5,10 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
 import PropTypes from 'prop-types';
 
 import Icon from '@src/components/Icon';
+import Button from '@src/components/Button';
 
 /**
  * Panel card with a title, optional subtitle, and optional refresh button.
@@ -52,10 +52,9 @@ const PanelCard = ({
                             disabled={isFetching}
                             onClick={refetch}
                             className={'btn-icon'}
-                            aria-label={'Refresh'}
-                        >
-                            <Icon name={`refresh-cw ${isFetching ? 'icon-spin' : ''}`} />
-                        </Button>
+                            icon={`refresh-cw ${isFetching ? 'icon-spin' : ''}`}
+                            title={'Refresh'}
+                        />
                     )}
                 </Card.Title>
 

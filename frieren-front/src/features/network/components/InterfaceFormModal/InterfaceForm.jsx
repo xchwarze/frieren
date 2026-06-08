@@ -5,9 +5,10 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useCallback } from 'react';
-import { Button as BaseButton, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
+import Button from '@src/components/Button';
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SubmitButton from '@src/components/Form/SubmitButton';
@@ -52,9 +53,7 @@ const InterfaceForm = ({ name, defaultValues, onHide }) => {
             <ProtoAwareFields />
             <FormActions>
                 <SubmitButton label={'Save'} />
-                <BaseButton variant={'secondary'} onClick={onHide}>
-                    Cancel
-                </BaseButton>
+                <Button variant={'secondary'} onClick={onHide} label={'Cancel'} />
             </FormActions>
         </FormProvider>
     );

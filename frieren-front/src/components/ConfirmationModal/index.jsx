@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { Modal, Button, Spinner } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+
+import Button from '@src/components/Button';
 
 /**
  * Renders a confirmation modal component.
@@ -27,13 +29,8 @@ const ConfirmationModal = ({ show, onHide, onConfirm, title, description, isConf
             {children}
         </Modal.Body>
         <Modal.Footer>
-            <Button variant={'secondary'} onClick={onHide} disabled={isConfirmLoading}>
-                Cancel
-            </Button>
-            <Button variant={'danger'} onClick={onConfirm} disabled={isConfirmLoading}>
-                {isConfirmLoading && <Spinner animation={'border'} size={'sm'} className={'me-2'} />}
-                Confirm
-            </Button>
+            <Button variant={'secondary'} onClick={onHide} disabled={isConfirmLoading} label={'Cancel'} />
+            <Button variant={'danger'} onClick={onConfirm} loading={isConfirmLoading} label={'Confirm'} />
         </Modal.Footer>
     </Modal>
 );

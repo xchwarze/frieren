@@ -5,9 +5,9 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useCallback } from 'react';
-import { Button as BaseButton } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
+import Button from '@src/components/Button';
 import Loading from '@src/components/Loading';
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
@@ -78,9 +78,7 @@ const RadioConfigForm = ({ radio, onHide }) => {
             <SwitchField name={'disabled'} label={'Disabled'} />
             <FormActions>
                 <SubmitButton />
-                <BaseButton variant={'secondary'} onClick={onHide}>
-                    Cancel
-                </BaseButton>
+                <Button variant={'secondary'} onClick={onHide} label={'Cancel'} />
             </FormActions>
         </FormProvider>
     );

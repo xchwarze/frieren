@@ -5,18 +5,17 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useMemo } from 'react';
-import Button from 'react-bootstrap/Button';
 import { useSetAtom } from 'jotai';
 import { useLocation } from 'wouter';
 import PropTypes from 'prop-types';
 
 import { openLink } from '@src/helpers/actionsHelper.js';
 import ActionButtons from '@src/components/ActionButtons';
+import Button from '@src/components/Button';
 import PanelCard from '@src/components/PanelCard';
 import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import TablePagination from '@src/components/TablePagination';
-import Icon from '@src/components/Icon';
 import ModuleIcon from '@src/components/ModuleIcon';
 import usePagination from '@src/hooks/usePagination.js';
 import selectedInstalledModuleAtom from '@src/features/modules/atoms/selectedInstalledModuleAtom.js';
@@ -107,41 +106,37 @@ const InstalledModulesCard = ({ installedQuery }) => {
                                 <td>
                                     <ActionButtons>
                                     <Button
-                                        aria-label={'Open repository'}
+                                        title={'Open repository'}
+                                        icon={'external-link'}
                                         variant={'outline-secondary'}
                                         size={'sm'}
                                         onClick={() => openLink(repository)}
-                                    >
-                                        <Icon name={'external-link'}/>
-                                    </Button>
+                                    />
                                     <Button
-                                        aria-label={'Report bug'}
+                                        title={'Report bug'}
+                                        icon={'alert-circle'}
                                         variant={'outline-secondary'}
                                         size={'sm'}
                                         onClick={() => openLink(bugs)}
-                                    >
-                                        <Icon name={'alert-circle'}/>
-                                    </Button>
+                                    />
                                     {!system && !forceSidebar && (
                                         <Button
-                                            aria-label={sidebar ? 'Unpin' : 'Pin'}
+                                            title={sidebar ? 'Unpin' : 'Pin'}
+                                            icon={sidebar ? 'eye-off' : 'eye'}
                                             variant={'outline-primary'}
                                             size={'sm'}
                                             disabled={isPinPending}
                                             onClick={() => handlePinClick(module)}
-                                        >
-                                            <Icon name={sidebar ? 'eye-off' : 'eye'}/>
-                                        </Button>
+                                        />
                                     )}
                                     {!system && (
                                         <Button
-                                            aria-label={'Remove'}
+                                            title={'Remove'}
+                                            icon={'trash-2'}
                                             variant={'outline-danger'}
                                             size={'sm'}
                                             onClick={() => handleRemoveClick(module)}
-                                        >
-                                            <Icon name={'trash-2'}/>
-                                        </Button>
+                                        />
                                     )}
                                     </ActionButtons>
                                 </td>

@@ -6,10 +6,10 @@
  */
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import PropTypes from 'prop-types';
 
 import Icon from '@src/components/Icon';
+import Button from '@src/components/Button';
 
 /**
  * Reusable search input with icon and clear button.
@@ -34,11 +34,10 @@ const SearchInput = ({ value, onChange, placeholder = 'Search...', className = '
             <Button
                 type={'button'}
                 variant={'outline-secondary'}
-                aria-label={'Clear search'}
+                icon={'x'}
+                title={'Clear search'}
                 onClick={() => onChange('')}
-            >
-                <Icon name={'x'} />
-            </Button>
+            />
         )}
     </InputGroup>
 );

@@ -5,14 +5,13 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import Navbar from 'react-bootstrap/Navbar';
-import Button from 'react-bootstrap/Button';
 import { useAtomValue } from 'jotai';
 
 import logoImage from '@src/assets/logo.png';
 import terminalStatusAtom from '@src/features/terminal/atoms/terminalStatusAtom.js';
 import useOpenTerminalMutation from '@src/features/terminal/hooks/useOpenTerminalMutation.js';
 import SystemActionsDropdown from '@src/components/SystemActionsDropdown';
-import Icon from '@src/components/Icon';
+import Button from '@src/components/Button';
 
 const enableTerminal = import.meta.env.VITE_ENABLE_TERMINAL === 'true';
 
@@ -42,12 +41,11 @@ const Header = () => {
                     <Button
                         variant={'outline-primary'}
                         className={'btn-icon fs-5'}
-                        aria-label={'Open terminal'}
+                        icon={'terminal'}
+                        title={'Open terminal'}
                         disabled={terminalStatus}
                         onClick={openTerminalMutation}
-                    >
-                        <Icon name={'terminal'} />
-                    </Button>
+                    />
                 )}
                 <SystemActionsDropdown />
             </div>

@@ -6,12 +6,12 @@
  */
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
-import Button from 'react-bootstrap/Button';
 import PropTypes from 'prop-types';
 
 import useScript from '@src/hooks/useScript';
 import { ucfirst } from '@src/helpers/actionsHelper.js';
 import Icon from '@src/components/Icon';
+import Button from '@src/components/Button';
 
 // From frieren-module-template/vite.config.js
 const FRIEREN_MODULE_PREFIX = 'FrierenModule';
@@ -40,14 +40,14 @@ const DynamicModule = ({ name, version }) => {
         return (
             <Alert variant={'danger'}>
                 <Icon name={'alert-triangle'} /> Module not found or not available. This error is commonly caused because the .js was not found in the path where it should be.
-                <Button size={'sm'} variant={'outline-danger'} onClick={retry} className={'ms-3'}>Retry</Button>
+                <Button size={'sm'} variant={'outline-danger'} onClick={retry} className={'ms-3'} label={'Retry'} />
             </Alert>
         );
     } else if (typeof window[libraryName] !== 'function') {
         return (
             <Alert variant={'danger'}>
                 <Icon name={'alert-triangle'} /> Error executing module: Function not found. This error is caused by a configuration or build error in the module.
-                <Button size={'sm'} variant={'outline-danger'} onClick={retry} className={'ms-3'}>Retry</Button>
+                <Button size={'sm'} variant={'outline-danger'} onClick={retry} className={'ms-3'} label={'Retry'} />
             </Alert>
         );
     }
