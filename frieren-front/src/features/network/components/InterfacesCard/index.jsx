@@ -24,20 +24,16 @@ import InterfaceFormModal from '@src/features/network/components/InterfaceFormMo
 const InterfacesCard = () => {
     const interfacesQuery = useGetInterfaces();
     const { isSuccess } = interfacesQuery;
-    const { mutateAsync: toggleMutation } = useToggleInterface();
+    const { mutate: toggleInterface, isPending: isToggling } = useToggleInterface();
 
-    const [busyName, setBusyName] = useState(null);
+    const [togglingName, setTogglingName] = useState(null);
     const [editing, setEditing] = useState(null);
 
     const interfaces = interfacesQuery?.data?.interfaces ?? [];
 
-    const runToggle = async (name, action) => {
-        setBusyName(name);
-        try {
-            await toggleMutation({ name, action });
-        } finally {
-            setBusyName(null);
-        }
+    const handleToggle = (iface) => {
+        setTogglingName(iface.name);
+        toggleInterface({ name: iface.name, action: iface.up ? 'down' : 'up' });
     };
 
     const renderContent = () => {
@@ -66,7 +62,7 @@ const InterfacesCard = () => {
                 </thead>
                 <tbody>
                     {interfaces.map((iface) => {
-                        const busy = busyName === iface.name;
+                        const busy = isToggling && togglingName === iface.name;
 
                         return (
                             <tr key={iface.name}>
@@ -88,30 +84,21 @@ const InterfacesCard = () => {
                                 <td>
                                     <ActionButtons>
                                         <Button
-                                            icon={'arrow-up'}
-                                            variant={'outline-success'}
-                                            size={'sm'}
-                                            title={'Bring up'}
-                                            loading={busy}
-                                            disabled={busy || iface.up}
-                                            onClick={() => runToggle(iface.name, 'up')}
-                                        />
-                                        <Button
-                                            icon={'arrow-down'}
-                                            variant={'outline-danger'}
-                                            size={'sm'}
-                                            title={'Bring down'}
-                                            loading={busy}
-                                            disabled={busy || !iface.up}
-                                            onClick={() => runToggle(iface.name, 'down')}
-                                        />
-                                        <Button
-                                            icon={'edit'}
-                                            variant={'outline-secondary'}
+                                            icon={'edit-2'}
+                                            variant={'outline-primary'}
                                             size={'sm'}
                                             title={'Edit'}
                                             disabled={busy}
                                             onClick={() => setEditing(iface)}
+                                        />
+                                        <Button
+                                            icon={iface.up ? 'toggle-right' : 'toggle-left'}
+                                            variant={iface.up ? 'outline-danger' : 'outline-success'}
+                                            size={'sm'}
+                                            title={iface.up ? 'Bring down' : 'Bring up'}
+                                            loading={busy}
+                                            disabled={busy}
+                                            onClick={() => handleToggle(iface)}
                                         />
                                     </ActionButtons>
                                 </td>

@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
+import { sleep } from '@src/helpers/actionsHelper.js';
 import { NETWORK_GET_INTERFACES } from '@src/features/network/helpers/queryKeys.js';
 
 /**
@@ -28,8 +29,9 @@ const useToggleInterface = () => {
             name,
             state: action,
         }),
-        onSuccess: (data, { name, action }) => {
+        onSuccess: async (data, { name, action }) => {
             toast.success(`${name} brought ${action}`);
+            await sleep(1500);
             queryClient.invalidateQueries({ queryKey: [NETWORK_GET_INTERFACES] });
         },
         onError: () => {
