@@ -9,7 +9,7 @@ import { Provider } from 'jotai'
 import 'bootstrap/dist/css/bootstrap.css';
 
 import './assets/styles.css';
-import './assets/feather.css';
+import './assets/fonts/frieren-icons.css';
 import { queryClient } from '@src/services/queryClient';
 import RouterProvider from '@src/navigation/RouterProvider';
 import ThemeVariantApplier from '@src/components/ThemeVariantApplier';
