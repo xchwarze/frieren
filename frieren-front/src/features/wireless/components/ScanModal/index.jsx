@@ -114,6 +114,7 @@ const ScanModal = ({ show, onHide, radioName, onConnect }) => {
                                     size={'sm'}
                                     variant={'outline-primary'}
                                     icon={'log-in'}
+                                    title={'Connect'}
                                     onClick={() => onConnect(net)}
                                 />
                             </td>

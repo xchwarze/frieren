@@ -84,6 +84,7 @@ const InstalledPackagesCard = () => {
                                     variant={'outline-danger'}
                                     size={'sm'}
                                     icon={'trash-2'}
+                                    title={'Remove package'}
                                     loading={removingName === pkg.name}
                                     disabled={!!removingName}
                                     onClick={() => setSelectedPackage(pkg)}

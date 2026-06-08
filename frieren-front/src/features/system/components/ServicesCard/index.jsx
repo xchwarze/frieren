@@ -162,7 +162,6 @@ const ServicesCard = () => {
                                                 variant={'outline-success'}
                                                 size={'sm'}
                                                 title={'Start'}
-                                                aria-label={'Start'}
                                                 loading={busy}
                                                 onClick={() => requestAction({ type: 'control', name: svc.name, command: 'start' })}
                                             />
@@ -171,7 +170,6 @@ const ServicesCard = () => {
                                                 variant={'outline-danger'}
                                                 size={'sm'}
                                                 title={'Stop'}
-                                                aria-label={'Stop'}
                                                 disabled={busy}
                                                 onClick={() => requestAction({ type: 'control', name: svc.name, command: 'stop' })}
                                             />
@@ -180,7 +178,6 @@ const ServicesCard = () => {
                                                 variant={'outline-secondary'}
                                                 size={'sm'}
                                                 title={'Restart'}
-                                                aria-label={'Restart'}
                                                 disabled={busy}
                                                 onClick={() => requestAction({ type: 'control', name: svc.name, command: 'restart' })}
                                             />

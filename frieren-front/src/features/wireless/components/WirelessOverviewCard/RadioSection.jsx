@@ -63,18 +63,21 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                         size={'sm'}
                         variant={'outline-secondary'}
                         icon={'settings'}
+                        title={'Configure radio'}
                         onClick={() => onConfigure(radioName, radio.band)}
                     />
                     <Button
                         size={'sm'}
                         variant={'outline-info'}
                         icon={'wifi'}
+                        title={'Scan networks'}
                         onClick={() => onScan(radioName)}
                     />
                     <Button
                         size={'sm'}
                         variant={'outline-success'}
                         icon={'plus'}
+                        title={'Add interface'}
                         onClick={() => onAdd(radioName)}
                     />
                 </ActionButtons>
@@ -115,6 +118,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                                                 size={'sm'}
                                                 variant={'outline-primary'}
                                                 icon={'edit-2'}
+                                                title={'Edit'}
                                                 onClick={() => onEdit(iface.section, radioName)}
                                                 disabled={!iface.section || isBusy}
                                             />
@@ -122,6 +126,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                                                 size={'sm'}
                                                 variant={iface.disabled ? 'outline-success' : 'outline-danger'}
                                                 icon={iface.disabled ? 'toggle-left' : 'toggle-right'}
+                                                title={iface.disabled ? 'Enable' : 'Disable'}
                                                 loading={isToggling && togglingSection === iface.section}
                                                 onClick={() => handleToggle(iface)}
                                                 disabled={!iface.section || isBusy}
@@ -130,6 +135,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                                                 size={'sm'}
                                                 variant={'outline-danger'}
                                                 icon={'trash-2'}
+                                                title={'Remove'}
                                                 onClick={() => setConfirmRemove(iface.section)}
                                                 loading={isRemoving && removingSection === iface.section}
                                                 disabled={!iface.section || isBusy}

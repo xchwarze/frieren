@@ -45,6 +45,7 @@ const PackageTable = memo(({ packages, isInstalling, installingName, installedNa
                             variant={'outline-primary'}
                             size={'sm'}
                             icon={'download'}
+                            title={'Install package'}
                             disabled={isInstalling}
                             loading={isInstalling && installingName === pkg.name}
                             onClick={() => onInstall(pkg)}

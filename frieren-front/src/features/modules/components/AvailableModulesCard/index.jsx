@@ -102,7 +102,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                             <td>
                                 <ActionButtons>
                                 <Button
-                                    aria-label={'Open repository'}
+                                    title={'Open repository'}
                                     icon={'external-link'}
                                     variant={'outline-secondary'}
                                     size={'sm'}
@@ -110,7 +110,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                                 />
                                 {!checkInstalled(module) && (
                                     <Button
-                                        aria-label={'Download module'}
+                                        title={'Download module'}
                                         icon={'download-cloud'}
                                         variant={'outline-primary'}
                                         size={'sm'}
@@ -119,7 +119,7 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                                 )}
                                 {checkUpdateable(module) && (
                                     <Button
-                                        aria-label={'Update module'}
+                                        title={'Update module'}
                                         icon={'download-cloud'}
                                         variant={'outline-warning'}
                                         size={'sm'}
