@@ -6,8 +6,8 @@
  */
 import { useAtom } from 'jotai';
 import { useLocation } from 'wouter';
-import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Button from '@common/components/Button';
 import PanelCard from '@common/components/PanelCard';
 import { demoCounterAtom, demoPersistedAtom } from '@module/feature/atoms/demoAtoms';
 
@@ -27,9 +27,7 @@ const StateDemoCard = () => {
                 <div className={'d-flex align-items-center mb-3'}>
                     <strong className={'me-2'}>Jotai atom:</strong>
                     <span className={'me-2'}>Counter: {counter}</span>
-                    <Button size={'sm'} variant={'outline-primary'} onClick={() => setCounter(c => c + 1)}>
-                        Increment
-                    </Button>
+                    <Button size={'sm'} variant={'outline-primary'} onClick={() => setCounter(c => c + 1)} label={'Increment'} />
                 </div>
                 <div className={'d-flex align-items-center mb-3'}>
                     <strong className={'me-2'}>Jotai atomWithStorage:</strong>
