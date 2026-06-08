@@ -15,9 +15,9 @@ import Icon from '@src/components/Icon';
  *
  * Accessible name and tooltip are derived so icon-only buttons are always labelled:
  * - aria-label: label, else title, else icon name.
- * - title (tooltip): explicit title, else label.
+ * - title (tooltip): only the explicit title (a visible label needs no tooltip).
  *
- * @param {String} label - Visible text; also used as accessible name and tooltip when set.
+ * @param {String} label - Visible text; also used as accessible name when set.
  * @param {String} title - Tooltip text; also used as accessible name when no label is set.
  * @param {String} icon - The name of the icon to be displayed on the button.
  * @param {Boolean} disabled - A flag to indicate if the button is disabled.
@@ -32,7 +32,7 @@ const Button = ({ label, title, icon, disabled, loading, children, ...rest}) => 
         disabled={disabled || loading}
         {...rest}
         aria-label={label || title || icon}
-        title={title || label}
+        title={title}
     >
         <span className={'d-inline-flex align-items-center gap-1'}>
             {loading ? (
