@@ -120,7 +120,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                                             />
                                             <Button
                                                 size={'sm'}
-                                                variant={iface.disabled ? 'outline-success' : 'outline-warning'}
+                                                variant={iface.disabled ? 'outline-success' : 'outline-danger'}
                                                 icon={iface.disabled ? 'toggle-left' : 'toggle-right'}
                                                 loading={isToggling && togglingSection === iface.section}
                                                 onClick={() => handleToggle(iface)}
