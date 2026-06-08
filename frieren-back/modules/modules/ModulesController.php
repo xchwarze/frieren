@@ -87,35 +87,38 @@ class ModulesController extends \frieren\core\Controller
 
     private function sortModulesByOrder($modules)
     {
-        // decorate with a sequence index so equal/null "order" values keep
-        // their original relative order (usort is not stable before PHP 8.0)
-        $seq = 0;
-        foreach ($modules as &$module) {
-            $module['_seq'] = $seq++;
+        // split into two buckets: items with a numeric "order" and items
+        // without one. the unordered bucket keeps its discovery (foreach)
+        // order and is appended last, so "nulls last" holds by construction
+        // without relying on usort stability (not guaranteed before PHP 8.0,
+        // and the documented minimum is PHP 7.2).
+        $orderedModules = [];
+        $unorderedModules = [];
+        $discoveryIndex = 0;
+        foreach ($modules as $module) {
+            if ($module['order'] === null) {
+                $unorderedModules[] = $module;
+                continue;
+            }
+
+            // record discovery index so equal "order" values keep their
+            // original relative order (explicit, version-safe tiebreak)
+            $module['_discoveryIndex'] = $discoveryIndex++;
+            $orderedModules[] = $module;
         }
-        unset($module);
 
-        usort($modules, function ($a, $b) {
-            $aHasOrder = $a['order'] !== null;
-            $bHasOrder = $b['order'] !== null;
-            if ($aHasOrder !== $bHasOrder) {
-                // unordered items go to the end
-                return $aHasOrder ? -1 : 1;
-            }
-            if ($aHasOrder && $a['order'] !== $b['order']) {
-                return $a['order'] <=> $b['order'];
-            }
-
-            return $a['_seq'] <=> $b['_seq'];
+        usort($orderedModules, function ($firstModule, $secondModule) {
+            return [$firstModule['order'], $firstModule['_discoveryIndex']]
+                <=> [$secondModule['order'], $secondModule['_discoveryIndex']];
         });
 
-        // strip the helper fields so the API response shape is unchanged
-        foreach ($modules as &$module) {
-            unset($module['order'], $module['_seq']);
-        }
-        unset($module);
+        // recombine (ordered first, unordered last) and strip helper fields
+        // so the API response shape is unchanged
+        return array_map(function ($module) {
+            unset($module['order'], $module['_discoveryIndex']);
 
-        return $modules;
+            return $module;
+        }, array_merge($orderedModules, $unorderedModules));
     }
 
     public function getAvailableModules()
