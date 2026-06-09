@@ -23,6 +23,18 @@ const getUrlDetails = () => {
 };
 
 /**
+ * Reads the JS-readable XSRF-TOKEN cookie set by the backend so it can be echoed
+ * back in the X-XSRF-TOKEN header (double-submit CSRF defense).
+ *
+ * @return {String} The XSRF token value, or an empty string if the cookie is absent.
+ */
+const getXsrfToken = () => {
+    const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+
+    return match ? decodeURIComponent(match[1]) : '';
+};
+
+/**
  * Fetches data from a specified URL with a timeout.
  *
  * @param {String} url - The URL to fetch data from.
@@ -80,6 +92,11 @@ export const fetchService = async (url, method, data = null, timeout = 15000) =>
         mode: 'cors',
         credentials: 'include',
     };
+
+    const xsrfToken = getXsrfToken();
+    if (xsrfToken) {
+        options.headers['X-XSRF-TOKEN'] = xsrfToken;
+    }
 
     if (data) {
         options.body = JSON.stringify(data);

@@ -84,18 +84,37 @@ class ApiCore
      */
     public function setCSRFToken()
     {
+        $secure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+
         if (session_status() == PHP_SESSION_NONE) {
+            // SameSite=Lax keeps the session cookie off cross-site POSTs — defense
+            // in depth beneath the header token check in authenticated().
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path' => '/',
+                'domain' => '',
+                'secure' => $secure,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
             session_start();
         }
 
         if (!isset($_SESSION['XSRF-TOKEN'])) {
             $_SESSION['XSRF-TOKEN'] = bin2hex(random_bytes(32));
-            //session_write_close();
         }
 
         if (!isset($_COOKIE['XSRF-TOKEN']) || $_COOKIE['XSRF-TOKEN'] !== $_SESSION['XSRF-TOKEN']) {
-            $secure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-            setcookie('XSRF-TOKEN', $_SESSION['XSRF-TOKEN'], 0, '/', '', $secure, false);
+            // httponly=false on purpose: the SPA reads this cookie and echoes it in
+            // the X-XSRF-TOKEN header (double-submit), which a cross-site page cannot do.
+            setcookie('XSRF-TOKEN', $_SESSION['XSRF-TOKEN'], [
+                'expires' => 0,
+                'path' => '/',
+                'domain' => '',
+                'secure' => $secure,
+                'httponly' => false,
+                'samesite' => 'Lax',
+            ]);
         }
     }
 
@@ -140,8 +159,10 @@ class ApiCore
             return false;
         }
 
-        //if (!isset($_SERVER['HTTP_X_XSRF_TOKEN']) || $_SERVER['HTTP_X_XSRF_TOKEN'] !== $_SESSION['XSRF-TOKEN']) {
-        if (!isset($_COOKIE['XSRF-TOKEN']) || $_COOKIE['XSRF-TOKEN'] !== $_SESSION['XSRF-TOKEN']) {
+        // Header-based double-submit: compare the X-XSRF-TOKEN header (timing-safe)
+        // against the session token. A cross-site attacker cannot read the JS-readable
+        // XSRF-TOKEN cookie to echo it here, so a forged request carries no valid token.
+        if (!isset($_SERVER['HTTP_X_XSRF_TOKEN']) || !hash_equals($_SESSION['XSRF-TOKEN'], $_SERVER['HTTP_X_XSRF_TOKEN'])) {
             $this->responseHandler->setError('Invalid CSRF token');
             return false;
         }
