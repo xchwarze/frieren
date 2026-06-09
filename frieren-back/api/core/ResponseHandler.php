@@ -71,12 +71,11 @@ class ResponseHandler
      */
     private function sendJson($data)
     {
-        header('Access-Control-Allow-Origin: *');
-        //header('Access-Control-Allow-Origin: http://localhost:6778');
-        header('Access-Control-Allow-Methods: GET, POST');
-        header('Access-Control-Allow-Headers: Content-Type, Authorization');
-        header('Access-Control-Allow-Credentials: true');
-        header('Access-Control-Max-Age: 3600');
+        // Same-origin only: the panel and API are served from the same origin in
+        // production, and the dev server proxies /api server-side, so the browser
+        // never makes a cross-origin call. Emitting no CORS headers blocks any
+        // cross-origin site from reading responses — the prior `*` + credentials
+        // combo was spec-invalid anyway.
         header('Content-Type: application/json');
         http_response_code($this->statusCode);
         echo json_encode($data);
