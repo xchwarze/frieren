@@ -68,10 +68,10 @@ const fetchWithTimeout = async (url, options, timeout) => {
  * @param {String} url - The URL to send the fetch request to.
  * @param {String} method - The HTTP method to use for the fetch request.
  * @param {object|null} [data=null] - Optional data to send with the fetch request.
- * @param {number} [timeout=9000] - Optional timeout value in milliseconds.
+ * @param {number} [timeout=15000] - Optional timeout value in milliseconds.
  * @return {Promise} A promise that resolves to the response of the fetch request.
  */
-export const fetchService = async (url, method, data = null, timeout = 9000) => {
+export const fetchService = async (url, method, data = null, timeout = 15000) => {
     const options = {
         method,
         headers: {
