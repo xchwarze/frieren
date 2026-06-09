@@ -22,6 +22,13 @@ class TerminalController extends \frieren\core\Controller
         'getStatus' => true,
     ];
 
+    // ttyd is launched via nohup (execBackground) and forks asynchronously, so an
+    // immediate pgrep can miss it and report a spurious failure — this is why the
+    // very first open after install fails while later ones succeed. Poll briefly to
+    // let the process spawn and bind port 1477 before reporting status.
+    const START_POLL_ATTEMPTS = 10;
+    const START_POLL_INTERVAL_US = 150000; // 150ms -> up to ~1.5s total
+
     private function getTerminalPath()
     {
         if (OpenWrtHelper::isSDAvailable() && file_exists(self::TTYD_SD_PATH)) {
@@ -29,6 +36,20 @@ class TerminalController extends \frieren\core\Controller
         }
 
         return self::TTYD_PATH;
+    }
+
+    private function waitForRunning($terminal)
+    {
+        // Sleep before each check: ttyd never appears in under one interval, so the
+        // happy path costs a single pgrep instead of two or three.
+        for ($attempt = 0; $attempt < self::START_POLL_ATTEMPTS; $attempt++) {
+            usleep(self::START_POLL_INTERVAL_US);
+            if (OpenWrtHelper::checkRunning($terminal)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function startTerminal()
@@ -41,7 +62,7 @@ class TerminalController extends \frieren\core\Controller
             $shell = SettingsHelper::getTerminalAutologin() ? '/bin/ash' : '/bin/login';
             $command = "{$terminal} -p 1477 -i br-lan {$shell}";
             OpenWrtHelper::execBackground($command);
-            $status = OpenWrtHelper::checkRunning($terminal);
+            $status = $this->waitForRunning($terminal);
             if (!$status) {
                 $this->logger("Terminal could not be run! command exec: {$command}");
             }
