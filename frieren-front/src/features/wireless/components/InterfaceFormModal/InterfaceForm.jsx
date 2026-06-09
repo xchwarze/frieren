@@ -5,11 +5,11 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useCallback } from 'react';
-import { Form } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Button from '@src/components/Button';
 import FormProvider from '@src/components/Form/FormProvider';
+import ReadOnlyField from '@src/components/Form/ReadOnlyField';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
 import SubmitButton from '@src/components/Form/SubmitButton';
@@ -45,14 +45,10 @@ const InterfaceForm = ({ radio, section, onHide, defaultValues, onInterfaceSaved
             onSubmit={handleSubmit}
             defaultValues={defaultValues}
         >
-            <Form.Group className={'mb-3'}>
-                <Form.Label>{isEditMode ? 'Section' : 'Radio'}</Form.Label>
-                <Form.Control
-                    value={isEditMode ? section : radio}
-                    disabled
-                    readOnly
-                />
-            </Form.Group>
+            <ReadOnlyField
+                label={isEditMode ? 'Section' : 'Radio'}
+                value={isEditMode ? section : radio}
+            />
             <SelectField
                 name={'mode'}
                 label={'Mode'}

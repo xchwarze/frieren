@@ -5,11 +5,11 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import { useCallback } from 'react';
-import { Form } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import Button from '@src/components/Button';
 import FormProvider from '@src/components/Form/FormProvider';
+import ReadOnlyField from '@src/components/Form/ReadOnlyField';
 import SelectField from '@src/components/Form/SelectField';
 import SubmitButton from '@src/components/Form/SubmitButton';
 import FormActions from '@src/components/FormActions';
@@ -41,10 +41,7 @@ const InterfaceForm = ({ name, defaultValues, onHide }) => {
             onSubmit={handleSubmit}
             defaultValues={defaultValues}
         >
-            <Form.Group className={'mb-3'}>
-                <Form.Label>Interface</Form.Label>
-                <Form.Control value={name} readOnly plaintext />
-            </Form.Group>
+            <ReadOnlyField label={'Interface'} value={name} />
             <SelectField
                 name={'proto'}
                 label={'Protocol'}
