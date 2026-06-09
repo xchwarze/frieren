@@ -43,7 +43,7 @@ frieren-back/
 ## Key Patterns
 
 - **JSON POST API** — all requests send `{module, action, ...params}`
-- **Auth** — session-based + CSRF cookie. Login module bypasses auth check
+- **Auth** — session-based + CSRF via `X-XSRF-TOKEN` double-submit header (`hash_equals` vs session token) and `SameSite=Lax` cookies. Login module bypasses auth check
 - **Helpers** — `HelperFactory` creates OS-specific helpers (only OpenWrt implemented, extensible via `HelperInterface`)
 - **Module helpers** — per-module `ModuleOpenWrtHelper` classes for system commands
 - **Config** — UCI (OpenWrt Unified Configuration Interface) read/write via `UciConfigHelper`
@@ -56,8 +56,8 @@ frieren-back/
 - `initRequest()` — parses JSON from `php://input`
 - `setCSRFToken()` — manages XSRF token (cookie + session)
 - `handleRequest()` — main dispatcher; checks auth, routes to module
-- `authenticated()` — validates session + CSRF token
-- CORS: wildcard origin, GET/POST, credentials included
+- `authenticated()` — validates session + `X-XSRF-TOKEN` header (double-submit)
+- CORS: none — same-origin only (no `Access-Control-*` headers emitted)
 
 ### Controller (`api/core/Controller.php`)
 - Abstract base for all module controllers
@@ -73,7 +73,7 @@ frieren-back/
 ### ResponseHandler (`api/core/ResponseHandler.php`)
 - `setData($data, $statusCode)` — success response
 - `setError($error, $statusCode)` — error response
-- `dispatchResponse()` — sends JSON with CORS headers
+- `dispatchResponse()` — sends JSON response (same-origin, no CORS headers)
 - `streamFile($file)` — binary file download
 
 ### Router (`api/core/Router.php`)
