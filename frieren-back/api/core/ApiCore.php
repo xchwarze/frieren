@@ -31,6 +31,11 @@ class ApiCore
     private $router;
 
     /**
+     * @var bool True when request parsing failed (bad Content-Type or JSON).
+     */
+    private $initFailed = false;
+
+    /**
      * Constructor for the class.
      *
      * Initializes the request, sets a CSRF token for security, and sets up
@@ -56,9 +61,21 @@ class ApiCore
      */
     private function initRequest()
     {
+        // Require application/json. A cross-site form/simple-request can only send
+        // text/plain or form encodings, so this forces any cross-origin caller into
+        // a CORS preflight (which same-origin policy blocks) — defense in depth
+        // beneath the X-XSRF-TOKEN header check.
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        if (stripos($contentType, 'application/json') !== 0) {
+            $this->responseHandler->setError('Unsupported Media Type', 415);
+            $this->initFailed = true;
+            return;
+        }
+
         $this->request = json_decode(file_get_contents('php://input'), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             $this->responseHandler->setError('Invalid JSON input');
+            $this->initFailed = true;
         }
     }
 
@@ -87,6 +104,13 @@ class ApiCore
      */
     public function handleRequest()
     {
+        // Request parsing already failed (bad Content-Type / JSON) — surface that
+        // error directly instead of routing a null request through auth.
+        if ($this->initFailed) {
+            $this->responseHandler->dispatchResponse();
+            return;
+        }
+
         try {
             if ($this->authenticated()) {
                 $this->responseHandler = $this->router->routeModule();
