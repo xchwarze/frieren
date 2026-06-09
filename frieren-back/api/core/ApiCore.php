@@ -16,6 +16,12 @@ namespace frieren\core;
 class ApiCore
 {
     /**
+     * Name of the double-submit CSRF token: the session key and the cookie name
+     * (the SPA echoes its value back in the X-XSRF-TOKEN request header).
+     */
+    const CSRF_TOKEN_KEY = 'XSRF-TOKEN';
+
+    /**
      * @var array The request data.
      */
     private $request;
@@ -46,7 +52,8 @@ class ApiCore
     {
         $this->responseHandler = new ResponseHandler();
 
-        // Skip session/JSON parsing for CORS preflight requests
+        // A bodiless OPTIONS request carries no JSON to parse; skip request/session
+        // setup and let handleRequest() reject it via the normal auth path.
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             return;
         }
@@ -100,22 +107,35 @@ class ApiCore
             session_start();
         }
 
-        if (!isset($_SESSION['XSRF-TOKEN'])) {
-            $_SESSION['XSRF-TOKEN'] = bin2hex(random_bytes(32));
+        if (!isset($_SESSION[self::CSRF_TOKEN_KEY])) {
+            $_SESSION[self::CSRF_TOKEN_KEY] = bin2hex(random_bytes(32));
         }
 
-        if (!isset($_COOKIE['XSRF-TOKEN']) || $_COOKIE['XSRF-TOKEN'] !== $_SESSION['XSRF-TOKEN']) {
-            // httponly=false on purpose: the SPA reads this cookie and echoes it in
-            // the X-XSRF-TOKEN header (double-submit), which a cross-site page cannot do.
-            setcookie('XSRF-TOKEN', $_SESSION['XSRF-TOKEN'], [
-                'expires' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => $secure,
-                'httponly' => false,
-                'samesite' => 'Lax',
-            ]);
+        if (!isset($_COOKIE[self::CSRF_TOKEN_KEY]) || $_COOKIE[self::CSRF_TOKEN_KEY] !== $_SESSION[self::CSRF_TOKEN_KEY]) {
+            self::sendCsrfCookie($_SESSION[self::CSRF_TOKEN_KEY]);
         }
+    }
+
+    /**
+     * Writes the JS-readable double-submit CSRF cookie. Setting and clearing it must
+     * share identical attributes, so both setCSRFToken() and logout() funnel through
+     * here. httponly is intentionally false: the SPA reads this cookie to echo it back
+     * in the X-XSRF-TOKEN header, which a cross-site page cannot do.
+     *
+     * @param string $value Token value ('' to clear the cookie).
+     * @param int $expires Expiry timestamp (0 = session cookie).
+     */
+    public static function sendCsrfCookie($value, $expires = 0)
+    {
+        $secure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        setcookie(self::CSRF_TOKEN_KEY, $value, [
+            'expires' => $expires,
+            'path' => '/',
+            'domain' => '',
+            'secure' => $secure,
+            'httponly' => false,
+            'samesite' => 'Lax',
+        ]);
     }
 
     /**
@@ -162,7 +182,7 @@ class ApiCore
         // Header-based double-submit: compare the X-XSRF-TOKEN header (timing-safe)
         // against the session token. A cross-site attacker cannot read the JS-readable
         // XSRF-TOKEN cookie to echo it here, so a forged request carries no valid token.
-        if (!isset($_SERVER['HTTP_X_XSRF_TOKEN']) || !hash_equals($_SESSION['XSRF-TOKEN'], $_SERVER['HTTP_X_XSRF_TOKEN'])) {
+        if (!isset($_SERVER['HTTP_X_XSRF_TOKEN']) || !hash_equals($_SESSION[self::CSRF_TOKEN_KEY], $_SERVER['HTTP_X_XSRF_TOKEN'])) {
             $this->responseHandler->setError('Invalid CSRF token');
             return false;
         }

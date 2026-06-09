@@ -34,15 +34,7 @@ class LoginController extends \frieren\core\Controller
         unset($_SESSION['XSRF-TOKEN']);
         unset($_SESSION['user_logged']);
         unset($_COOKIE['XSRF-TOKEN']);
-        $secure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-        setcookie('XSRF-TOKEN', '', [
-            'expires' => time() - 3600,
-            'path' => '/',
-            'domain' => '',
-            'secure' => $secure,
-            'httponly' => false,
-            'samesite' => 'Lax',
-        ]);
+        \frieren\core\ApiCore::sendCsrfCookie('', time() - 3600);
         session_destroy();
 
         return self::setSuccess();
