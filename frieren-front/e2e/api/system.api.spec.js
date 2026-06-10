@@ -55,4 +55,20 @@ test.describe('API: System', () => {
         expect(json).not.toHaveProperty('error');
         expect(Array.isArray(json)).toBe(true);
     });
+
+    test('getServices returns init.d services with boot/running state', async ({ api }) => {
+        const { response, json } = await api.post('system', 'getServices');
+        expect(response.ok()).toBeTruthy();
+        expect(json).not.toHaveProperty('error');
+        expect(json).toHaveProperty('services');
+        expect(Array.isArray(json.services)).toBe(true);
+        expect(json.services.length).toBeGreaterThan(0);
+
+        const service = json.services[0];
+        expect(service).toHaveProperty('name');
+        expect(service).toHaveProperty('enabled');
+        expect(service).toHaveProperty('running');
+        expect(typeof service.enabled).toBe('boolean');
+        expect(typeof service.running).toBe('boolean');
+    });
 });

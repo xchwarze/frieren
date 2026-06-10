@@ -11,7 +11,7 @@ test.describe('Modules', () => {
     });
 
     test('displays installed modules table', async ({ page }) => {
-        await expect(page.getByText('Installed Modules')).toBeVisible();
+        await expect(page.getByText('Installed Modules', { exact: true })).toBeVisible();
 
         const headers = ['Module', 'Description', 'Author', 'Version', 'Size', 'Action'];
         for (const header of headers) {

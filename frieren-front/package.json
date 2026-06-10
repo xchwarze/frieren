@@ -15,9 +15,9 @@
     "test:e2e:ui": "npx playwright test --ui",
     "test:e2e:report": "npx playwright show-report",
     "test:api": "npx playwright test --project=api",
-    "test:api:record": "npx playwright test --project=api e2e/api/record-responses.js",
+    "test:api:record": "npx playwright test --project=record",
     "test:mock": "npx playwright test --project=mock",
-    "test:all": "npx playwright test"
+    "test:all": "npx playwright test --project=e2e --project=api --project=mock"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

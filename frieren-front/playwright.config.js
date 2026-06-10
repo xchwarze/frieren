@@ -32,6 +32,7 @@ export default defineConfig({
         {
             name: 'e2e',
             dependencies: ['setup'],
+            testMatch: /e2e\/[^/]+\.spec\.js$/,
             use: {
                 storageState: './e2e/.auth/session.json',
             },
@@ -40,6 +41,14 @@ export default defineConfig({
             name: 'api',
             dependencies: ['setup'],
             testMatch: /api\/.*\.spec\.js/,
+            use: {
+                storageState: './e2e/.auth/session.json',
+            },
+        },
+        {
+            name: 'record',
+            dependencies: ['setup'],
+            testMatch: /api\/record-responses\.js/,
             use: {
                 storageState: './e2e/.auth/session.json',
             },

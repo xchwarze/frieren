@@ -6,7 +6,7 @@ test.describe('Navigation', () => {
     });
 
     test('sidebar shows all core navigation links', async ({ page }) => {
-        const expectedLinks = ['Dashboard', 'Packages', 'System', 'Modules', 'Wireless', 'Settings'];
+        const expectedLinks = ['Dashboard', 'Packages', 'System', 'Network', 'Modules', 'Wireless', 'Settings'];
         for (const link of expectedLinks) {
             await expect(page.getByRole('link', { name: link })).toBeVisible();
         }
@@ -16,6 +16,7 @@ test.describe('Navigation', () => {
         const routes = [
             { name: 'Packages', hash: '#/packages' },
             { name: 'System', hash: '#/system' },
+            { name: 'Network', hash: '#/network' },
             { name: 'Modules', hash: '#/modules' },
             { name: 'Wireless', hash: '#/wireless' },
             { name: 'Settings', hash: '#/settings' },
@@ -53,16 +54,24 @@ test.describe('Navigation', () => {
     });
 
     test('direct URL navigation works', async ({ page }) => {
-        await page.goto('/#/settings');
-        await page.waitForLoadState('networkidle');
+        // Load each route from a blank page so it is exercised as a real deep
+        // link (full document load). An in-page hash swap between tabbed routes
+        // races with the tab URL canonicalization (replaceState).
+        const deepLink = async (route) => {
+            await page.goto('about:blank');
+            await page.goto(route);
+        };
+
+        await deepLink('/#/settings');
         await expect(page.getByText('Change Timezone')).toBeVisible();
 
-        await page.goto('/#/system');
-        await page.waitForLoadState('networkidle');
+        await deepLink('/#/system');
         await expect(page.getByRole('tab', { name: /Info/ })).toBeVisible();
 
-        await page.goto('/#/dashboard');
-        await page.waitForLoadState('networkidle');
+        await deepLink('/#/network');
+        await expect(page.getByRole('tab', { name: /Interfaces/ })).toBeVisible();
+
+        await deepLink('/#/dashboard');
         await expect(page.getByText('System Stats')).toBeVisible();
     });
 

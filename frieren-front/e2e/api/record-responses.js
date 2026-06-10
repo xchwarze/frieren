@@ -1,6 +1,7 @@
 import { test } from './api-fixture.js';
 import { writeFileSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
+import { sanitizeRecorded, trimRecorded } from '../fixtures/sanitize.js';
 
 const OUTPUT_PATH = './e2e/fixtures/recorded-responses.json';
 
@@ -14,6 +15,7 @@ const ENDPOINTS = [
     ['system', 'getFileSystemUsage'],
     ['system', 'getSystemLogs'],
     ['system', 'getSystemLogs', { search: 'kern' }, 'getSystemLogs:search'],
+    ['system', 'getServices'],
     ['modules', 'getModuleList'],
     ['modules', 'getInstalledModules'],
     ['modules', 'getAvailableModules'],
@@ -23,6 +25,13 @@ const ENDPOINTS = [
     ['packages', 'getInstalledPackagesStatus'],
     ['settings', 'getSectionData'],
     ['terminal', 'getStatus'],
+    ['network', 'getInterfaces'],
+    ['network', 'getDhcpLeases'],
+    ['network', 'getStaticLeases'],
+    ['network', 'getArpTable'],
+    ['network', 'runPing', { host: '127.0.0.1' }],
+    ['network', 'runTraceroute', { host: '127.0.0.1' }],
+    ['network', 'runNslookup', { host: 'localhost' }],
     ['wireless', 'getWirelessOverview'],
     ['wireless', 'getRawWirelessConfig'],
 ];
@@ -55,6 +64,11 @@ test('record all API responses', async ({ api }) => {
                     interface: radio.interfaces[0].ifname,
                 });
                 recorded.wireless.getAssociationList = assocList;
+
+                const { json: ifaceStatus } = await api.post('wireless', 'getInterfaceStatus', {
+                    section: radio.interfaces[0].section,
+                });
+                recorded.wireless.getInterfaceStatus = ifaceStatus;
             }
 
             const { json: scanResult } = await api.post('wireless', 'scanForNetworks', {
@@ -65,5 +79,8 @@ test('record all API responses', async ({ api }) => {
     }
 
     mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
-    writeFileSync(OUTPUT_PATH, JSON.stringify(recorded, null, 2));
+    // Never commit real device data — scrub MACs/IPs/hostnames/SSIDs/keys,
+    // then trim to a small representative sample.
+    const clean = trimRecorded(sanitizeRecorded(recorded));
+    writeFileSync(OUTPUT_PATH, JSON.stringify(clean, null, 2));
 });

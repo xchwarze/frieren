@@ -61,15 +61,14 @@ test.describe('Dashboard', () => {
     });
 
     test('system stats refresh button updates data', async ({ page }) => {
-        await expect(page.getByText('System Stats')).toBeVisible();
-        const statsPanel = page.locator('text=System Stats').locator('..');
-        const statsBefore = await statsPanel.locator('..').textContent();
+        const statsCard = page.locator('.panel-card', { hasText: 'System Stats' });
+        await expect(statsCard).toBeVisible();
 
-        const refreshBtn = statsPanel.getByRole('button');
+        const refreshBtn = statsCard.locator('.panel-card-title').getByRole('button', { name: 'Refresh' });
         await refreshBtn.click();
         await page.waitForTimeout(1500);
 
-        const statsAfter = await statsPanel.locator('..').textContent();
+        const statsAfter = await statsCard.textContent();
         expect(statsAfter).toMatch(/\d+\.?\d*%/);
     });
 });

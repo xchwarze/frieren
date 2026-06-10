@@ -62,6 +62,23 @@ test.describe('API: Wireless', () => {
         expect(json).not.toHaveProperty('error');
     });
 
+    test('getInterfaceStatus returns runtime status for an interface section', async ({ api }) => {
+        const overview = await api.post('wireless', 'getWirelessOverview');
+        const radioNames = Object.keys(overview.json);
+        test.skip(radioNames.length === 0, 'No radios available');
+
+        const radio = overview.json[radioNames[0]];
+        const iface = radio.interfaces?.[0];
+        test.skip(!iface || !iface.section, 'No interface section on first radio');
+
+        const { response, json } = await api.post('wireless', 'getInterfaceStatus', {
+            section: iface.section,
+        });
+        expect(response.ok()).toBeTruthy();
+        expect(json).not.toHaveProperty('error');
+        expect(json).toHaveProperty('mode');
+    });
+
     test('getRawWirelessConfig returns raw UCI text', async ({ api }) => {
         const { response, json } = await api.post('wireless', 'getRawWirelessConfig');
         expect(response.ok()).toBeTruthy();

@@ -40,9 +40,9 @@ test.describe('Wireless', () => {
     });
 
     test('radio header has settings, scan, and add buttons', async ({ page }) => {
-        await expect(page.getByRole('button', { name: 'settings' }).first()).toBeVisible();
-        await expect(page.getByRole('button', { name: 'wifi' }).first()).toBeVisible();
-        await expect(page.getByRole('button', { name: 'plus' }).first()).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Configure radio' }).first()).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Scan networks' }).first()).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Add interface' }).first()).toBeVisible();
     });
 
     test('shows associated stations section', async ({ page }) => {

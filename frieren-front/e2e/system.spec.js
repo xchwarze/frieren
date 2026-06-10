@@ -5,10 +5,10 @@ test.describe('System', () => {
         await page.goto('/#/system');
     });
 
-    test('has three tabs: Info, Logs, Diagnostics', async ({ page }) => {
+    test('has three tabs: Info, Services, Logs', async ({ page }) => {
         await expect(page.getByRole('tab', { name: /Info/ })).toBeVisible();
+        await expect(page.getByRole('tab', { name: /Services/ })).toBeVisible();
         await expect(page.getByRole('tab', { name: /Logs/ })).toBeVisible();
-        await expect(page.getByRole('tab', { name: /Diagnostics/ })).toBeVisible();
     });
 
     test('Info tab shows USB devices table', async ({ page }) => {
@@ -44,9 +44,34 @@ test.describe('System', () => {
         await expect(page.getByText('System Log')).toBeVisible();
     });
 
-    test('Diagnostics tab shows diagnostics panel', async ({ page }) => {
-        await page.getByRole('tab', { name: /Diagnostics/ }).click();
-        await expect(page.getByRole('tabpanel')).toBeVisible();
+    test('Info tab shows diagnostics card', async ({ page }) => {
+        await expect(page.getByText('Diagnostics', { exact: true })).toBeVisible();
+    });
+
+    test('Services tab lists init.d services', async ({ page }) => {
+        await page.getByRole('tab', { name: /Services/ }).click();
+        await expect(page.getByText('Init Services')).toBeVisible();
+
+        const headers = ['Service', 'On Boot', 'Status', 'Action'];
+        for (const header of headers) {
+            await expect(page.getByRole('columnheader', { name: header }).first()).toBeVisible();
+        }
+
+        const rows = page.locator('table tbody tr');
+        await expect(rows.first()).toBeVisible();
+        expect(await rows.count()).toBeGreaterThan(0);
+    });
+
+    test('Services search filters the list', async ({ page }) => {
+        await page.getByRole('tab', { name: /Services/ }).click();
+
+        const searchBox = page.getByPlaceholder('Search services...');
+        await expect(searchBox).toBeVisible();
+        await searchBox.fill('dropbear');
+        await page.waitForTimeout(600);
+
+        const firstRow = await page.locator('table tbody tr').first().textContent();
+        expect(firstRow.toLowerCase()).toContain('dropbear');
     });
 
     test('USB devices refresh button works', async ({ page }) => {

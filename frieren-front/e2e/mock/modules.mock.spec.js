@@ -4,7 +4,7 @@ test.describe('Mock: Modules', () => {
     test('renders installed modules table', async ({ mockPage: page }) => {
         await page.goto('/#/modules');
 
-        await expect(page.getByText('Installed Modules')).toBeVisible();
+        await expect(page.getByText('Installed Modules', { exact: true })).toBeVisible();
         const headers = ['Module', 'Description', 'Author', 'Version', 'Size', 'Action'];
         for (const header of headers) {
             await expect(page.getByRole('columnheader', { name: header })).toBeVisible();
