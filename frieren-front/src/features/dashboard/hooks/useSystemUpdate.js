@@ -4,47 +4,24 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-import { toast } from 'react-toastify';
-
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
-import useBackgroundTask from '@src/hooks/useBackgroundTask.js';
 import { fetchPost } from '@src/services/fetchService.js';
-import { DASHBOARD_GET_UPDATE_STATUS } from '@src/features/dashboard/helpers/queryKeys.js';
 
 /**
- * Manages the system update lifecycle: trigger, poll, notify.
+ * Triggers a system update (download + install + reboot). The "updating" wait —
+ * loading window, reboot detection and redirect — is handled by SystemStatusModal
+ * (action='update'), mirroring the restart flow.
  *
- * @return {Object} { startUpdate, isUpdating, isPending }
+ * @return {Object} The mutation object.
  */
-const useSystemUpdate = () => {
-    const taskStatus = useBackgroundTask({
-        queryKey: DASHBOARD_GET_UPDATE_STATUS,
-        module: 'dashboard',
-        action: 'getSystemUpdateStatus',
-        onCompleted: () => {
-            toast.success('Update installed. Device is rebooting...');
-        },
-    });
-
-    const mutation = useAuthenticatedMutation({
+const useSystemUpdate = () => (
+    useAuthenticatedMutation({
         mutationFn: ({ updateUrl }) => fetchPost({
             module: 'dashboard',
             action: 'startSystemUpdate',
             updateUrl,
         }),
-        onSuccess: ({ success }) => {
-            if (success) {
-                taskStatus.start();
-                toast.info('Downloading and installing update...');
-            }
-        },
-    });
-
-    return {
-        startUpdate: mutation.mutate,
-        isUpdating: taskStatus.isRunning,
-        isPending: mutation.isPending,
-    };
-};
+    })
+);
 
 export default useSystemUpdate;

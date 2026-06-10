@@ -9,6 +9,7 @@ import { Alert } from 'react-bootstrap';
 
 import Button from '@src/components/Button';
 import ConfirmationModal from '@src/components/ConfirmationModal';
+import SystemStatusModal from '@src/components/SystemStatusModal';
 import useNews from '@src/features/dashboard/hooks/useNews.js';
 import useSystemUpdate from '@src/features/dashboard/hooks/useSystemUpdate.js';
 
@@ -22,8 +23,9 @@ const appVersion = import.meta.env.VITE_APP_VERSION;
  */
 const UpdateAlert = () => {
     const { data, isSuccess } = useNews();
-    const { startUpdate, isUpdating, isPending } = useSystemUpdate();
+    const updateMutation = useSystemUpdate();
     const [showConfirm, setShowConfirm] = useState(false);
+    const [systemStatus, setSystemStatus] = useState(null);
     const lastVersion = data?.lastVersion;
     const hasUpdate = isSuccess && lastVersion && lastVersion.version !== appVersion;
 
@@ -33,7 +35,13 @@ const UpdateAlert = () => {
 
     const handleConfirm = () => {
         setShowConfirm(false);
-        startUpdate({ updateUrl: lastVersion.updateUrl });
+        updateMutation.mutate({ updateUrl: lastVersion.updateUrl }, {
+            onSuccess: ({ success }) => {
+                if (success) {
+                    setSystemStatus('update');
+                }
+            },
+        });
     };
 
     return (
@@ -50,9 +58,9 @@ const UpdateAlert = () => {
                         variant={'primary'}
                         size={'sm'}
                         icon={'download'}
-                        label={isUpdating ? 'Updating...' : 'Update'}
-                        loading={isUpdating || isPending}
-                        disabled={isUpdating || isPending}
+                        label={updateMutation.isPending ? 'Updating...' : 'Update'}
+                        loading={updateMutation.isPending}
+                        disabled={updateMutation.isPending}
                         onClick={() => setShowConfirm(true)}
                     />
                 )}
@@ -64,6 +72,7 @@ const UpdateAlert = () => {
                 title={'Confirm System Update'}
                 description={`This will download and install version ${lastVersion.version}. The device will reboot after the update completes. Continue?`}
             />
+            <SystemStatusModal action={systemStatus} onClose={() => setSystemStatus(null)} />
         </>
     );
 };
