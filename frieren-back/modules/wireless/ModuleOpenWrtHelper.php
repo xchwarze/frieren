@@ -32,7 +32,9 @@ class ModuleOpenWrtHelper
         $apList = [];
         foreach ($scanData['results'] as $entry) {
             $ssid = $entry['ssid'] ?? '';
-            if (empty($ssid) || !mb_check_encoding($ssid, 'UTF-8') || $ssid === 'unknown') {
+            // preg_match('//u') rejects invalid UTF-8 via PCRE, so the wireless
+            // module is the only mbstring user dropped — no php8-mod-mbstring dep.
+            if (empty($ssid) || preg_match('//u', $ssid) !== 1 || $ssid === 'unknown') {
                 continue;
             }
 
