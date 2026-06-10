@@ -133,7 +133,9 @@ class SystemController extends \frieren\core\Controller
             return self::setError('Invalid service');
         }
 
-        $enabled = filter_var($this->request['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        // Avoid filter_var (ext-filter is absent on minimal OpenWrt PHP). The JSON
+        // body sends a real boolean; also accept common truthy string/int forms.
+        $enabled = in_array($this->request['enabled'] ?? false, [true, 1, '1', 'true', 'on', 'yes'], true);
         if (!self::setupModuleHelper()::setServiceEnabled($name, $enabled)) {
             $action = $enabled ? 'enable' : 'disable';
             return self::setError("Failed to {$action} {$name}");

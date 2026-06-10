@@ -62,8 +62,12 @@ class DashboardController extends \frieren\core\Controller
             return self::setError('No internet connection available.');
         }
 
-        $updateUrl = filter_var($this->request['updateUrl'] ?? '', FILTER_VALIDATE_URL);
-        if (!$updateUrl) {
+        // FILTER_VALIDATE_URL needs ext-filter, which isn't compiled into minimal
+        // OpenWrt PHP builds — validate with parse_url (always available in core).
+        $updateUrl = trim($this->request['updateUrl'] ?? '');
+        $parts = parse_url($updateUrl);
+        if (!$parts || empty($parts['host']) || empty($parts['scheme'])
+            || !in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
             return self::setError('Invalid update URL');
         }
 
