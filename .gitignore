@@ -29,3 +29,6 @@ dist-ssr
 .claude/
 .nelson/
 /specs/
+/memory/
+/docs/
+/frieren-front/docs/
