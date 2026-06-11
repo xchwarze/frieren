@@ -17,7 +17,7 @@ Originally `frieren-terminal` contained a modified copy of [ttyd's frontend](htt
 import { FrierenTerminal } from '@frieren/terminal-core';
 
 const term = new FrierenTerminal({
-    wsUrl: 'ws://192.168.7.1:1477/ws',
+    wsUrl: 'ws://192.168.7.1:5001/ws',
 });
 
 term.open(document.getElementById('terminal'));

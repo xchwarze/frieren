@@ -49,7 +49,7 @@ diff -Naur html-original/src/components/app.tsx html/src/components/app.tsx
  const wsUrl = [protocol, '//', window.location.host, path, '/ws', window.location.search].join('');
  const tokenUrl = [window.location.protocol, '//', window.location.host, path, '/token'].join('');
 +*/
-+const port = 1477;
++const port = 5001;
 +const wsUrl = [protocol, window.location.hostname, ':', port, '/ws', window.location.search].join('');
 +const tokenUrl = undefined;
 +
