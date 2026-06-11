@@ -144,7 +144,7 @@ class ModuleOpenWrtHelper {
 | system | getUsbDevices, getFileSystemUsage, getSystemLogs, startDiagnosticsScript, getDiagnosticsStatus, downloadDiagnosticsFile, getServices, controlService, toggleEnabled | System monitoring + init.d service control |
 | modules | getModuleList, getAvailableModules, getInstalledModules, downloadModule, downloadStatus, installModule, installStatus, checkDestination, removeModule, pinModule | Module management |
 | settings | getSectionData, setHostname, setTimezone, setDatetimeFromBrowser, setUserPassword, setPanelTheme | System config |
-| terminal | startTerminal, stopTerminal, getStatus | ttyd on port 1477 |
+| terminal | startTerminal, stopTerminal, getStatus | ttyd on port 5001 |
 | packages | updateLists, getUpdateStatus, getInstalledPackages, getInstalledPackagesStatus, getAvailablePackages, getAvailablePackagesStatus, installPackage, getInstallStatus, removePackage, getRemoveStatus | Package management (opkg) |
 | wireless | scanForNetworks, getWirelessOverview, getRadioConfig, setRadioConfig, getAssociationList, addInterface, removeInterface, toggleInterface, getInterfaceConfig, setInterfaceConfig, getRawWirelessConfig, setRawWirelessConfig, resetWirelessConfig | WiFi management |
 

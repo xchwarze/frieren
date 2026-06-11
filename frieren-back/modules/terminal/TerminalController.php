@@ -25,7 +25,7 @@ class TerminalController extends \frieren\core\Controller
     // ttyd is launched via nohup (execBackground) and forks asynchronously, so an
     // immediate pgrep can miss it and report a spurious failure — this is why the
     // very first open after install fails while later ones succeed. Poll briefly to
-    // let the process spawn and bind port 1477 before reporting status.
+    // let the process spawn and bind port 5001 before reporting status.
     const START_POLL_ATTEMPTS = 10;
     const START_POLL_INTERVAL_US = 150000; // 150ms -> up to ~1.5s total
 
@@ -60,7 +60,7 @@ class TerminalController extends \frieren\core\Controller
         $status = OpenWrtHelper::checkRunning($terminal);
         if (!$status) {
             $shell = SettingsHelper::getTerminalAutologin() ? '/bin/ash' : '/bin/login';
-            $command = "{$terminal} -p 1477 -i br-lan {$shell}";
+            $command = "{$terminal} -p 5001 -i br-lan {$shell}";
             OpenWrtHelper::execBackground($command);
             $status = $this->waitForRunning($terminal);
             if (!$status) {
