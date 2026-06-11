@@ -11,7 +11,7 @@ import { FrierenTerminal } from '@frieren/terminal-core';
 import terminalSettingsAtom from '@src/features/terminal/atoms/terminalSettingsAtom.js';
 import { TERMINAL_THEMES } from '@src/features/terminal/helpers/terminalThemes.js';
 
-const WS_PORT = 1477;
+const WS_PORT = 5001;
 
 const buildWsUrl = () => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';

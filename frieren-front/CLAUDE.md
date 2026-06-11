@@ -252,7 +252,7 @@ All requests: `POST {apiPath}` with JSON body `{ module, action, ...params }`.
 | settings | setDatetimeFromBrowser | Sync device time from browser |
 | settings | setUserPassword | Change password |
 | settings | setPanelTheme | Change UI theme |
-| terminal | startTerminal | Start ttyd on port 1477 |
+| terminal | startTerminal | Start ttyd on port 5001 |
 | terminal | stopTerminal | Kill ttyd |
 | terminal | getStatus | Check ttyd running |
 | wireless | getWirelessOverview | Radios + interfaces overview |
