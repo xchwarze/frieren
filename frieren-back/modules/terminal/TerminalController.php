@@ -54,8 +54,11 @@ class TerminalController extends \frieren\core\Controller
 
     public function startTerminal()
     {
-        exec("/etc/init.d/ttyd disable");
+        // disable ttyd instance
+        exec("/etc/init.d/ttyd stop");
+        OpenWrtHelper::execBackground("/etc/init.d/ttyd disable");
 
+        // terminal implementation
         $terminal = $this->getTerminalPath();
         $status = OpenWrtHelper::checkRunning($terminal);
         if (!$status) {
