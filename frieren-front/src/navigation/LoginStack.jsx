@@ -35,7 +35,10 @@ const LoginStack = () => {
             <ErrorBoundary FallbackComponent={ErrorFallback} resetKeys={[location]}>
                 <Switch>
                     {modules.map(({ name, title, version }) => (
-                        <Route key={name} path={`/${name}`}>
+                        // Optional :tab? segment so modules using PanelTabs (which
+                        // canonicalizes the URL to /<name>/<tab>) keep matching their
+                        // route instead of falling through to NotFound.
+                        <Route key={name} path={`/${name}/:tab?`}>
                             <DynamicModule
                                 name={name}
                                 title={title}
