@@ -17,6 +17,11 @@ export interface TerminalLiteViewerOptions {
     theme?: ITheme;
 }
 
+// Read-only view never wants a cursor. Forcing the cursor colour transparent hides
+// it in every renderer and focus state (xterm has no cursorStyle:'none'), and keeps
+// it hidden across operator theme switches.
+const withoutCursor = (theme: ITheme): ITheme => ({ ...theme, cursor: 'transparent' });
+
 /**
  * Render-only terminal view: an xterm surface you write text / ANSI into, with
  * NO websocket, input, zmodem, flow-control or webgl. Purpose-built for showing
@@ -42,7 +47,7 @@ export class TerminalLiteViewer {
             // interactive FrierenTerminal must NOT do this (it gets real CRLF).
             convertEol: true,
             ...options.termOptions,
-            theme: options.theme ?? DEFAULT_THEME,
+            theme: withoutCursor(options.theme ?? DEFAULT_THEME),
         });
 
         // Read-only view: never consume keystrokes. Returning false stops xterm from
@@ -78,7 +83,7 @@ export class TerminalLiteViewer {
     }
 
     setTheme(theme: ITheme): void {
-        this.terminal.options.theme = theme;
+        this.terminal.options.theme = withoutCursor(theme);
     }
 
     dispose(): void {
