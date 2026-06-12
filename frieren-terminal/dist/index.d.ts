@@ -68,6 +68,42 @@ export { ITheme }
 
 export declare const TERMINAL_STATUS_EVENT = "ws-terminal";
 
+/**
+ * Map of terminal theme identifiers to their ITheme color definitions. Shared so
+ * any consumer (the panel terminal or a module's TerminalLiteViewer) renders the
+ * same operator-selected scheme.
+ */
+export declare const TERMINAL_THEMES: Record<string, ITheme>;
+
+/**
+ * Render-only terminal view: an xterm surface you write text / ANSI into, with
+ * NO websocket, input, zmodem, flow-control or webgl. Purpose-built for showing
+ * read-only tool output (logs, ANSI-coloured captures) inside a panel — far
+ * lighter than {@link FrierenTerminal}, which is the full ttyd client.
+ *
+ * Lifecycle: `open(el)` once, then `set(text)` per refresh (or `write` to append);
+ * call `fit()` on container resize and `dispose()` on unmount.
+ */
+export declare class TerminalLiteViewer {
+    private terminal;
+    private fitAddon;
+    constructor(options?: TerminalLiteViewerOptions);
+    open(parent: HTMLElement): void;
+    /** Append data to the view. */
+    write(data: string | Uint8Array): void;
+    /** Replace the whole view (use for re-read/polled snapshots so nothing stacks). */
+    set(data: string | Uint8Array): void;
+    clear(): void;
+    fit(): void;
+    setTheme(theme: ITheme): void;
+    dispose(): void;
+}
+
+export declare interface TerminalLiteViewerOptions {
+    termOptions?: ITerminalOptions;
+    theme?: ITheme;
+}
+
 export declare type TerminalStatus = 'initializing' | 'connected' | 'reconnected' | 'disconnected' | 'reconnecting';
 
 export { }
