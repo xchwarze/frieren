@@ -8,7 +8,6 @@ import { useMemo, useRef } from 'react';
 import { Resizable } from 're-resizable';
 import Collapse from 'react-bootstrap/Collapse';
 import { useAtom, useAtomValue } from 'jotai';
-import '@frieren/terminal-core/index.css';
 
 import terminalStatusAtom from '@src/features/terminal/atoms/terminalStatusAtom.js';
 import terminalSettingsAtom from '@src/features/terminal/atoms/terminalSettingsAtom.js';

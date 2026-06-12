@@ -22,10 +22,6 @@ import * as Yup from 'yup';
 import * as TerminalCore from '@frieren/terminal-core';
 import loadingImage from '@src/assets/loading.png';
 
-// xterm styles loaded app-wide so any consumer of TerminalCore (panel terminal or
-// a module's TerminalLiteViewer) renders styled without bundling the CSS itself.
-import '@frieren/terminal-core/index.css';
-
 /**
  * Sets up UMD support by assigning global variables for various libraries.
  */

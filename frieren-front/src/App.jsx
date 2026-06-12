@@ -7,6 +7,7 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'jotai'
 import 'bootstrap/dist/css/bootstrap.css';
+import '@frieren/terminal-core/index.css';
 
 import './assets/styles.css';
 import './assets/fonts/frieren-icons.css';
