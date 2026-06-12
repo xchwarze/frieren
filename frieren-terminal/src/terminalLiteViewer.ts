@@ -42,6 +42,12 @@ export class TerminalLiteViewer {
             ...options.termOptions,
             theme: options.theme ?? DEFAULT_THEME,
         });
+
+        // Read-only view: never consume keystrokes. Returning false stops xterm from
+        // processing (and preventDefault-ing) the key, so it bubbles to the browser —
+        // F12/devtools and other shortcuts keep working even with the view focused.
+        // Mouse text selection / copy still work.
+        this.terminal.attachCustomKeyEventHandler(() => false);
     }
 
     open(parent: HTMLElement): void {
