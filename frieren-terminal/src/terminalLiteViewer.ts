@@ -17,10 +17,12 @@ export interface TerminalLiteViewerOptions {
     theme?: ITheme;
 }
 
-// Read-only view never wants a cursor. Forcing the cursor colour transparent hides
-// it in every renderer and focus state (xterm has no cursorStyle:'none'), and keeps
-// it hidden across operator theme switches.
-const withoutCursor = (theme: ITheme): ITheme => ({ ...theme, cursor: 'transparent' });
+// Read-only view never wants a cursor. xterm has no cursorStyle:'none', so hide it
+// two ways: cursorInactiveStyle 'none' drops it entirely while unfocused (the normal
+// state — this view ignores keys), and a fully transparent cursor colour covers the
+// focused case (click-to-select). rgba(0,0,0,0) is used over the 'transparent' keyword
+// so xterm's colour parser handles it deterministically; reapplied on theme switches.
+const withoutCursor = (theme: ITheme): ITheme => ({ ...theme, cursor: 'rgba(0, 0, 0, 0)' });
 
 /**
  * Render-only terminal view: an xterm surface you write text / ANSI into, with
@@ -42,6 +44,7 @@ export class TerminalLiteViewer {
             ...DEFAULT_TERM_OPTIONS,
             disableStdin: true,
             cursorBlink: false,
+            cursorInactiveStyle: 'none',
             // Log/file output carries bare "\n" (it is not a tty), so map LF -> CRLF
             // or each line keeps the previous line's column (staircase). The
             // interactive FrierenTerminal must NOT do this (it gets real CRLF).
