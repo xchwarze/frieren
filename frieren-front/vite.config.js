@@ -9,6 +9,10 @@ import react from '@vitejs/plugin-react';
 import { compression } from 'vite-plugin-compression2';
 import { analyzer } from 'vite-bundle-analyzer';
 import path from 'path';
+import { readFileSync } from 'fs';
+
+// eslint-disable-next-line no-undef
+const appVersion = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8')).version;
 
 const cacheBuster = () => ({
   name: 'cache-buster',
@@ -45,6 +49,12 @@ export default defineConfig(({ mode }) => {
         // eslint-disable-next-line no-undef
         '@frieren/terminal-core': path.resolve(__dirname, '../frieren-terminal/dist'),
       }
+    },
+
+    // Single source of truth for the app version: package.json, injected at build
+    // time so it never drifts from the .env files.
+    define: {
+      'import.meta.env.VITE_APP_VERSION': JSON.stringify(appVersion),
     },
 
     // for build
