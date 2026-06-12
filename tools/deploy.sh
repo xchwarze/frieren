@@ -55,7 +55,7 @@ scp_with_pass() {
 }
 
 deploy_back() {
-    echo "Deploying backend -> ${USER}@${HOST}:${REMOTE_PATH}"
+    echo "[+] Deploying backend -> ${USER}@${HOST}:${REMOTE_PATH}"
 
     # api/ core files
     scp_with_pass "${PASS}" "${BACK_PATH}/api/index.php" "${USER}@${HOST}:${REMOTE_PATH}/api/"
@@ -66,27 +66,25 @@ deploy_back() {
     # modules/
     scp_with_pass "${PASS}" -r "${BACK_PATH}/modules" "${USER}@${HOST}:${REMOTE_PATH}/"
 
-    echo "Backend deployed."
+    echo "[*] Backend deployed."
 }
 
 build_terminal() {
-    echo "Building terminal library..."
+    echo "[+] Building terminal library..."
     cd "${TERMINAL_PATH}"
     yarn build
-    echo "Terminal library built."
+    echo "[*] Terminal library built."
 }
 
 deploy_front() {
-    build_terminal
-
-    echo "Building frontend..."
+    echo "[+] Building frontend..."
     cd "${FRONT_PATH}"
     yarn build --mode release
 
-    echo "Deploying frontend -> ${USER}@${HOST}:${REMOTE_PATH}"
+    echo "[+] Deploying frontend -> ${USER}@${HOST}:${REMOTE_PATH}"
     scp_with_pass "${PASS}" -r "${FRONT_PATH}/dist/"* "${USER}@${HOST}:${REMOTE_PATH}/"
 
-    echo "Frontend deployed."
+    echo "[*] Frontend deployed."
 }
 
 deploy_module() {
@@ -99,17 +97,17 @@ deploy_module() {
         exit 1
     fi
 
-    echo "Building module '${MODULE_NAME}'..."
+    echo "[+] Building module '${MODULE_NAME}'..."
     cd "${MODULE_SRC_PATH}"
     yarn build --mode release
 
     local remoteModulePath="${REMOTE_PATH}/modules/${MODULE_NAME}"
-    echo "Deploying module '${MODULE_NAME}' -> ${USER}@${HOST}:${remoteModulePath}"
+    echo "[+] Deploying module '${MODULE_NAME}' -> ${USER}@${HOST}:${remoteModulePath}"
 
     ssh_with_pass "${PASS}" "${USER}@${HOST}" "mkdir -p '${remoteModulePath}'"
     scp_with_pass "${PASS}" -r "dist/"* "${USER}@${HOST}:${remoteModulePath}/"
 
-    echo "Module '${MODULE_NAME}' deployed."
+    echo "[*] Module '${MODULE_NAME}' deployed."
 }
 
 case "$SERVICE" in
