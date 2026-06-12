@@ -293,7 +293,9 @@ class OpenWrtHelper
      */
     public static function hasInternetConnection()
     {
-        $result = self::exec('/bin/ping -c1 -W2 1.1.1.1');
+        // -c2: tolerate a single dropped packet. ping exits 0 if AT LEAST ONE of the two
+        // replies arrives, so one good reply is enough to count as online.
+        $result = self::exec('/bin/ping -c2 -W2 1.1.1.1');
 
         return $result !== false;
     }
