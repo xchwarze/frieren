@@ -81,8 +81,10 @@ export declare const TERMINAL_THEMES: Record<string, ITheme>;
  * read-only tool output (logs, ANSI-coloured captures) inside a panel — far
  * lighter than {@link FrierenTerminal}, which is the full ttyd client.
  *
- * Lifecycle: `open(el)` once, then `set(text)` per refresh (or `write` to append);
- * call `fit()` on container resize and `dispose()` on unmount.
+ * Lifecycle: `open(el)` once, then feed output one of two ways — `write(text)` to
+ * append (streamed/drained deltas) or `set(text)` to replace the whole view (full
+ * snapshots polled each refresh, so nothing stacks). Call `fit()` on container
+ * resize, `clear()` to reset, and `dispose()` on unmount.
  */
 export declare class TerminalLiteViewer {
     private terminal;

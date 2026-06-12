@@ -14612,6 +14612,7 @@ class FrierenTerminal {
     window.dispatchEvent(new CustomEvent(TERMINAL_STATUS_EVENT, { detail: { status } }));
   }
 }
+const withoutCursor = (theme) => ({ ...theme, cursor: "rgba(0, 0, 0, 0)" });
 class TerminalLiteViewer {
   constructor(options = {}) {
     this.fitAddon = new addonFitExports.FitAddon();
@@ -14619,13 +14620,15 @@ class TerminalLiteViewer {
       ...DEFAULT_TERM_OPTIONS,
       disableStdin: true,
       cursorBlink: false,
+      cursorInactiveStyle: "none",
       // Log/file output carries bare "\n" (it is not a tty), so map LF -> CRLF
       // or each line keeps the previous line's column (staircase). The
       // interactive FrierenTerminal must NOT do this (it gets real CRLF).
       convertEol: true,
       ...options.termOptions,
-      theme: options.theme ?? DEFAULT_THEME
+      theme: withoutCursor(options.theme ?? DEFAULT_THEME)
     });
+    this.terminal.attachCustomKeyEventHandler(() => false);
   }
   open(parent) {
     this.terminal.loadAddon(this.fitAddon);
@@ -14648,7 +14651,7 @@ class TerminalLiteViewer {
     this.fitAddon.fit();
   }
   setTheme(theme) {
-    this.terminal.options.theme = theme;
+    this.terminal.options.theme = withoutCursor(theme);
   }
   dispose() {
     this.terminal.dispose();
