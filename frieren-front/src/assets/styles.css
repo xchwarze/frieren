@@ -104,7 +104,7 @@
 }
 
 /* mini loading animation */
-@keyframes spin {
+@keyframes f-spin-element {
     from {
         transform: rotate(0deg);
     }
@@ -115,12 +115,12 @@
 
 .icon-spin {
     display: inline-block;
-    animation: spin 2s linear infinite;
+    animation: f-spin-element 2s linear infinite;
 }
 
 .icon-spin-slow {
     display: inline-block;
-    animation: spin 5s linear infinite;
+    animation: f-spin-element 5s linear infinite;
 }
 
 /* loading.png is white; invert it on light theme so it stays visible */
@@ -151,11 +151,11 @@
 }
 
 .float-image {
-    animation: float 3s ease-in-out infinite;
+    animation: f-float-image 3s ease-in-out infinite;
     will-change: transform;
 }
 
-@keyframes float-image {
+@keyframes f-float-image {
     0%, 100% {
         transform: translateY(0);
     }
