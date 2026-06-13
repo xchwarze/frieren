@@ -32,7 +32,7 @@ const AboutModal = ({ show, onHide }) => (
                 enhancing its performance and modularity.
             </p>
             <div className={'text-center my-4'}>
-                <img src={MascotImage} alt={'Mascot'} className={'about-image'} />
+                <img src={MascotImage} alt={'Mascot'} className={'about-image float-image'} />
             </div>
             <ListGroup variant={'flush'}>
                 <ListGroup.Item><strong>Version:</strong> {appVersion}</ListGroup.Item>
