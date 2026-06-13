@@ -144,8 +144,23 @@
     padding: 0.6rem;
 }
 
-/* for use in about section */
+/* for use in about modal */
 .about-image {
     max-width: 100%;
     height: auto;
+}
+
+.float-image {
+    animation: float 3s ease-in-out infinite;
+    will-change: transform;
+}
+
+@keyframes float-image {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-14px);
+    }
 }

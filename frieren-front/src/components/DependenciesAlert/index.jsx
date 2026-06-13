@@ -70,7 +70,7 @@ const DependenciesAlert = ({ module, dependenciesQueryKey, show, message, intern
             )}
             {isLoading && !showLog && (
                 <div className={'text-center'}>
-                    <Loading size={100} />
+                    <Loading size={96} />
                 </div>
             )}
             {installFailed && (

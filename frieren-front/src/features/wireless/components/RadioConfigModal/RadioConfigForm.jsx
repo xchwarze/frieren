@@ -64,7 +64,7 @@ const RadioConfigForm = ({ radio, onHide }) => {
     if (isFetching && !radioConfig) {
         return (
             <div className={'text-center py-4'}>
-                <Loading size={80} />
+                <Loading size={96} />
             </div>
         );
     }

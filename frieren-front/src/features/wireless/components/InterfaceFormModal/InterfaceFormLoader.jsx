@@ -38,7 +38,7 @@ const InterfaceFormLoader = ({ radio, section, onHide, initialValues, onInterfac
     if (isFetching) {
         return (
             <div className={'text-center py-3'}>
-                <Loading size={80} />
+                <Loading size={96} />
             </div>
         );
     }
