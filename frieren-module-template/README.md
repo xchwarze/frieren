@@ -91,6 +91,10 @@ In the root of this project, the `config` folder contains common configurations 
 # API gateway
 VITE_RELATIVE_API_PATH=api/index.php
 
+# Path to the shared frieren-front sources (the @src / @common components).
+# Defaults to ../frieren-front/src (assumes frieren-front is a sibling checkout).
+VITE_COMMON_ALIAS=../frieren-front/src
+
 # for build
 VITE_COMPRESSION_ENABLE=true
 VITE_ANALYZER_ENABLE=false
@@ -101,10 +105,22 @@ VITE_MANUAL_CHUNKS_ENABLE=false
 ### Configuration Flags
 
 - `VITE_RELATIVE_API_PATH`: Defines the relative path to the API entry point. This is used to configure the API gateway path.
+- `VITE_COMMON_ALIAS`: Filesystem path to `frieren-front/src`, which backs the `@src` and `@common` aliases (the shared `PanelCard`, `PanelStack`, `Button`, … components). Defaults to `../frieren-front/src`, i.e. it assumes `frieren-front` sits next to the module. When `frieren-front` lives elsewhere (e.g. a monorepo where it is under `frieren/frieren-front`), point this at the correct `frieren-front/src`.
 - `VITE_COMPRESSION_ENABLE`: When set to true, it enables compression of the build files, reducing their size and improving load times. This option is primarily used for creating distributable releases and for testing with real hardware in actual environments.
 - `VITE_ANALYZER_ENABLE`: Enables the bundle analyzer plugin when set to `true`. This is useful for analyzing and visualizing the size of the output files.
 - `VITE_SOURCEMAP`: Controls the generation of sourcemaps. Setting this to `true` helps in debugging by mapping the compiled code back to the original source code.
 - `VITE_MANUAL_CHUNKS_ENABLE`: When enabled, this allows for manual chunking of the build output, which can be particularly useful during development and testing with real hardware. This option helps to optimize the loading strategy by separating vendor code from the core code.
+
+### Overriding flags from the CLI
+
+Every flag above is read from the build environment, so besides editing `config/.env.<mode>`
+you can pass any of them inline on the build command — the inline value wins over the `.env`
+file. Handy for one-off builds (CI, a relocated `frieren-front`) without editing committed config:
+
+```bash
+# Build pointing the shared aliases at a frieren-front that isn't a sibling:
+VITE_COMMON_ALIAS=/path/to/frieren-front/src yarn build --mode release
+```
 
 ## Dependencies
 
