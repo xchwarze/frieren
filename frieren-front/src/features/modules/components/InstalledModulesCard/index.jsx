@@ -80,7 +80,7 @@ const InstalledModulesCard = ({ installedQuery }) => {
                     </thead>
                     <tbody>
                     {pageData.map((module) => {
-                        const { name, title, icon, description, author, version, size, repository, bugs, sidebar, forceSidebar, system } = module;
+                        const { name, title, icon, description, author, version, size, repository, documentation, sidebar, forceSidebar, system } = module;
                         return (
                             <tr key={name}>
                                 <td>
@@ -112,13 +112,15 @@ const InstalledModulesCard = ({ installedQuery }) => {
                                         size={'sm'}
                                         onClick={() => openLink(repository)}
                                     />
-                                    <Button
-                                        title={'Report bug'}
-                                        icon={'alert-circle'}
-                                        variant={'outline-secondary'}
-                                        size={'sm'}
-                                        onClick={() => openLink(bugs)}
-                                    />
+                                    {documentation && (
+                                        <Button
+                                            title={'Open documentation'}
+                                            icon={'file-text'}
+                                            variant={'outline-secondary'}
+                                            size={'sm'}
+                                            onClick={() => openLink(documentation)}
+                                        />
+                                    )}
                                     {!system && !forceSidebar && (
                                         <Button
                                             title={sidebar ? 'Unpin' : 'Pin'}

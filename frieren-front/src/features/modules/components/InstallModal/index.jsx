@@ -8,6 +8,7 @@ import { useEffect, useCallback } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
+import Alert from 'react-bootstrap/Alert';
 
 import { MODULE_INSTALL_TYPE_INTERNAL, MODULE_INSTALL_TYPE_SD } from '@src/features/modules/helpers/constants.js';
 import { installModuleAtom, setModuleDestinationAtom } from '@src/features/modules/atoms/installModuleAtom.js';
@@ -15,6 +16,7 @@ import useCheckDestination from '@src/features/modules/hooks/useCheckDestination
 import useDownloadModule from '@src/features/modules/hooks/useDownloadModule';
 import Button from '@src/components/Button';
 import Loading from '@src/components/Loading';
+import { getPanelVersion, isPanelVersionSufficient } from '@src/helpers/versionHelper.js';
 
 /**
  * Generates a modal for installing modules. Handles the download and installation process
@@ -26,9 +28,10 @@ const InstallModal = () => {
     const setDestination = useSetAtom(setModuleDestinationAtom);
     const { data: destinationStatus, refetch: checkDestination, isSuccess: isDestinationSuccess } = useCheckDestination();
     const { mutate: downloadModule } = useDownloadModule();
-    const { title, author, repository, destination, updating } = selectedRemoteModule ?? {};
+    const { title, author, repository, destination, updating, minPanelVersion } = selectedRemoteModule ?? {};
     const { isInternalAvailable, isSDAvailable } = destinationStatus ?? {};
     const isProcessing = destination !== undefined;
+    const meetsMinVersion = isPanelVersionSufficient(minPanelVersion);
 
     const handleDownloadClick = (destination) => {
         setDestination(destination);
@@ -59,7 +62,13 @@ const InstallModal = () => {
                         <p>Downloading and installing...</p>
                     </div>
                 )}
-                {!isProcessing && (
+                {!isProcessing && !meetsMinVersion && (
+                    <Alert variant={'warning'}>
+                        This module requires panel version <strong>{minPanelVersion}</strong> or newer to continue.
+                        Current version: <strong>{getPanelVersion()}</strong>. Update the panel first.
+                    </Alert>
+                )}
+                {!isProcessing && meetsMinVersion && (
                     <>
                         <p>This community module was developed by: <strong>{author}</strong></p>
                         <p>If you have any problem or comment about the module you can leave it to the developer at the{' '}
@@ -68,10 +77,10 @@ const InstallModal = () => {
                 )}
             </Modal.Body>
             <Modal.Footer>
-                {!isDestinationSuccess && (
+                {meetsMinVersion && !isDestinationSuccess && (
                     <Spinner animation={'border'} />
                 )}
-                {isDestinationSuccess && (
+                {meetsMinVersion && isDestinationSuccess && (
                     <>
                         {isSDAvailable && (
                             <Button

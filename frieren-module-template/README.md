@@ -28,6 +28,51 @@ This template comes equipped with various scripts to aid in your module developm
 - `update-module`: Syncs a module's dependencies and config files with this template. Supports `--force`, `--no-files`, `--no-install`, and `--build` flags.
 - `version-bump`: Bumps the module version in package.json and manifest.json.
 
+## Manifest (`public/manifest.json`)
+
+The manifest is your module's contract with the panel. Run `yarn validate` to check it.
+
+```json
+{
+  "title": "Demo Module",
+  "name": "demo",
+  "description": "Demo for scaffolding a new module",
+  "icon": "zap",
+  "authors": [
+    { "name": "DSR!", "email": "xchwarze@gmail.com" }
+  ],
+  "keywords": ["development"],
+  "repository": "https://github.com/xchwarze/frieren-modules/tree/master/demo",
+  "documentation": "https://github.com/xchwarze/frieren-modules/tree/master/demo#readme",
+  "license": "LGPL-3.0-or-later",
+  "guestType": ["OpenWrt"],
+  "dependencies": [],
+  "minPanelVersion": "1.4.1",
+  "system": false,
+  "forceSidebar": false,
+  "version": "1.0.0"
+}
+```
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `name` | yes | Routing key / namespace stem. Must match `^[a-z0-9_]+$` (lowercase, digits, underscore — **no hyphens**). |
+| `title` | yes | Human-facing name. |
+| `description` | yes | One line. |
+| `version` | yes | semver `x.y.z`. |
+| `authors` | yes | Array of `{name, email}` (one or more). |
+| `icon` | sidebar only | A Feather glyph name (see ui-layout.spec §12) **or** an `icon.png` shipped in `public/`. Required when `forceSidebar:true`. |
+| `repository` | yes | Source URL. |
+| `documentation` | no | Docs/readme URL; shown as a button in the panel when present. |
+| `license` | no | SPDX id (e.g. `LGPL-3.0-or-later`). |
+| `keywords` | no | String array. |
+| `guestType` | no | Platforms: `OpenWrt` and/or `RaspberryPi`. |
+| `dependencies` | no | opkg packages for the install handshake. |
+| `minPanelVersion` | no | Minimum panel version (semver). The panel blocks install + shows a notice if it is older. |
+| `system` | yes | `false` for third-party modules. |
+| `forceSidebar` | yes | Show in the sidebar by default. |
+| `order` | no | Reserved for built-in sidebar layout; third-party items append after, by discovery order. |
+
 ## Advanced Examples for Reference
 
 This section provides insights into more complex scenarios that you might encounter while developing modules for the Frieren project. These examples highlight advanced usage of the framework's capabilities and can serve as a reference for implementing sophisticated features in your modules.

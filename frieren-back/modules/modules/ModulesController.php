@@ -168,6 +168,8 @@ class ModulesController extends \frieren\core\Controller
                 continue;
             }
 
+            $authorNames = implode(', ', array_column($info['authors'], 'name'));
+
             $modules[] = [
                 'name' => $info['name'],
                 'title' => $info['title'],
@@ -175,10 +177,10 @@ class ModulesController extends \frieren\core\Controller
                 'sidebar' => isset($sidebarSettings[$info['name']]),
                 'forceSidebar' => $info['forceSidebar'],
                 'description' => $info['description'],
-                'author' => $info['author']['name'],
+                'author' => $authorNames,
                 'version' => $info['version'],
                 'repository' => $info['repository'],
-                'bugs' => $info['bugs'],
+                'documentation' => $info['documentation'] ?? '',
                 'system' => $info['system'],
                 'size' => $moduleSizes[basename($moduleFolder)] ?? '0K',
             ];

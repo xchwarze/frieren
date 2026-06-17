@@ -108,6 +108,15 @@ const AvailableModulesCard = ({ availableQuery, installedQuery }) => {
                                     size={'sm'}
                                     onClick={() => openLink(module.repository)}
                                 />
+                                {module.documentation && (
+                                    <Button
+                                        title={'Open documentation'}
+                                        icon={'file-text'}
+                                        variant={'outline-secondary'}
+                                        size={'sm'}
+                                        onClick={() => openLink(module.documentation)}
+                                    />
+                                )}
                                 {!checkInstalled(module) && (
                                     <Button
                                         title={'Download module'}

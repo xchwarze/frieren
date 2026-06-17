@@ -3,15 +3,19 @@
   "name": "settings",
   "description": "Adds support for system configuration.",
   "icon": "settings",
-  "author": {
-    "name": "DSR!",
-    "email": "xchwarze@gmail.com"
-  },
+  "authors": [
+    {
+      "name": "DSR!",
+      "email": "xchwarze@gmail.com"
+    }
+  ],
   "keywords": [],
   "repository": "https://github.com/xchwarze/frieren",
-  "bugs": "https://github.com/xchwarze/frieren/issues",
-  "homepage": "https://github.com/xchwarze",
+  "documentation": "https://github.com/xchwarze/frieren#readme",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "guestType": [],
+  "dependencies": [],
+  "minPanelVersion": "1.0.0",
   "system": true,
   "forceSidebar": true,
   "version": "1.0.0",

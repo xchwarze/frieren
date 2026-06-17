@@ -8,25 +8,28 @@
  */
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { input, checkbox } from '@inquirer/prompts';
+import { input, checkbox, confirm } from '@inquirer/prompts';
 import { ExitPromptError, CancelPromptError } from '@inquirer/core';
 import fs from 'fs-extra';
 import path from 'path';
-import * as yup from 'yup';
 
-// fix Yup email implementation
-yup.addMethod(yup.string, 'email', function validateEmail(message) {
-    return this.matches( /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
-        message,
-        name: 'email',
-        excludeEmptyString: true,
-    });
-});
+import {
+    stringRequiredSchema,
+    emailSchema,
+    urlSchema,
+    optionalUrlSchema,
+    nameSchema,
+    optionalSemverSchema,
+} from './manifestSchema.js';
 
-// Add a custom prompt for Inquirer
-const promptWithValidation = async (message, schema) => {
+// Turn a comma-separated answer into a clean array (no empty entries).
+const toList = (value) => value.split(',').map((part) => part.trim()).filter(Boolean);
+
+// Inquirer prompt backed by a yup schema for validation.
+const promptWithValidation = async (message, schema, options = {}) => {
     return input({
         message,
+        ...options,
         validate: async (value) => {
             try {
                 await schema.validate(value);
@@ -38,23 +41,27 @@ const promptWithValidation = async (message, schema) => {
     });
 };
 
-const promptUser = async () => {
-    // validations
-    const stringRequiredSchema = yup.string().required('This field is required.');
-    const emailSchema = yup.string().email('Please enter a valid email address').required('This field is required.');
-    const urlSchema = yup.string().url('Please enter a valid URL').required('This field is required.');
+const promptAuthors = async () => {
+    const authors = [];
+    do {
+        const name = await promptWithValidation('Author name:', stringRequiredSchema);
+        const email = await promptWithValidation('Author email:', emailSchema);
+        authors.push({ name, email });
+    } while (await confirm({ message: 'Add another author?', default: false }));
 
-    // prompts
+    return authors;
+};
+
+const promptUser = async () => {
     const title = await promptWithValidation('Module title:', stringRequiredSchema);
-    const name = await promptWithValidation('Module name (e.g. my-module):', stringRequiredSchema);
+    const name = await promptWithValidation('Module name (e.g. my_module):', nameSchema);
     const description = await promptWithValidation('Module description:', stringRequiredSchema);
-    const authorName = await promptWithValidation('Author name:', stringRequiredSchema);
-    const authorEmail = await promptWithValidation('Author email:', emailSchema);
+    const authors = await promptAuthors();
     const keywordsString = await promptWithValidation('Keywords (comma separated):', stringRequiredSchema);
-    const icon = await promptWithValidation('Icon:', stringRequiredSchema);
+    const icon = await promptWithValidation('Icon (Feather glyph name or icon.png):', stringRequiredSchema);
     const repository = await promptWithValidation('Repository URL:', urlSchema);
-    const bugs = await promptWithValidation('Bugs URL:', urlSchema);
-    const homepage = await promptWithValidation('Homepage URL:', urlSchema);
+    const documentation = await promptWithValidation('Documentation URL (optional):', optionalUrlSchema, { default: '' });
+    const license = await input({ message: 'License (SPDX):', default: 'LGPL-3.0-or-later' });
     const guestType = await checkbox({
         message: 'Select Guest Type:',
         required: true,
@@ -64,22 +71,21 @@ const promptUser = async () => {
         ],
     });
     const dependenciesString = await input({ message: 'Extra dependencies (comma separated):' });
+    const minPanelVersion = await promptWithValidation('Minimum panel version (x.y.z, optional):', optionalSemverSchema, { default: '1.0.0' });
 
     return {
         title,
         name,
         description,
         icon,
-        author: {
-            name: authorName,
-            email: authorEmail,
-        },
-        keywords: keywordsString.split(',').map((part) => part.trim()),
+        authors,
+        keywords: toList(keywordsString),
         repository,
-        bugs,
-        homepage,
+        documentation,
+        license,
         guestType,
-        dependencies: dependenciesString.split(',').map((part) => part.trim()),
+        dependencies: toList(dependenciesString),
+        minPanelVersion,
     };
 };
 
@@ -106,28 +112,52 @@ const prepareProjectConfig = async () => {
     }
 }
 
-const generateManifestFile = async (data) => {
+// Builds the manifest in the canonical field order, dropping optional fields left empty.
+const buildManifest = (data) => {
+    const manifest = {
+        title: data.title,
+        name: data.name,
+        description: data.description,
+        icon: data.icon,
+        authors: data.authors,
+        keywords: data.keywords,
+        repository: data.repository,
+    };
+    if (data.documentation) {
+        manifest.documentation = data.documentation;
+    }
+    if (data.license) {
+        manifest.license = data.license;
+    }
+    manifest.guestType = data.guestType;
+    manifest.dependencies = data.dependencies;
+    if (data.minPanelVersion) {
+        manifest.minPanelVersion = data.minPanelVersion;
+    }
+    manifest.system = false;
+    manifest.forceSidebar = false;
+    manifest.version = '1.0.0';
+
+    return manifest;
+};
+
+const generateManifestFile = async (manifest) => {
     const filePath = path.join(process.cwd(), 'public', 'manifest.json');
     if (await fs.pathExists(filePath)) {
         console.log(chalk.yellow('[*] Manifest file already exists. Overwriting...'));
     }
 
-    await fs.writeJson(filePath, data, { spaces: 2 });
+    await fs.writeJson(filePath, manifest, { spaces: 2 });
     console.log(chalk.green(`[+] Manifest file generated at ${filePath}`));
 }
 
-const mainAction = async (options) => {
+const mainAction = async () => {
     try {
         const userInput = await promptUser();
+        const manifest = buildManifest(userInput);
 
-        const manifestData = {
-            ...userInput,
-            system: false,
-            forceSidebar: false,
-            version: "1.0.0",
-        };
-        await updatePackageFile(manifestData);
-        await generateManifestFile(manifestData);
+        await updatePackageFile(manifest);
+        await generateManifestFile(manifest);
         await prepareProjectConfig();
 
         console.log(chalk.green('Module created successfully!'));
@@ -147,17 +177,17 @@ const mainAction = async (options) => {
  * Implementation...
  */
 console.log(chalk.yellow(`
-      ___         ___                       ___           ___           ___           ___     
-     /  /\\       /  /\\        ___          /  /\\         /  /\\         /  /\\         /__/\\    
-    /  /:/_     /  /::\\      /  /\\        /  /:/_       /  /::\\       /  /:/_        \\  \\:\\   
-   /  /:/ /\\   /  /:/\\:\\    /  /:/       /  /:/ /\\     /  /:/\\:\\     /  /:/ /\\        \\  \\:\\  
-  /  /:/ /:/  /  /:/~/:/   /__/::\\      /  /:/ /:/_   /  /:/~/:/    /  /:/ /:/_   _____\\__\\:\\ 
+      ___         ___                       ___           ___           ___           ___
+     /  /\\       /  /\\        ___          /  /\\         /  /\\         /  /\\         /__/\\
+    /  /:/_     /  /::\\      /  /\\        /  /:/_       /  /::\\       /  /:/_        \\  \\:\\
+   /  /:/ /\\   /  /:/\\:\\    /  /:/       /  /:/ /\\     /  /:/\\:\\     /  /:/ /\\        \\  \\:\\
+  /  /:/ /:/  /  /:/~/:/   /__/::\\      /  /:/ /:/_   /  /:/~/:/    /  /:/ /:/_   _____\\__\\:\\
  /__/:/ /:/  /__/:/ /:/___ \\__\\/\\:\\__  /__/:/ /:/ /\\ /__/:/ /:/___ /__/:/ /:/ /\\ /__/::::::::\\
  \\  \\:\\/:/   \\  \\:\\/:::::/    \\  \\:\\/\\ \\  \\:\\/:/ /:/ \\  \\:\\/:::::/ \\  \\:\\/:/ /:/ \\  \\:\\~~\\~~\\/
-  \\  \\::/     \\  \\::/~~~~      \\__\\::/  \\  \\::/ /:/   \\  \\::/~~~~   \\  \\::/ /:/   \\  \\:\\  ~~~ 
-   \\  \\:\\      \\  \\:\\          /__/:/    \\  \\:\\/:/     \\  \\:\\        \\  \\:\\/:/     \\  \\:\\     
-    \\  \\:\\      \\  \\:\\         \\__\\/      \\  \\::/       \\  \\:\\        \\  \\::/       \\  \\:\\    
-     \\__\\/       \\__\\/                     \\__\\/         \\__\\/         \\__\\/         \\__\\/    
+  \\  \\::/     \\  \\::/~~~~      \\__\\::/  \\  \\::/ /:/   \\  \\::/~~~~   \\  \\::/ /:/   \\  \\:\\  ~~~
+   \\  \\:\\      \\  \\:\\          /__/:/    \\  \\:\\/:/     \\  \\:\\        \\  \\:\\/:/     \\  \\:\\
+    \\  \\:\\      \\  \\:\\         \\__\\/      \\  \\::/       \\  \\:\\        \\  \\::/       \\  \\:\\
+     \\__\\/       \\__\\/                     \\__\\/         \\__\\/         \\__\\/         \\__\\/
 
 
  Create Frieren Module - by DSR!

@@ -12,44 +12,22 @@ import fs from 'fs-extra';
 import path from 'path';
 import * as yup from 'yup';
 
-// fix Yup email implementation
-yup.addMethod(yup.string, 'email', function validateEmail(message) {
-    return this.matches( /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
-        message,
-        name: 'email',
-        excludeEmptyString: true,
-    });
-});
+import { manifestSchema, validateIcon } from './manifestSchema.js';
 
-const schema = yup.object().shape({
-    name: yup.string().required('Module name is required.'),
-    version: yup.string().required('Version is required.'),
-    description: yup.string().required('Module description is required.'),
-    author: yup.object().shape({
-        name: yup.string().required('Author name is required.'),
-        email: yup.string().email('Must be a valid email.').required('Author email is required.'),
-    }),
-    system: yup.boolean().required('System flag is required.'),
-    forceSidebar: yup.boolean().required('ForceSidebar flag is required.'),
-    keywords: yup.array().of(yup.string()).min(1, 'At least one keyword is required.'),
-    icon: yup.string().required('Icon is required.'),
-    title: yup.string().required('Title is required.'),
-    order: yup.number().integer().positive().optional(),
-    repository: yup.string().url('Must be a valid URL.').required('Repository URL is required.'),
-    bugs: yup.string().url('Must be a valid URL.').required('Bugs URL is required.'),
-    homepage: yup.string().url('Must be a valid URL.').required('Homepage URL is required.'),
-    guestType: yup.array().of(
-        yup.string().oneOf(['OpenWrt', 'RaspberryPi'], 'GuestType must be either OpenWrt or RaspberryPi')
-    ),
-    dependencies: yup.array().of(yup.string()),
-});
-
-const mainAction = async (options) => {
-    const manifestPath = path.join(process.cwd(), 'public', 'manifest.json');
+const mainAction = async () => {
+    const publicDir = path.join(process.cwd(), 'public');
+    const manifestPath = path.join(publicDir, 'manifest.json');
 
     try {
         const manifest = await fs.readJson(manifestPath);
-        await schema.validate(manifest, { strict: true });
+        await manifestSchema.validate(manifest, { strict: true });
+
+        const { errors, warnings } = validateIcon(manifest, publicDir);
+        warnings.forEach((warning) => console.warn(chalk.yellow(`Warning: ${warning}`)));
+        if (errors.length) {
+            console.error(chalk.red('Validation failed:'), errors);
+            process.exit(1);
+        }
 
         console.log(chalk.green('Validation successful: manifest.json is valid.'));
     } catch (error) {
@@ -68,20 +46,20 @@ const mainAction = async (options) => {
  * Implementation...
  */
 console.log(chalk.yellow(`
-    ,---,.                                                                  
-  ,'  .' |             ,--,                                                 
-,---.'   |   __  ,-. ,--.'|                 __  ,-.                  ,---,  
-|   |   .' ,' ,'/ /| |  |,                ,' ,'/ /|              ,-+-. /  | 
-:   :  :   '  | |' | \`--'_        ,---.   '  | |' |    ,---.    ,--.'|'   | 
-:   |  |-, |  |   ,' ,' ,'|      /     \\  |  |   ,'   /     \\  |   |  ,"' | 
-|   :  ;/| '  :  /   '  | |     /    /  | '  :  /    /    /  | |   | /  | | 
-|   |   .' |  | '    |  | :    .    ' / | |  | '    .    ' / | |   | |  | | 
-'   :  '   ;  : |    '  : |__  '   ;   /| ;  : |    '   ;   /| |   | |  |/  
-|   |  |   |  , ;    |  | '.'| '   |  / | |  , ;    '   |  / | |   | |--'   
-|   :  \\    ---'     ;  :    ; |   :    |  ---'     |   :    | |   |/       
-|   | ,'             |  ,   /   \\   \\  /             \\   \\  /  '---'        
-\`----'                ---\`-'     \`----'               \`----'                
-    
+    ,---,.
+  ,'  .' |             ,--,
+,---.'   |   __  ,-. ,--.'|                 __  ,-.                  ,---,
+|   |   .' ,' ,'/ /| |  |,                ,' ,'/ /|              ,-+-. /  |
+:   :  :   '  | |' | \`--'_        ,---.   '  | |' |    ,---.    ,--.'|'   |
+:   |  |-, |  |   ,' ,' ,'|      /     \\  |  |   ,'   /     \\  |   |  ,"' |
+|   :  ;/| '  :  /   '  | |     /    /  | '  :  /    /    /  | |   | /  | |
+|   |   .' |  | '    |  | :    .    ' / | |  | '    .    ' / | |   | |  | |
+'   :  '   ;  : |    '  : |__  '   ;   /| ;  : |    '   ;   /| |   | |  |/
+|   |  |   |  , ;    |  | '.'| '   |  / | |  , ;    '   |  / | |   | |--'
+|   :  \\    ---'     ;  :    ; |   :    |  ---'     |   :    | |   |/
+|   | ,'             |  ,   /   \\   \\  /             \\   \\  /  '---'
+\`----'                ---\`-'     \`----'               \`----'
+
  Manifest Validator - by DSR!
 `));
 
