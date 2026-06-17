@@ -496,6 +496,14 @@ class ModuleOpenWrtHelper
             }
         }
 
+        // Role pointers live in frieren config, not wireless: report whether THIS section is
+        // the current management (ap) / recon (monitor) interface so the edit form can show
+        // the switch state. Strings '1'/'0' to match the frontend's `=== '1'` check.
+        $config['isManagement'] =
+            (OpenWrtHelper::uciGet('frieren.@settings[0].management_interface', false) === $section) ? '1' : '0';
+        $config['isRecon'] =
+            (OpenWrtHelper::uciGet('frieren.@settings[0].recon_interface', false) === $section) ? '1' : '0';
+
         return $config;
     }
 
@@ -510,10 +518,12 @@ class ModuleOpenWrtHelper
      * @param string $network    UCI network name.
      * @param mixed  $hidden     Whether to hide the SSID (1 or 0).
      * @param mixed  $disabled   Whether to disable the interface (1 or 0).
+     * @param bool   $isManagement Mark this ap interface as the management interface.
+     * @param bool   $isRecon      Mark this monitor interface as the recon interface.
      * @return bool True on success.
      * @throws \Exception If the section does not exist.
      */
-    public static function setInterfaceConfig($section, $ssid, $encryption, $key, $mode, $network, $hidden, $disabled)
+    public static function setInterfaceConfig($section, $ssid, $encryption, $key, $mode, $network, $hidden, $disabled, $isManagement = false, $isRecon = false)
     {
         $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
 
@@ -535,11 +545,35 @@ class ModuleOpenWrtHelper
             OpenWrtHelper::uciSet("wireless.{$section}.hidden", $hidden ? 1 : 0, false, false);
         }
 
+        // Role pointers (frieren config): mirror addInterface so editing an interface can set
+        // OR clear its management/recon role. Setting overwrites the single pointer; clearing
+        // only blanks it when THIS section currently holds the role (don't clobber another's).
+        self::setRolePointer('management_interface', $section, $mode === 'ap' && $isManagement);
+        self::setRolePointer('recon_interface', $section, $mode === 'monitor' && $isRecon);
+
         OpenWrtHelper::uciCommit();
 
         OpenWrtHelper::execBackground('wifi reload');
 
         return true;
+    }
+
+    /**
+     * Sets a frieren role pointer (management_interface / recon_interface) to $section when
+     * $enabled, or blanks it when disabled and $section currently holds it. Does not commit.
+     *
+     * @param string $key     Pointer key under frieren.@settings[0].
+     * @param string $section  Wireless section this interface owns.
+     * @param bool   $enabled  Whether this section should hold the role.
+     */
+    private static function setRolePointer($key, $section, $enabled)
+    {
+        $path = "frieren.@settings[0].{$key}";
+        if ($enabled) {
+            OpenWrtHelper::uciSet($path, $section, false, false);
+        } elseif (OpenWrtHelper::uciGet($path, false) === $section) {
+            OpenWrtHelper::uciSet($path, '', false, false);
+        }
     }
 
     /**

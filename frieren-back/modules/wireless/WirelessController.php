@@ -140,7 +140,9 @@ class WirelessController extends \frieren\core\Controller
             $this->request['mode'],
             $this->request['network'],
             $this->request['hidden'],
-            $this->request['disabled']
+            $this->request['disabled'],
+            $this->request['isManagement'] ?? false,
+            $this->request['isRecon'] ?? false
         )) {
             return self::setSuccess();
         }
