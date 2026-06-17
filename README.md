@@ -22,7 +22,7 @@ Frieren is a framework for running security tools on OpenWrt routers and Single 
 - **[frieren-back](frieren-back/)** — PHP micro-framework. JSON POST API with session auth, CSRF, UCI config integration, and a mini ORM.
 - **[frieren-front](frieren-front/)** — React SPA (Vite, Wouter, Jotai, React Query). Supports dynamic UMD module loading.
 - **[frieren-module-template](frieren-module-template/)** — Scaffolding tool for developing third-party modules with shared dependencies via window globals.
-- **[frieren-terminal](frieren-terminal/)** — Modified ttyd web terminal (Webpack + xterm.js) built into an inlined HTML asset for the ttyd binary.
+- **[frieren-terminal](frieren-terminal/)** — `@frieren/terminal-core`, a TypeScript/xterm.js library bundled into the frontend. Provides the live ttyd terminal client, a read-only log viewer, and the shared terminal themes.
 - **[tools](tools/)** — Development helpers: dev API proxy, device deploy script, API test client, and a PHP minifier.
 
 ## Related Repositories
