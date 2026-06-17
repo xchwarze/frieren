@@ -9,10 +9,12 @@ Frieren is a framework for running security tools on OpenWrt routers and Single 
 ## Features
 
 - **WiFi Management** — Create, edit, and remove wireless interfaces. Scan for networks, configure radios, edit raw UCI config.
+- **Network** — Manage network interfaces, view DHCP leases, and run connectivity diagnostics.
 - **Module System** — Install, remove, and pin third-party modules from a remote repository. Modules load dynamically as UMD bundles.
 - **Package Manager** — Install and remove opkg packages directly from the web panel.
 - **Integrated Terminal** — Web-based terminal (ttyd) accessible from the panel.
-- **System Tools** — Dashboard with system stats, USB device listing, filesystem usage, syslog viewer, diagnostics.
+- **System Tools** — Dashboard with system stats, USB device listing, filesystem usage, syslog viewer, diagnostics, and init.d service control.
+- **Settings** — Configure hostname, timezone, user password, and panel theme.
 - **Extensible** — Scaffold new modules with `frieren-module-template`. PHP controller + React frontend per module.
 
 ## Components
@@ -20,11 +22,14 @@ Frieren is a framework for running security tools on OpenWrt routers and Single 
 - **[frieren-back](frieren-back/)** — PHP micro-framework. JSON POST API with session auth, CSRF, UCI config integration, and a mini ORM.
 - **[frieren-front](frieren-front/)** — React SPA (Vite, Wouter, Jotai, React Query). Supports dynamic UMD module loading.
 - **[frieren-module-template](frieren-module-template/)** — Scaffolding tool for developing third-party modules with shared dependencies via window globals.
+- **[frieren-terminal](frieren-terminal/)** — Modified ttyd web terminal (Webpack + xterm.js) built into an inlined HTML asset for the ttyd binary.
+- **[tools](tools/)** — Development helpers: dev API proxy, device deploy script, API test client, and a PHP minifier.
 
 ## Related Repositories
 
 - **[Frieren Modules](https://github.com/xchwarze/frieren-modules)**: Contains community-developed modules based on the `frieren-module-template`. This repository is a resource for users looking to extend the functionality of their Frieren installation with additional features.
 - **[Frieren Release](https://github.com/xchwarze/frieren-release)**: Hosts the installers for deploying precompiled versions of Frieren. This repository is ideal for users who wish to install Frieren quickly and easily without going through the build process.
+- **[Frieren Modules Release](https://github.com/xchwarze/frieren-modules-release)**: Build pipeline for the module catalog — generates the `modules.json` index and the per-module release tarballs that the panel installs from.
 
 ## Installation
 
