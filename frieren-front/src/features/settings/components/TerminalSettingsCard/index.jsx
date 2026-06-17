@@ -16,6 +16,7 @@ import InputField from '@src/components/Form/InputField';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import FormActions from '@src/components/FormActions';
 
 const CURSOR_STYLE_OPTIONS = [
     { value: 'block', label: 'Block' },
@@ -84,7 +85,9 @@ const TerminalSettingsCard = ({ query }) => {
                     name={'terminalAutologin'}
                     label={'Use Autologin'}
                 />
-                <SubmitButton />
+                <FormActions>
+                    <SubmitButton />
+                </FormActions>
             </FormProvider>
         );
     };

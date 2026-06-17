@@ -15,6 +15,7 @@ import SkeletonBar from '@src/components/SkeletonBar';
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import FormActions from '@src/components/FormActions';
 
 /**
  * Generate a timezone card component with the ability to change the timezone.
@@ -37,7 +38,7 @@ const TimezoneCard = ({ query }) => {
                         <SkeletonBar width={80} />
                         <div className={'mt-1'}><SkeletonBar width={300} height={38} barHeight={34} /></div>
                     </div>
-                    <div className={'d-flex gap-2'}>
+                    <div className={'d-flex justify-content-end gap-2 mt-3'}>
                         <SkeletonBar width={80} height={38} barHeight={34} />
                         <SkeletonBar width={38} height={38} barHeight={34} />
                     </div>
@@ -52,10 +53,10 @@ const TimezoneCard = ({ query }) => {
                     label={'Timezone'}
                     options={TIMEZONES}
                 />
-                <div className={'d-flex gap-2'}>
+                <FormActions>
                     <SubmitButton />
                     <SyncFromBrowserButton />
-                </div>
+                </FormActions>
             </FormProvider>
         );
     };

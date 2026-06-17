@@ -83,20 +83,19 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                 </ActionButtons>
             </div>
 
-            {radio.interfaces?.length > 0 || hasNewInterface ? (
-                <PanelTable>
-                    <thead>
-                        <tr>
-                            <th>Interface</th>
-                            <th>SSID</th>
-                            <th>Mode</th>
-                            <th>BSSID</th>
-                            <th>Encryption</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <PanelTable>
+                <thead>
+                    <tr>
+                        <th>Interface</th>
+                        <th>SSID</th>
+                        <th>Mode</th>
+                        <th>BSSID</th>
+                        <th>Encryption</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
                         {radio.interfaces?.map((iface) => (
                             isCheckingRadio && checkingSection === iface.section ? (
                                 <InterfaceSkeletonRow key={iface.section} />
@@ -146,11 +145,13 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                             )
                         ))}
                         {hasNewInterface && <InterfaceSkeletonRow />}
+                        {!(radio.interfaces?.length > 0) && !hasNewInterface && (
+                            <tr>
+                                <td colSpan={7}>No interfaces configured</td>
+                            </tr>
+                        )}
                     </tbody>
                 </PanelTable>
-            ) : (
-                <p className={'text-body-secondary'}>No interfaces configured</p>
-            )}
 
             <ConfirmationModal
                 show={!!confirmRemove}

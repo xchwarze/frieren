@@ -40,9 +40,9 @@ const AboutModal = ({ show, onHide }) => (
             </ListGroup>
         </Modal.Body>
         <Modal.Footer className={'justify-content-center'}>
-            <small className={'text-muted'}>
-                For more information and contributions, visit our
-                &nbsp;<a href={'https://github.com/xchwarze/frieren'} target={'_blank'} rel={'noopener noreferrer'}>GitHub</a>.
+            <small className={'text-body-secondary'}>
+                For more information and contributions, visit our{' '}
+                <a href={'https://github.com/xchwarze/frieren'} target={'_blank'} rel={'noopener noreferrer'}>GitHub</a>.
                 The artist who created the image is <a href={'https://twitter.com/yohira_works'} target={'_blank'} rel={'noopener noreferrer'}>@yohira_works</a>.
             </small>
         </Modal.Footer>

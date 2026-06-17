@@ -23,25 +23,23 @@ const Settings = () => {
     const query = useGetSectionData();
 
     return (
-        <>
-            <Row className={'g-3'}>
-                <Col md={6}>
-                    <TimezoneCard query={query} />
-                </Col>
-                <Col md={6}>
-                    <HostnameCard query={query} />
-                </Col>
-                <Col md={6}>
-                    <TerminalSettingsCard query={query} />
-                </Col>
-                <Col md={6}>
-                    <UpdateUserPasswordCard />
-                </Col>
-                <Col md={6}>
-                    <PanelThemeCard query={query} />
-                </Col>
-            </Row>
-        </>
+        <Row className={'g-3'}>
+            <Col md={6}>
+                <TimezoneCard query={query} />
+            </Col>
+            <Col md={6}>
+                <HostnameCard query={query} />
+            </Col>
+            <Col md={6}>
+                <TerminalSettingsCard query={query} />
+            </Col>
+            <Col md={6}>
+                <UpdateUserPasswordCard />
+            </Col>
+            <Col md={6}>
+                <PanelThemeCard query={query} />
+            </Col>
+        </Row>
     );
 }
 

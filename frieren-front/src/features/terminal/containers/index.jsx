@@ -79,15 +79,11 @@ const Terminal = () => {
 
     useTerminalStatusEvent();
 
-    return (
-        <>
-            {terminalStatus && (
-                <div className={'flex-shrink-0'}>
-                    <TerminalHeader />
-                    <TerminalPanel />
-                </div>
-            )}
-        </>
+    return terminalStatus && (
+        <div className={'flex-shrink-0'}>
+            <TerminalHeader />
+            <TerminalPanel />
+        </div>
     );
 };
 

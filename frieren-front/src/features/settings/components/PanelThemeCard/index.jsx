@@ -13,6 +13,7 @@ import SkeletonBar from '@src/components/SkeletonBar';
 import FormProvider from '@src/components/Form/FormProvider';
 import SelectField from '@src/components/Form/SelectField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import FormActions from '@src/components/FormActions';
 
 const THEMES = [
     { value: 'light', label: 'Light' },
@@ -53,7 +54,9 @@ const PanelThemeCard = ({ query }) => {
                     label={'Interface Theme'}
                     options={THEMES}
                 />
-                <SubmitButton />
+                <FormActions>
+                    <SubmitButton />
+                </FormActions>
             </FormProvider>
         );
     };

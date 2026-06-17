@@ -54,16 +54,16 @@ const InstallModal = () => {
             </Modal.Header>
             <Modal.Body>
                 {isProcessing && (
-                    <div className={'text-center mt-3'}>
+                    <div className={'text-center'}>
                         <Loading size={96} />
-                        <p className={'mt-2'}>Downloading and installing...</p>
+                        <p>Downloading and installing...</p>
                     </div>
                 )}
                 {!isProcessing && (
                     <>
-                        <p>This community module was developed by: <strong className={'ms-1'}>{author}</strong></p>
-                        <p>If you have any problem or comment about the module you can leave it to the developer at the
-                            <a className={'mx-1'} href={repository} target={'_blank'} rel={'noopener noreferrer'}>following link</a></p>
+                        <p>This community module was developed by: <strong>{author}</strong></p>
+                        <p>If you have any problem or comment about the module you can leave it to the developer at the{' '}
+                            <a href={repository} target={'_blank'} rel={'noopener noreferrer'}>following link</a></p>
                     </>
                 )}
             </Modal.Body>

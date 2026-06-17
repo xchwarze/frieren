@@ -59,7 +59,6 @@ const SystemLogsCard = () => {
                         value={searchTerm}
                         onChange={setSearchTerm}
                         placeholder={'Search logs...'}
-                        className={'mb-3'}
                     />
                     <PanelTable>
                         <thead>

@@ -12,6 +12,7 @@ import PanelCard from '@src/components/PanelCard';
 import FormProvider from '@src/components/Form/FormProvider';
 import InputField from '@src/components/Form/InputField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import FormActions from '@src/components/FormActions';
 
 const defaultValues = {
     currentPassword: '',
@@ -57,7 +58,9 @@ const UpdateUserPasswordCard = () => {
                     type={'password'}
                     placeholder={'Confirm new password'}
                 />
-                <SubmitButton />
+                <FormActions>
+                    <SubmitButton />
+                </FormActions>
             </FormProvider>
         </PanelCard>
     );

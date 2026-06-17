@@ -13,7 +13,7 @@ import Button from '@src/components/Button';
 /**
  * Panel card with a title, optional subtitle, and optional refresh button.
  *
- * Owns the title→content gap (the header block carries `mb-3`) so consumers
+ * Owns the title→content gap (the header block carries `mb-4`) so consumers
  * never add a top margin to their first child to compensate. Card-to-card
  * spacing is the container's job (use a `gap-*` wrapper), not the card's.
  *
@@ -23,6 +23,8 @@ import Button from '@src/components/Button';
  * @param {Boolean} [showRefresh=true] - Whether to show the refresh button.
  * @param {Function} [refetch] - Refetch handler for the refresh button.
  * @param {Boolean} [isFetching] - Disables and spins the refresh button while fetching.
+ * @param {Boolean} [fill=false] - Make the body a flex column so a trailing child with
+ *   `mt-auto` anchors to the bottom (pairs with `className="h-100"` for equal-height rows).
  * @param {ReactNode} children - The content to render inside the panel card.
  * @param {Object} rest - Additional props forwarded to the Card root (e.g. className).
  * @return {ReactNode} The rendered panel card component.
@@ -34,12 +36,13 @@ const PanelCard = ({
                        showRefresh = true,
                        refetch,
                        isFetching,
+                       fill = false,
                        className = '',
                        children,
                        ...rest
                    }) => (
     <Card className={`panel-card ${className}`.trim()} {...rest}>
-        <Card.Body>
+        <Card.Body className={fill ? 'd-flex flex-column' : undefined}>
             <div className={'mb-4'}>
                 <Card.Title className={'panel-card-title'}>
                     <span className={'d-inline-flex align-items-center gap-2'}>
@@ -77,6 +80,7 @@ PanelCard.propTypes = {
     showRefresh: PropTypes.bool,
     refetch: PropTypes.func,
     isFetching: PropTypes.bool,
+    fill: PropTypes.bool,
     className: PropTypes.string,
     children: PropTypes.node.isRequired,
 };

@@ -82,36 +82,37 @@ const AssociationListCard = () => {
                     </Form.Select>
                 </Form.Group>
             )}
-            {sorted.length > 0 ? (
-                <PanelTable>
-                    <thead>
-                        <tr>
-                            {renderSortHeader('mac', 'MAC Address')}
-                            {renderSortHeader('signal', 'Signal')}
-                            {renderSortHeader('noise', 'Noise')}
-                            {renderSortHeader('rx_rate', 'RX Rate')}
-                            {renderSortHeader('tx_rate', 'TX Rate')}
+            <PanelTable>
+                <thead>
+                    <tr>
+                        {renderSortHeader('mac', 'MAC Address')}
+                        {renderSortHeader('signal', 'Signal')}
+                        {renderSortHeader('noise', 'Noise')}
+                        {renderSortHeader('rx_rate', 'RX Rate')}
+                        {renderSortHeader('tx_rate', 'TX Rate')}
+                    </tr>
+                </thead>
+                <tbody>
+                    {sorted.map((client) => (
+                        <tr key={client.mac}>
+                            <td><code>{client.mac}</code></td>
+                            <td>
+                                <Badge bg={getSignalVariant(client.signal)}>
+                                    {client.signal} dBm
+                                </Badge>
+                            </td>
+                            <td>{client.noise} dBm</td>
+                            <td>{client.rx_rate}</td>
+                            <td>{client.tx_rate}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {sorted.map((client) => (
-                            <tr key={client.mac}>
-                                <td><code>{client.mac}</code></td>
-                                <td>
-                                    <Badge bg={getSignalVariant(client.signal)}>
-                                        {client.signal} dBm
-                                    </Badge>
-                                </td>
-                                <td>{client.noise} dBm</td>
-                                <td>{client.rx_rate}</td>
-                                <td>{client.tx_rate}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </PanelTable>
-            ) : (
-                <p className={'text-body-secondary'}>No associated stations</p>
-            )}
+                    ))}
+                    {sorted.length === 0 && (
+                        <tr>
+                            <td colSpan={5}>No associated stations</td>
+                        </tr>
+                    )}
+                </tbody>
+            </PanelTable>
         </PanelCard>
     );
 };

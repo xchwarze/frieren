@@ -155,7 +155,7 @@ const SystemStatusModal = ({ action, onClose }) => {
                 <Modal.Body className={'text-center py-5'}>
                     <Loading size={96} className={'mb-3'} />
                     <h5>Restarting device...</h5>
-                    <p className={'text-muted mb-0'}>Checking connectivity every 20 seconds</p>
+                    <p className={'text-body-secondary mb-0'}>Checking connectivity every 20 seconds</p>
                 </Modal.Body>
             </Modal>
         );
@@ -170,7 +170,7 @@ const SystemStatusModal = ({ action, onClose }) => {
                             <Icon name={'alert-triangle'} style={{ fontSize: '2.5rem' }} />
                         </div>
                         <h5>Update did not complete</h5>
-                        <p className={'text-muted'}>The device did not reboot in time — the update may have failed. Check the device and try again.</p>
+                        <p className={'text-body-secondary'}>The device did not reboot in time — the update may have failed. Check the device and try again.</p>
                         <Button variant={'secondary'} onClick={onClose} label={'Close'} />
                     </Modal.Body>
                 </Modal>
@@ -182,7 +182,7 @@ const SystemStatusModal = ({ action, onClose }) => {
                 <Modal.Body className={'text-center py-5'}>
                     <Loading size={96} className={'mb-3'} />
                     <h5>Updating device...</h5>
-                    <p className={'text-muted mb-0'}>Downloading and installing. The device will reboot — checking every 30 seconds.</p>
+                    <p className={'text-body-secondary mb-0'}>Downloading and installing. The device will reboot — checking every 30 seconds.</p>
                 </Modal.Body>
             </Modal>
         );

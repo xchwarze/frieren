@@ -13,6 +13,7 @@ import SkeletonBar from '@src/components/SkeletonBar';
 import FormProvider from '@src/components/Form/FormProvider';
 import InputField from '@src/components/Form/InputField';
 import SubmitButton from '@src/components/Form/SubmitButton';
+import FormActions from '@src/components/FormActions';
 
 /**
  * Generate a HostnameCard component that allows users to change the hostname.
@@ -47,7 +48,9 @@ const HostnameCard = ({ query }) => {
                     label={'Hostname'}
                     placeholder={'Enter the new hostname'}
                 />
-                <SubmitButton />
+                <FormActions>
+                    <SubmitButton />
+                </FormActions>
             </FormProvider>
         );
     };
