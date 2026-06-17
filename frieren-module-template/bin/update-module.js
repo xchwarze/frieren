@@ -39,6 +39,7 @@ const SYNCED_FILES = [
     '.gitignore',
     '.yarnrc.yml',
     'vite.config.js',
+    'bin/manifestSchema.js',
     'bin/update-module.js',
     'bin/validate.js',
     'bin/version-bump.js',
