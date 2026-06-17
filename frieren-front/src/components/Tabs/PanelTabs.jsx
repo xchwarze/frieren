@@ -19,11 +19,11 @@ import ConditionalTabContent from '@src/components/Tabs/ConditionalTabContent';
  * react-bootstrap <Tabs> can introspect it to render the nav.
  *
  * @param {String} id - The container base path segment (e.g. 'network').
- * @param {Object} tab - { key, title, icon, content }.
+ * @param {Object} tab - { key, title, icon, count?, content }.
  * @return {ReactElement} The <Tab> element.
  */
-export const renderPanelTab = (id, { key, title, icon, content }) => (
-    <Tab key={key} eventKey={key} title={<TabTitle title={title} icon={icon} />}>
+export const renderPanelTab = (id, { key, title, icon, count, content }) => (
+    <Tab key={key} eventKey={key} title={<TabTitle title={title} icon={icon} count={count} />}>
         <ConditionalTabContent id={id} eventKey={key}>
             {content}
         </ConditionalTabContent>

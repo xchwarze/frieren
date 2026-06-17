@@ -19,7 +19,8 @@ import useActiveTab from '@src/hooks/useActiveTab.js';
 const ConditionalTabContent = ({ id, eventKey, children }) => {
     const { activeTab } = useActiveTab(id, 'Dummy');
 
-    return activeTab === eventKey ? <>{children}</> : null;
+    // mt-3 separates the tab nav from its content (the gap the tab bar otherwise lacks).
+    return activeTab === eventKey ? <div className={'mt-3'}>{children}</div> : null;
 };
 
 ConditionalTabContent.propTypes = {
