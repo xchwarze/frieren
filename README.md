@@ -43,6 +43,11 @@ For a quick and easy installation, execute the following command in your termina
 wget -qO- https://raw.githubusercontent.com/xchwarze/frieren-release/master/install/install-openwrt.sh | sh
 ```
 
+> **New to this? Start here.** If you're not sure what OpenWrt is, how to flash it, or
+> how to open the panel afterwards, follow the step-by-step, beginner-friendly
+> **[Installation FAQ](FAQ.md)** — it walks you through everything from a clean device to
+> logging in.
+
 ### Manual Compilation
 
 Each component within the Frieren project (`frieren-back`, `frieren-front` and `frieren-module-template`) has its own detailed `README.md` file with specific build and installation instructions. Please refer to these files in their respective directories for more detailed guidance.
