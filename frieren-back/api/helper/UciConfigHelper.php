@@ -30,6 +30,20 @@ class UciConfigHelper
         }
 
         $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        return self::parseLines($lines);
+    }
+
+    /**
+     * Parses UCI config lines into a sections array. Named sections (quoted or
+     * bare) are keyed by their name; anonymous sections are keyed @type[i],
+     * where i counts anonymous sections of that type in file order.
+     *
+     * @param array $lines Config file lines without trailing newlines.
+     * @return array Parsed config data keyed by section.
+     */
+    private static function parseLines($lines)
+    {
         $config = [];
         $currentSectionKey = null;
         $sectionCounter = [];
@@ -37,15 +51,17 @@ class UciConfigHelper
         foreach ($lines as $line) {
             $trimmed = ltrim($line);
 
-            // Ignore comments
+            // Ignore blank lines and comments
             if ($trimmed === '' || $trimmed[0] === '#') {
                 continue;
             }
 
             $keyword = $trimmed[0];
 
-            // Section support
-            if ($keyword === 'c' && preg_match('/^config\s+(\w+)\s*(\w*)/', $trimmed, $matches)) {
+            // Section: `config <type> [ 'name' | "name" | name ]`. The type may
+            // contain hyphens (e.g. wifi-device); the name, when present, may be
+            // single/double quoted or a bare identifier.
+            if ($keyword === 'c' && preg_match('/^config\s+(\S+)(?:\s+(?:"([^"]*)"|\'([^\']*)\'|(\w+)))?/', $trimmed, $matches)) {
                 $currentSectionKey = self::parseConfig($matches, $config, $sectionCounter);
                 continue;
             }
@@ -76,8 +92,18 @@ class UciConfigHelper
     private static function parseConfig($matches, &$config, &$sectionCounter)
     {
         $type = $matches[1];
-        $name = $matches[2];
-        if (empty($name)) {
+
+        // Name is whichever of the double-quoted / single-quoted / bare capture
+        // groups matched; empty string means the section is anonymous.
+        $name = '';
+        foreach ([2, 3, 4] as $group) {
+            if (isset($matches[$group]) && $matches[$group] !== '') {
+                $name = $matches[$group];
+                break;
+            }
+        }
+
+        if ($name === '') {
             if (!isset($sectionCounter[$type])) {
                 $sectionCounter[$type] = -1;
             }
