@@ -200,6 +200,44 @@ class OpenWrtHelper
     }
 
     /**
+     * Reads a whole UCI config through ubus (the live uci engine), returning its
+     * sections keyed by their real identifier.
+     *
+     * Contrast with uciReadConfig(): that parses the config file with zero
+     * process spawns but keys anonymous sections positionally as @type[i]; ubus
+     * instead reports each section's real name and, for anonymous sections, the
+     * internal cfgXXXXXX id it uses everywhere else. Use this reader (one process
+     * spawn) when call sites address sections by the identity ubus reports (e.g.
+     * wireless, whose wifi-iface sections may be anonymous); prefer uciReadConfig()
+     * for named-only configs on a hot path.
+     *
+     * @param string $configName Config name (e.g. 'wireless', 'network').
+     * @return array Sections keyed by name/id; empty array on failure.
+     */
+    public static function uciGetConfig($configName)
+    {
+        $result = self::execUbusCall('uci', 'get', ['config' => $configName]);
+
+        return ($result !== false && isset($result['values'])) ? $result['values'] : [];
+    }
+
+    /**
+     * Reads a single UCI section's options through ubus. See uciGetConfig() for
+     * the ubus-vs-file-parser tradeoff.
+     *
+     * @param string $configName Config name (e.g. 'wireless').
+     * @param string $section Section identifier as reported by ubus (a real name
+     *                        like 'radio0'/'wifinet0', or an anonymous cfgXXXXXX id).
+     * @return array The section's option map; empty array when the section is missing.
+     */
+    public static function uciGetSection($configName, $section)
+    {
+        $result = self::execUbusCall('uci', 'get', ['config' => $configName, 'section' => $section]);
+
+        return ($result !== false && isset($result['values'])) ? $result['values'] : [];
+    }
+
+    /**
      * Downloads a file from a specified URL and saves it to a given path.
      *
      * @param string $url The URL of the file to be downloaded.

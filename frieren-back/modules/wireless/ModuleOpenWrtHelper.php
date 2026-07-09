@@ -83,8 +83,7 @@ class ModuleOpenWrtHelper
     public static function getWirelessOverview()
     {
         // UCI: source of truth for all radios and interfaces (including disabled)
-        $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'wireless']);
-        $uciSections = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
+        $uciSections = OpenWrtHelper::uciGetConfig('wireless');
 
         // network.wireless status: authoritative runtime ifnames and radio up state
         $wirelessStatus = OpenWrtHelper::execUbusCall('network.wireless', 'status');
@@ -197,8 +196,7 @@ class ModuleOpenWrtHelper
         $radio = preg_replace('/[^a-zA-Z0-9_]/', '', $radio);
 
         // One ubus uci call for the radio section instead of a fork per field.
-        $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'wireless', 'section' => $radio]);
-        $values = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
+        $values = OpenWrtHelper::uciGetSection('wireless', $radio);
         $current = [
             'channel'  => $values['channel']  ?? null,
             'txpower'  => $values['txpower']  ?? null,
@@ -310,8 +308,7 @@ class ModuleOpenWrtHelper
         $radio = preg_replace('/[^a-zA-Z0-9_]/', '', $radio);
 
         // Generate unique named section (wifinet0, wifinet1, ...)
-        $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'wireless']);
-        $sections = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
+        $sections = OpenWrtHelper::uciGetConfig('wireless');
         $maxN = -1;
         foreach (array_keys($sections) as $name) {
             if (preg_match('/^wifinet(\d+)$/', $name, $m)) {
@@ -488,8 +485,7 @@ class ModuleOpenWrtHelper
         $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
 
         // One ubus uci call for the whole section instead of a fork per field.
-        $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'wireless', 'section' => $section]);
-        $values = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
+        $values = OpenWrtHelper::uciGetSection('wireless', $section);
 
         $fields = ['device', 'network', 'mode', 'ssid', 'encryption', 'key', 'disabled', 'hidden', 'bssid'];
         $config = [];
