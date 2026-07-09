@@ -244,11 +244,15 @@ class ModuleOpenWrtHelper
         // (the CLI resolves quoted section names correctly).
         $live = self::interfaceLiveStatus();
 
-        // Read the whole network config in ONE ubus call instead of forking
-        // `uci get` per field per interface. The ubus uci backend keys sections
-        // by their real names (lan/wan/...) and returns list options as arrays.
-        $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'network']);
-        $uciSections = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
+        // Read the whole network config in ONE file parse (0 forks) instead of
+        // forking `uci get` per field. Interface sections are always named
+        // (config interface 'lan'), so the parser keys them by real name and
+        // returns list options (dns) as arrays.
+        try {
+            $uciSections = OpenWrtHelper::uciReadConfig('network');
+        } catch (\Exception $e) {
+            $uciSections = [];
+        }
 
         $interfaces = [];
         foreach ($live as $name => $status) {
