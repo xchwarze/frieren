@@ -94,10 +94,19 @@ class OpenWrtHelper
      */
     public static function checkDependency($dependencies)
     {
-        $output = self::exec('/bin/opkg list-installed');
+        // Installed packages come straight from the opkg status DB via one grep,
+        // instead of `opkg list-installed` which formats the whole package database.
+        $statusLines = self::exec("/bin/grep -F 'Package: ' /usr/lib/opkg/status", false, true);
+        $installed = [];
+        foreach (is_array($statusLines) ? $statusLines : [] as $line) {
+            if (strncmp($line, 'Package: ', 9) === 0) {
+                $installed[trim(substr($line, 9))] = true;
+            }
+        }
+
         $missingDependencies = [];
         foreach ($dependencies as $dependency) {
-            if (strpos($output, "{$dependency} -") === false) {
+            if (!isset($installed[$dependency])) {
                 $missingDependencies[] = $dependency;
             }
         }
