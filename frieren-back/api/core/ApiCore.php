@@ -152,6 +152,15 @@ class ApiCore
 
         try {
             if ($this->authenticated()) {
+                // Release the session lock before dispatching. PHP's file session
+                // handler holds an exclusive lock from session_start() until close,
+                // so leaving it open serializes every concurrent request from the
+                // same session behind a slow action (ping, terminal start, opkg).
+                // The login module manages its own session writes, so skip it there.
+                if (($this->request['module'] ?? '') !== 'login') {
+                    session_write_close();
+                }
+
                 $this->responseHandler = $this->router->routeModule();
             }
         } catch (\Exception $error) {
