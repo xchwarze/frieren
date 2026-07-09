@@ -244,6 +244,12 @@ class ModuleOpenWrtHelper
         // (the CLI resolves quoted section names correctly).
         $live = self::interfaceLiveStatus();
 
+        // Read the whole network config in ONE ubus call instead of forking
+        // `uci get` per field per interface. The ubus uci backend keys sections
+        // by their real names (lan/wan/...) and returns list options as arrays.
+        $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'network']);
+        $uciSections = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
+
         $interfaces = [];
         foreach ($live as $name => $status) {
             if ($name === 'loopback') {
@@ -254,19 +260,18 @@ class ModuleOpenWrtHelper
                 ? $status['ipv4-address'][0]
                 : [];
 
-            $uciProto = OpenWrtHelper::uciGet("network.{$name}.proto", false);
-            $uciDns = OpenWrtHelper::uciGet("network.{$name}.dns", false);
+            $uci = $uciSections[$name] ?? [];
 
             $interfaces[] = [
                 'name' => $name,
-                'proto' => $status['proto'] ?? ($uciProto ?? ''),
+                'proto' => $status['proto'] ?? ($uci['proto'] ?? ''),
                 'up' => isset($status['up']) ? (bool)$status['up'] : false,
-                'ipaddr' => $ipv4['address'] ?? (OpenWrtHelper::uciGet("network.{$name}.ipaddr", false) ?? null),
+                'ipaddr' => $ipv4['address'] ?? ($uci['ipaddr'] ?? null),
                 'netmask' => isset($ipv4['mask'])
                     ? self::cidrToNetmask($ipv4['mask'])
-                    : (OpenWrtHelper::uciGet("network.{$name}.netmask", false) ?? null),
-                'gateway' => OpenWrtHelper::uciGet("network.{$name}.gateway", false) ?? null,
-                'dns' => $uciDns ? preg_split('/\s+/', trim($uciDns)) : [],
+                    : ($uci['netmask'] ?? null),
+                'gateway' => $uci['gateway'] ?? null,
+                'dns' => self::normalizeList($uci['dns'] ?? null),
                 'uptime' => isset($status['uptime']) ? (int)$status['uptime'] : 0,
                 'device' => $status['l3_device'] ?? ($status['device'] ?? null),
             ];
