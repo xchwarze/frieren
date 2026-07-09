@@ -280,7 +280,10 @@ class OpenWrtHelper
     public static function fileGetContentsSSL($url)
     {
         if (extension_loaded('openssl')) {
-            return file_get_contents($url);
+            // Bound the read so a slow/hung remote can't pin a worker up to the
+            // default_socket_timeout (60s). 15s matches the PHP config ceiling.
+            $context = stream_context_create(['http' => ['timeout' => 15]]);
+            return file_get_contents($url, false, $context);
         }
 
         $url = escapeshellarg($url);
