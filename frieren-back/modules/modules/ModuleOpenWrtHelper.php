@@ -13,24 +13,6 @@ use frieren\helper\OpenWrtHelper;
 class ModuleOpenWrtHelper
 {
     /**
-     * Get the size of a local module folder.
-     *
-     * @param string $moduleFolder The path to the module folder.
-     * @throws \Exception Error getting size of module
-     * @return string The size of the module folder.
-     */
-    public static function getLocalModuleSize($moduleFolder)
-    {
-        $command = "du -sh " . escapeshellarg($moduleFolder) . " | awk '{print $1;}'";
-        $size = OpenWrtHelper::exec($command, true, true);
-        if ($size === false) {
-            throw new \Exception("Error getting size of module {$moduleFolder}");
-        }
-
-        return $size;
-    }
-
-    /**
      * Get sizes of all module subdirectories in a single du call.
      *
      * @param string $modulesRoot The root modules directory.
