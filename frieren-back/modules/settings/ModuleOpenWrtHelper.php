@@ -232,15 +232,23 @@ class ModuleOpenWrtHelper
      */
     public static function getSectionData()
     {
+        // Read the frieren config once (0 forks) instead of one `uci get` per
+        // field. Anonymous @settings[0] is keyed correctly by the file parser.
+        try {
+            $settings = OpenWrtHelper::uciReadConfig('frieren')['@settings[0]'] ?? [];
+        } catch (\Exception $e) {
+            $settings = [];
+        }
+
         return [
             'hostname' => gethostname(),
             'timezone' => self::getSystemTimeZone(),
-            'theme' => OpenWrtHelper::uciGet('frieren.@settings[0].theme', false) ?? 'auto',
-            'terminalAutologin' => self::getTerminalAutologin(),
-            'terminalTheme' => self::getTerminalTheme(),
-            'fontSize' => self::getTerminalFontSize(),
-            'cursorStyle' => self::getTerminalCursorStyle(),
-            'cursorBlink' => self::getTerminalCursorBlink(),
+            'theme' => $settings['theme'] ?? 'auto',
+            'terminalAutologin' => ($settings['terminal_autologin'] ?? null) === true,
+            'terminalTheme' => $settings['terminal_theme'] ?? 'default',
+            'fontSize' => (int) ($settings['terminal_font_size'] ?? 13),
+            'cursorStyle' => $settings['terminal_cursor_style'] ?? 'block',
+            'cursorBlink' => ($settings['terminal_cursor_blink'] ?? null) === true,
         ];
     }
 }
