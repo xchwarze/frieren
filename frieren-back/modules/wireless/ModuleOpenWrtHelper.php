@@ -196,15 +196,16 @@ class ModuleOpenWrtHelper
     {
         $radio = preg_replace('/[^a-zA-Z0-9_]/', '', $radio);
 
-        $fields = ['channel', 'txpower', 'htmode', 'country', 'disabled'];
-        $current = [];
-        foreach ($fields as $field) {
-            try {
-                $current[$field] = OpenWrtHelper::uciGet("wireless.{$radio}.{$field}");
-            } catch (\Exception $e) {
-                $current[$field] = null;
-            }
-        }
+        // One ubus uci call for the radio section instead of a fork per field.
+        $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'wireless', 'section' => $radio]);
+        $values = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
+        $current = [
+            'channel'  => $values['channel']  ?? null,
+            'txpower'  => $values['txpower']  ?? null,
+            'htmode'   => $values['htmode']   ?? null,
+            'country'  => $values['country']  ?? null,
+            'disabled' => $values['disabled'] ?? null,
+        ];
 
         $channelData  = OpenWrtHelper::execUbusCall('iwinfo', 'freqlist', ['device' => $radio]);
         $txpowerData  = OpenWrtHelper::execUbusCall('iwinfo', 'txpowerlist', ['device' => $radio]);
@@ -486,14 +487,14 @@ class ModuleOpenWrtHelper
     {
         $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
 
+        // One ubus uci call for the whole section instead of a fork per field.
+        $uciData = OpenWrtHelper::execUbusCall('uci', 'get', ['config' => 'wireless', 'section' => $section]);
+        $values = ($uciData !== false && isset($uciData['values'])) ? $uciData['values'] : [];
+
         $fields = ['device', 'network', 'mode', 'ssid', 'encryption', 'key', 'disabled', 'hidden', 'bssid'];
         $config = [];
         foreach ($fields as $field) {
-            try {
-                $config[$field] = OpenWrtHelper::uciGet("wireless.{$section}.{$field}");
-            } catch (\Exception $e) {
-                $config[$field] = '';
-            }
+            $config[$field] = $values[$field] ?? '';
         }
 
         // Role pointers live in frieren config, not wireless: report whether THIS section is
