@@ -127,12 +127,14 @@ class ModuleOpenWrtHelper
      */
     public static function listServices()
     {
-        $names = OpenWrtHelper::exec('ls ' . self::INIT_DIR, false);
-        if (!is_array($names)) {
+        $entries = @scandir(self::INIT_DIR);
+        if ($entries === false) {
             return [];
         }
 
         $running = self::runningServiceSet();
+        $enabled = self::enabledServiceSet();
+        $names = array_diff($entries, ['.', '..']);
         sort($names);
 
         $services = [];
@@ -143,7 +145,7 @@ class ModuleOpenWrtHelper
 
             $services[] = [
                 'name' => $name,
-                'enabled' => self::isServiceEnabled($name),
+                'enabled' => isset($enabled[$name]),
                 'running' => isset($running[$name]),
             ];
         }
@@ -160,9 +162,10 @@ class ModuleOpenWrtHelper
     public static function serviceState($name)
     {
         $running = self::runningServiceSet();
+        $enabled = self::enabledServiceSet();
 
         return [
-            'enabled' => self::isServiceEnabled($name),
+            'enabled' => isset($enabled[$name]),
             'running' => isset($running[$name]),
         ];
     }
@@ -194,15 +197,24 @@ class ModuleOpenWrtHelper
     }
 
     /**
-     * Boot-enabled check. `/etc/init.d/<svc> enabled` exits 0 when enabled,
-     * non-zero otherwise; exec() returns false on a non-zero exit.
+     * Set of boot-enabled services, keyed by name. A service is enabled when it
+     * has an rc.d start symlink (/etc/rc.d/S<NN><name>) — the same condition
+     * `/etc/init.d/<svc> enabled` checks, resolved with a single glob instead
+     * of one shell fork per service.
      *
-     * @param string $name init.d script name (already whitelisted).
-     * @return bool
+     * @return array<string, bool>
      */
-    private static function isServiceEnabled($name)
+    private static function enabledServiceSet()
     {
-        return OpenWrtHelper::exec(self::INIT_DIR . "/{$name} enabled") !== false;
+        $enabled = [];
+        foreach (glob('/etc/rc.d/S*') ?: [] as $link) {
+            $name = preg_replace('/^S\d+/', '', basename($link));
+            if ($name !== '') {
+                $enabled[$name] = true;
+            }
+        }
+
+        return $enabled;
     }
 
     /**
