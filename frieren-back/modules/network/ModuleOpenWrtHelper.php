@@ -204,22 +204,22 @@ class ModuleOpenWrtHelper
     {
         $hosts = self::readDhcpHosts();
 
-        $index = null;
-        foreach ($hosts as $i => $host) {
+        $sectionId = null;
+        foreach ($hosts as $id => $host) {
             if (isset($host['mac']) && strcasecmp($host['mac'], $mac) === 0) {
-                $index = $i;
+                $sectionId = $id;
                 break;
             }
         }
 
-        if ($index === null) {
+        if ($sectionId === null) {
             return false;
         }
 
-        // raw=true: the `@host[N]` selector's brackets get mangled if exec()'s
-        // escapeshellcmd runs on top of escapeshellarg. $index is an int we parsed,
-        // so single-quoting by hand is safe and keeps the shell from globbing `[N]`.
-        $deleted = OpenWrtHelper::exec("uci delete 'dhcp.@host[{$index}]'", true, true);
+        // Delete by the section's real uci id (named or anonymous cfgXXXXXX), so
+        // this stays correct regardless of named/anonymous section ordering.
+        // raw=true: escapeshellarg already quotes; skip escapeshellcmd.
+        $deleted = OpenWrtHelper::exec('uci delete ' . escapeshellarg("dhcp.{$sectionId}"), true, true);
         if ($deleted === false) {
             return false;
         }
@@ -365,16 +365,20 @@ class ModuleOpenWrtHelper
      */
     private static function readDhcpHosts()
     {
-        $config = OpenWrtHelper::uciReadConfig('dhcp');
+        // Read dhcp via ubus so every `host` section carries its real uci id
+        // (named section name, or anonymous cfgXXXXXX) and its .type. The file
+        // parser can't do this: it drops the section type and keys named
+        // sections by name, so a named `config host` would be missed AND the
+        // anonymous @host[i] indices would no longer line up with uci's own
+        // numbering — deleting by that index removes the wrong lease.
+        $sections = OpenWrtHelper::uciGetConfig('dhcp');
 
         $hosts = [];
-        foreach ($config as $sectionName => $section) {
-            if (preg_match('/^@host\[(\d+)\]$/', $sectionName, $m)) {
-                $hosts[(int)$m[1]] = $section;
+        foreach ($sections as $id => $section) {
+            if (($section['.type'] ?? '') === 'host') {
+                $hosts[$id] = $section;
             }
         }
-
-        ksort($hosts);
 
         return $hosts;
     }
