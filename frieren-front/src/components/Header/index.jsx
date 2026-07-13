@@ -12,8 +12,7 @@ import terminalStatusAtom from '@src/features/terminal/atoms/terminalStatusAtom.
 import useOpenTerminalMutation from '@src/features/terminal/hooks/useOpenTerminalMutation.js';
 import SystemActionsDropdown from '@src/components/SystemActionsDropdown';
 import Button from '@src/components/Button';
-
-const enableTerminal = import.meta.env.VITE_ENABLE_TERMINAL === 'true';
+import useGetSectionData from '@src/features/settings/hooks/useGetSectionData.js';
 
 /**
  * Generate the header component with logo and other tools.
@@ -23,6 +22,8 @@ const enableTerminal = import.meta.env.VITE_ENABLE_TERMINAL === 'true';
 const Header = () => {
     const { mutate: openTerminalMutation } = useOpenTerminalMutation();
     const terminalStatus = useAtomValue(terminalStatusAtom);
+    const { data: settingsData } = useGetSectionData();
+    const enableTerminal = settingsData?.terminalEnabled === true;
 
     return (
         <Navbar id={'header'} className={'bg-body-tertiary px-3'}>

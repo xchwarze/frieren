@@ -187,7 +187,6 @@ Bootstrap `data-bs-theme` attribute. Values: `'dark'`, `'light'`, or auto (syste
 | `VITE_RELATIVE_API_PATH` | API endpoint path | `api/index.php` |
 | `VITE_FULL_API_ENDPOINT` | Full API URL (overrides relative) | — |
 | `VITE_WEB_MODULES_FOLDER` | External modules folder | `modules` |
-| `VITE_ENABLE_TERMINAL` | Show terminal feature | `true` |
 | `VITE_COMPRESSION_ENABLE` | Gzip build output | `true` |
 | `VITE_SOURCEMAP` | Generate sourcemaps | `false` |
 | `VITE_MANUAL_CHUNKS_ENABLE` | Split vendor chunks | `false` |
