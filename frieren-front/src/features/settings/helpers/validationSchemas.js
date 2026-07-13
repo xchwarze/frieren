@@ -30,4 +30,5 @@ export const terminalSettingsSchema = yup.object({
     cursorStyle: yup.string().oneOf(['block', 'underline', 'bar']).required(),
     cursorBlink: yup.boolean(),
     terminalAutologin: yup.boolean(),
+    terminalEnabled: yup.boolean(),
 }).required();

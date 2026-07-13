@@ -23,7 +23,7 @@ const useSetTerminalSettings = () => {
     const setTerminalSettings = useSetAtom(terminalSettingsAtom);
 
     return useAuthenticatedMutation({
-        mutationFn: ({ terminalTheme, fontSize, cursorStyle, cursorBlink, terminalAutologin }) => fetchPost({
+        mutationFn: ({ terminalTheme, fontSize, cursorStyle, cursorBlink, terminalAutologin, terminalEnabled }) => fetchPost({
             module: 'settings',
             action: 'setTerminalSettings',
             terminalTheme,
@@ -31,6 +31,7 @@ const useSetTerminalSettings = () => {
             cursorStyle,
             cursorBlink,
             terminalAutologin,
+            terminalEnabled,
         }),
         onSuccess: (data, { terminalTheme, fontSize, cursorStyle, cursorBlink }) => {
             setTerminalSettings({ terminalTheme, fontSize, cursorStyle, cursorBlink });

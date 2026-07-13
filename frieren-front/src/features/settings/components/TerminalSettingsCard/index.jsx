@@ -5,6 +5,7 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 import PropTypes from 'prop-types';
+import { useWatch } from 'react-hook-form';
 
 import { TERMINAL_THEME_OPTIONS } from '@src/features/terminal/helpers/terminalThemes.js';
 import useSetTerminalSettings from '@src/features/settings/hooks/useSetTerminalSettings.js';
@@ -25,6 +26,51 @@ const CURSOR_STYLE_OPTIONS = [
 ];
 
 /**
+ * Terminal appearance fields, shown only when the terminal feature is enabled.
+ * Reads the live `terminalEnabled` form value; when off, the card collapses to
+ * just the enable switch. Values stay registered (FormProvider keeps them), so
+ * a save while collapsed still submits the retained appearance settings.
+ *
+ * @return {ReactNode|null} The appearance fields, or null when disabled.
+ */
+const TerminalAppearanceFields = () => {
+    const terminalEnabled = useWatch({ name: 'terminalEnabled' });
+    if (!terminalEnabled) {
+        return null;
+    }
+
+    return (
+        <>
+            <SelectField
+                name={'terminalTheme'}
+                label={'Terminal Theme'}
+                options={TERMINAL_THEME_OPTIONS}
+            />
+            <InputField
+                name={'fontSize'}
+                label={'Font Size'}
+                type={'number'}
+                min={8}
+                max={32}
+            />
+            <SelectField
+                name={'cursorStyle'}
+                label={'Cursor Style'}
+                options={CURSOR_STYLE_OPTIONS}
+            />
+            <SwitchField
+                name={'cursorBlink'}
+                label={'Cursor Blink'}
+            />
+            <SwitchField
+                name={'terminalAutologin'}
+                label={'Use Autologin'}
+            />
+        </>
+    );
+};
+
+/**
  * Settings card for terminal configuration options.
  *
  * @param {Object} query - The query object containing terminal settings data.
@@ -39,6 +85,7 @@ const TerminalSettingsCard = ({ query }) => {
         cursorStyle: query?.data?.cursorStyle,
         cursorBlink: query?.data?.cursorBlink,
         terminalAutologin: query?.data?.terminalAutologin,
+        terminalEnabled: query?.data?.terminalEnabled,
     };
 
     const renderContent = () => {
@@ -60,31 +107,11 @@ const TerminalSettingsCard = ({ query }) => {
 
         return (
             <FormProvider schema={terminalSettingsSchema} onSubmit={setTerminalSettings} defaultValues={defaultValues}>
-                <SelectField
-                    name={'terminalTheme'}
-                    label={'Terminal Theme'}
-                    options={TERMINAL_THEME_OPTIONS}
-                />
-                <InputField
-                    name={'fontSize'}
-                    label={'Font Size'}
-                    type={'number'}
-                    min={8}
-                    max={32}
-                />
-                <SelectField
-                    name={'cursorStyle'}
-                    label={'Cursor Style'}
-                    options={CURSOR_STYLE_OPTIONS}
-                />
                 <SwitchField
-                    name={'cursorBlink'}
-                    label={'Cursor Blink'}
+                    name={'terminalEnabled'}
+                    label={'Enable terminal support'}
                 />
-                <SwitchField
-                    name={'terminalAutologin'}
-                    label={'Use Autologin'}
-                />
+                <TerminalAppearanceFields />
                 <FormActions>
                     <SubmitButton />
                 </FormActions>
