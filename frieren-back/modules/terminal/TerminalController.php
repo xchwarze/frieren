@@ -54,6 +54,10 @@ class TerminalController extends \frieren\core\Controller
 
     public function startTerminal()
     {
+        if (!SettingsHelper::isTerminalEnabled()) {
+            return self::setError('Terminal is disabled');
+        }
+
         // disable ttyd instance
         exec("/etc/init.d/ttyd stop");
         OpenWrtHelper::execBackground("/etc/init.d/ttyd disable");
@@ -84,6 +88,10 @@ class TerminalController extends \frieren\core\Controller
 
     public function stopTerminal()
     {
+        if (!SettingsHelper::isTerminalEnabled()) {
+            return self::setError('Terminal is disabled');
+        }
+
         OpenWrtHelper::exec("/usr/bin/killall ttyd");
         $status = OpenWrtHelper::checkRunning($this->getTerminalPath());
         if ($status) {
@@ -95,6 +103,10 @@ class TerminalController extends \frieren\core\Controller
 
     public function getStatus()
     {
+        if (!SettingsHelper::isTerminalEnabled()) {
+            return self::setSuccess(["status" => false]);
+        }
+
         self::setSuccess(["status" => OpenWrtHelper::checkRunning($this->getTerminalPath())]);
     }
 }
