@@ -67,7 +67,10 @@ class TerminalController extends \frieren\core\Controller
         $status = OpenWrtHelper::checkRunning($terminal);
         if (!$status) {
             $shell = SettingsHelper::getTerminalAutologin() ? '/bin/ash' : '/bin/login';
-            $command = "{$terminal} -p 5001 -i br-lan {$shell}";
+            // Launch from /root so the (autologin) shell opens there instead of
+            // inheriting the PHP process cwd (/usr/share/frieren/api). The cd is
+            // confined to this subshell; all paths here are fixed (no user input).
+            $command = "sh -c 'cd /root && {$terminal} -p 5001 -i br-lan {$shell}'";
             OpenWrtHelper::execBackground($command);
             $status = $this->waitForRunning($terminal);
             if (!$status) {
