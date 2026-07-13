@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 
 import authAtom from '@src/atoms/authAtom.js';
 import { fetchPost } from '@src/services/fetchService.js';
+import { retrieveBrowserDatetime } from '@src/helpers/browserDatetime.js';
 
 /**
  * Returns a mutation hook for user login.
@@ -28,6 +29,7 @@ const useUserLoginMutation = () => {
         action: 'login',
         username,
         password,
+        ...retrieveBrowserDatetime(),
       })
     },
     onSuccess: (data) => {
