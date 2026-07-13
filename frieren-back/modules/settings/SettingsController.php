@@ -78,7 +78,8 @@ class SettingsController extends \frieren\core\Controller
             $this->request['fontSize'],
             $this->request['cursorStyle'],
             $this->request['cursorBlink'],
-            $this->request['terminalAutologin']
+            $this->request['terminalAutologin'],
+            $this->request['terminalEnabled']
         );
 
         if ($saved) {

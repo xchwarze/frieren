@@ -172,7 +172,7 @@ class ModuleOpenWrtHelper
      * @param bool   $autologin   Whether terminal autologin is enabled.
      * @return bool False when cursorStyle is invalid; true once saved.
      */
-    public static function saveTerminalSettings($theme, $fontSize, $cursorStyle, $cursorBlink, $autologin)
+    public static function saveTerminalSettings($theme, $fontSize, $cursorStyle, $cursorBlink, $autologin, $terminalEnabled)
     {
         if (!in_array($cursorStyle, ['block', 'underline', 'bar'], true)) {
             return false;
@@ -185,9 +185,21 @@ class ModuleOpenWrtHelper
         OpenWrtHelper::uciSet('frieren.@settings[0].terminal_cursor_style', $cursorStyle, false, false);
         OpenWrtHelper::uciSet('frieren.@settings[0].terminal_cursor_blink', (bool) $cursorBlink, false, false);
         OpenWrtHelper::uciSet('frieren.@settings[0].terminal_autologin', (bool) $autologin, false, false);
+        OpenWrtHelper::uciSet('frieren.@settings[0].terminal_enabled', (bool) $terminalEnabled, false, false);
         OpenWrtHelper::uciCommit();
 
         return true;
+    }
+
+    /**
+     * Whether the terminal feature is enabled. An absent flag counts as enabled
+     * so existing installs keep the terminal; only an explicit false disables it.
+     *
+     * @return bool
+     */
+    public static function isTerminalEnabled()
+    {
+        return OpenWrtHelper::uciGet('frieren.@settings[0].terminal_enabled', false) !== false;
     }
 
     /**
@@ -249,6 +261,7 @@ class ModuleOpenWrtHelper
             'fontSize' => (int) ($settings['terminal_font_size'] ?? 13),
             'cursorStyle' => $settings['terminal_cursor_style'] ?? 'block',
             'cursorBlink' => ($settings['terminal_cursor_blink'] ?? null) === true,
+            'terminalEnabled' => ($settings['terminal_enabled'] ?? true) === true,
         ];
     }
 }
