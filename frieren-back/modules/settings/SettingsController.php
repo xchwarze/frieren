@@ -45,8 +45,7 @@ class SettingsController extends \frieren\core\Controller
 
     public function setDatetimeFromBrowser()
     {
-        if (self::setupModuleHelper()::changeSystemTimeZone($this->request['timezone']) &&
-            self::setupModuleHelper()::syncDatetimeFromBrowser($this->request['datetime'])) {
+        if (self::setupModuleHelper()::applyBrowserDatetime($this->request['datetime'], $this->request['timezone'])) {
             return self::setSuccess();
         }
 

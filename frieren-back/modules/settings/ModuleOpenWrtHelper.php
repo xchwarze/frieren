@@ -12,6 +12,11 @@ use frieren\helper\OpenWrtHelper;
 
 class ModuleOpenWrtHelper
 {
+    // Reject epochs before 2020-01-01 as bogus (device default clocks). A fixed
+    // floor, not the current system year, so a future-skewed clock can still be
+    // corrected and the check is deterministic.
+    const MIN_SYNC_EPOCH = 1577836800;
+
     /**
      * Converts the OpenWrt IANA timezone value to a standard representation.
      *
@@ -50,6 +55,13 @@ class ModuleOpenWrtHelper
     public static function changeSystemTimeZone($timezone)
     {
         $timezone = self::convertOpenWrtTimezoneValue($timezone);
+
+        // Skip the commit + service reload when the timezone is already set.
+        // This matters on login, where this runs on every successful login.
+        if (OpenWrtHelper::uciGet('system.@system[0].timezone', false) === $timezone) {
+            return true;
+        }
+
         OpenWrtHelper::uciSet('system.@system[0].timezone', $timezone);
         OpenWrtHelper::exec('/etc/init.d/system reload');
 
@@ -65,12 +77,29 @@ class ModuleOpenWrtHelper
     public static function syncDatetimeFromBrowser($datetime)
     {
         $epoch = intval($datetime);
-        if (date('Y', $epoch) >= date('Y')) {
+        if ($epoch >= self::MIN_SYNC_EPOCH) {
             OpenWrtHelper::exec("date -s @{$epoch}");
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Applies a browser-supplied timezone and clock independently. Returns true
+     * if either was applied, so a rejected epoch alone is not reported as a total
+     * failure. Shared by the settings sync button and the login flow.
+     *
+     * @param mixed $datetime Epoch seconds from the browser.
+     * @param string $timezone Browser GMT offset (e.g. "GMT-3").
+     * @return bool True if the timezone or the clock was applied.
+     */
+    public static function applyBrowserDatetime($datetime, $timezone)
+    {
+        $tzOk = self::changeSystemTimeZone($timezone);
+        $timeOk = self::syncDatetimeFromBrowser($datetime);
+
+        return $tzOk || $timeOk;
     }
 
     /**
