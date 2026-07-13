@@ -22,6 +22,16 @@ class LoginController extends \frieren\core\Controller
                 $_SESSION['user_logged'] = true;
                 session_write_close();
 
+                // Best-effort: sync the device clock/timezone to the browser's on
+                // login (these gadgets have no RTC). Runs only after auth succeeds
+                // and never affects the login result.
+                if (isset($this->request['datetime'], $this->request['timezone'])) {
+                    \frieren\modules\settings\ModuleOpenWrtHelper::applyBrowserDatetime(
+                        $this->request['datetime'],
+                        $this->request['timezone']
+                    );
+                }
+
                 return self::setSuccess();
             }
         }
