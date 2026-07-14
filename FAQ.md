@@ -155,6 +155,102 @@ broken. In that case, update Frieren first (see below).
 
 ---
 
+## How do I install a module manually (from a file you were given)?
+
+Everything in the **Modules** screen comes from the official online catalog. If someone
+hands you a module as a file — a private or beta module that isn't in the catalog — you
+install it by hand over SSH. It is really just copying a folder into place.
+
+A module is simply a folder named after the module, containing at least a `manifest.json`
+and its `*Controller.php` (plus `module.umd.js` if it has a screen in the panel).
+"Installing" means putting that folder here:
+
+```
+/usr/share/frieren/modules/<module-name>/
+```
+
+Steps (example for a module called `mymod` distributed as `mymod.zip`):
+
+1. Copy the file to the router from your computer:
+
+   ```sh
+   scp mymod.zip root@192.168.1.1:/tmp/
+   ```
+
+2. SSH into the router and extract it into the modules folder:
+
+   ```sh
+   ssh root@192.168.1.1
+   unzip /tmp/mymod.zip -d /usr/share/frieren/modules
+   ```
+
+   > OpenWrt's minimal build may not include `unzip`. If it's missing, install it once
+   > with `opkg update && opkg install unzip` — or ask the author for a `.tar.gz`
+   > (Frieren's own module format), which needs no extra package:
+   > ```sh
+   > tar -xzf /tmp/mymod.tar.gz -C /usr/share/frieren/modules
+   > ```
+
+3. Check the layout — the manifest must sit exactly one level down:
+
+   ```sh
+   ls /usr/share/frieren/modules/mymod/manifest.json
+   ```
+
+   If instead you see a doubled path like `modules/mymod/mymod/…`, the archive had an
+   extra wrapper folder; move the inner folder up one level so `manifest.json` lands
+   directly in `/usr/share/frieren/modules/mymod/`.
+
+4. Refresh the panel in your browser. The module shows up in **Modules** right away — no
+   reboot and no service restart (Frieren scans the folder on every request).
+
+Two things **not** to do:
+
+- **Don't open and re-save `module.umd.js`.** It ships pre-compressed and Frieren serves
+  it that way; re-saving or "fixing" it will break the module's screen. Use the file
+  exactly as you received it.
+- **Don't rename the folder.** The folder name is the module's identity — it must match
+  the `name` in `manifest.json`, or the panel won't load it.
+
+**Tight on space, or using a USB / SD drive?** Put the module on the removable storage
+and link it in — the same trick the one-click "install to USB" option uses:
+
+```sh
+mkdir -p /sd/modules
+unzip /tmp/mymod.zip -d /sd/modules          # or: tar -xzf /tmp/mymod.tar.gz -C /sd/modules
+ln -s /sd/modules/mymod /usr/share/frieren/modules/mymod
+```
+
+---
+
+## How do I remove a module manually?
+
+Removing a module is just deleting its folder. Over SSH:
+
+```sh
+rm -rf /usr/share/frieren/modules/<module-name>
+```
+
+Refresh the panel and it's gone. This command is safe whether the module lives in
+internal flash or on USB/SD.
+
+If you installed it on USB/SD (the symlink method above), the path in
+`/usr/share/frieren/modules` is only a **link** — the command above removes the link, so
+also delete the real copy on the storage:
+
+```sh
+rm -rf /sd/modules/<module-name>
+```
+
+Optional cleanup: if the module saved its own settings, they live in a file named
+`/etc/config/fmod_<module-name>`. Delete it too if you want to leave no trace:
+
+```sh
+rm -f /etc/config/fmod_<module-name>
+```
+
+---
+
 ## How do I update Frieren?
 
 Just run the install command again. It removes the old version and installs the newest
@@ -216,6 +312,7 @@ opkg remove frieren
 | Login user | `root` |
 | Login password | your OpenWrt root password |
 | Install location | `/usr/share/frieren` |
+| Module folder | `/usr/share/frieren/modules/<name>/` (USB/SD: symlink to `/sd/modules/<name>/`) |
 | Update | re-run the install command |
 | Uninstall | `opkg remove frieren` |
 
