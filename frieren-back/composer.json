@@ -21,7 +21,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "frieren\\core\\Tests\\": "tests/",
+            "frieren\\core\\Tests\\": "tests-php/",
             "frieren\\modules\\": "modules/"
         }
     },

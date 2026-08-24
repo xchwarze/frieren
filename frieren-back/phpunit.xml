@@ -6,7 +6,7 @@
          cacheDirectory=".phpunit.cache">
     <testsuites>
         <testsuite name="frieren-back">
-            <directory>tests</directory>
+            <directory>tests-php</directory>
         </testsuite>
     </testsuites>
     <source>

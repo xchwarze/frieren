@@ -57,12 +57,14 @@ composer install   # one-time: installs phpunit/phpunit + php-mock/php-mock-phpu
 composer test        # or: vendor/bin/phpunit
 ```
 
-- `tests/` mirrors the framework layout: one file per core helper
-  (`OpenWrtHelperTest.php`, `UciConfigHelperTest.php`, `SQLiteTest.php`,
-  `BackgroundTaskHelperTest.php`) and one per built-in module Controller
-  (`tests/{Name}ControllerTest.php` for all 10: `login`, `dashboard`, `header`, `modules`,
-  `network`, `packages`, `settings`, `system`, `terminal`, `wireless`).
-- `tests/Support/DispatchesControllers.php` is a shared trait: it instantiates a real
+- `tests-php/` (named to sit next to a sibling `tests-js/` on the frontend side of the
+  ecosystem — this repo has no JS of its own, but the naming stays consistent) mirrors the
+  framework layout: one file per core helper (`OpenWrtHelperTest.php`,
+  `UciConfigHelperTest.php`, `SQLiteTest.php`, `BackgroundTaskHelperTest.php`) and one per
+  built-in module Controller (`tests-php/{Name}ControllerTest.php` for all 10: `login`,
+  `dashboard`, `header`, `modules`, `network`, `packages`, `settings`, `system`, `terminal`,
+  `wireless`).
+- `tests-php/Support/DispatchesControllers.php` is a shared trait: it instantiates a real
   Controller (which auto-dispatches its action in its constructor, exactly like production)
   and reads the response back via Reflection, since `ResponseHandler` has no public getter for
   its data/error and its own `dispatchResponse()` calls `exit()`.
@@ -70,8 +72,8 @@ composer test        # or: vendor/bin/phpunit
   inside `namespace frieren\helper` rather than through an injectable interface, so tests use
   [`php-mock/php-mock-phpunit`](https://github.com/php-mock/php-mock-phpunit) to intercept
   those calls at the PHP-namespace level instead of mocking a class — e.g.
-  `$this->getFunctionMock('frieren\helper', 'exec')`. Any test file under `tests/` shows the
-  pattern in context.
+  `$this->getFunctionMock('frieren\helper', 'exec')`. Any test file under `tests-php/` shows
+  the pattern in context.
 - `frieren-module-template`'s own `composer.json` path-repos this project in as a dev
   dependency (`frieren/back`, symlinked via Composer, not copied) so a third-party module's
   tests can dispatch a real `\frieren\core\Controller` too — see its README for that side.
