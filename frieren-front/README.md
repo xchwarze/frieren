@@ -46,6 +46,39 @@ yarn build
 
 Check out the other scripts in `package.json` for linting, previewing the build, and more.
 
+## Testing
+
+Two independent test layers, neither required to build/ship:
+
+### Unit/component — Vitest
+
+```bash
+yarn test         # vitest run --passWithNoTests
+yarn test:watch   # vitest, watch mode
+```
+
+- `vitest.config.js` mirrors `vite.config.js`'s `@src`/`@module` aliases (both resolve to this
+  app's own `./src`) — this is the host itself, so nothing needs mocking to satisfy an
+  external SDK the way a third-party module's tests do.
+- Tests live in `tests-js/`, not `src/` (mirrors `tests-php/` in the sibling PHP projects).
+  Example tests: `tests-js/versionHelper.test.js` (pure logic) and
+  `tests-js/PanelCard.test.jsx` (the real shared `PanelCard`/`Button`/`Icon` components,
+  no mocks).
+
+### Integration/e2e — Playwright
+
+```bash
+yarn test:e2e     # against a real device (BASE_URL, default 192.168.7.1:5000)
+yarn test:api     # API-contract specs against a real device
+yarn test:mock    # against the dev server, API responses mocked from e2e/fixtures/recorded-responses.json
+yarn test:all     # e2e + api + mock
+```
+
+- `playwright.config.js`; specs live in `e2e/{,.api,.mock}` (not `src/`, so the two test
+  runners never collide). `e2e/api/record-responses.js` (re-)generates
+  `e2e/fixtures/recorded-responses.json` from a real device — the source of truth for the
+  `mock` project's fixture responses.
+
 ## API Integration
 
 The frontend is designed to work seamlessly with the Frieren backend. Ensure the backend service is running and accessible to allow full functionality.
