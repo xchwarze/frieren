@@ -1,0 +1,34 @@
+{
+    "name": "frieren/back",
+    "description": "Frieren API backend — test-only Composer manifest. Production PHP classes are loaded by the framework's own autoloader on-device (api/index.php); this manifest exists purely so this repo (and any module that path-requires it as a dev dependency) can run PHPUnit tests locally/in CI. Nothing here is shipped to the device.",
+    "type": "library",
+    "license": "LGPL-3.0-or-later",
+    "require": {
+        "php": ">=8.1",
+        "ext-sqlite3": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0",
+        "php-mock/php-mock-phpunit": "^2.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "frieren\\": "api/"
+        },
+        "files": [
+            "api/config/config.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "frieren\\core\\Tests\\": "tests/",
+            "frieren\\modules\\": "modules/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --colors=always"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
