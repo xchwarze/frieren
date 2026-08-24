@@ -43,13 +43,17 @@ yarn test:watch   # vitest, watch mode
 
 - Config: `vitest.config.js` (jsdom environment; `@module`/`@src`/`@common` aliases matching
   `vite.config.js`) + `vitest.setup.jsx`, which mocks the `@common` components a scaffolded
-  module is most likely to render (`PanelCard`, `Button`, `FormActions`, `SkeletonBar`, `Form`)
-  so a component test doesn't need a real `frieren-front` checkout to run. Anything imported
-  from `@common` that ISN'T mocked there still resolves for real, via `VITE_COMMON_ALIAS`.
-- Example tests: `src/__tests__/StateDemoCard.test.jsx` (renders a real component, exercises
-  real jotai atoms + wouter, only the two `@common` components it uses are mocked) and
-  `src/__tests__/queryKeys.test.js` (plain logic, no rendering — note `.js`, not just `.jsx`,
-  is picked up).
+  module is most likely to render (`PanelCard`, `Button`, `FormActions`, `SkeletonBar`) so a
+  component test doesn't need a real `frieren-front` checkout to run. Anything imported from
+  `@common` that ISN'T mocked there still resolves for real, via `VITE_COMMON_ALIAS` — there is
+  no monolithic `@common/components/Form` to mock (§6.6: the form system is individual
+  subpath imports only).
+- Tests live in `tests-js/`, not `src/` — kept out of the `feature/{atoms,components,...}`
+  tree the same way `tests-php/` sits outside `public/`. Example tests:
+  `tests-js/StateDemoCard.test.jsx` (renders a real component, exercises real jotai atoms +
+  wouter, only the two `@common` components it uses are mocked) and
+  `tests-js/queryKeys.test.js` (plain logic, no rendering — note `.js`, not just `.jsx`, is
+  picked up).
 - Adapted from `frieren-modules-private/evilportal`'s Vitest setup — see `CHEATSHEET.md`'s
   Testing section for the full convention.
 
@@ -66,11 +70,11 @@ composer test        # or: vendor/bin/phpunit
   `\frieren\core\Controller`, `\frieren\helper\OpenWrtHelper`, etc. resolve to the real
   framework classes (symlinked, not copied) — see `frieren-back/README.md` for that side of
   the same setup.
-- Example tests: `tests/ModuleOpenWrtHelperTest.php` (pure logic + a mocked ubus call) and
-  `tests/DemoControllerTest.php` (dispatches the real `DemoController` and reads the response
-  via the shared `tests/Support/DispatchesControllers.php` trait — `ResponseHandler` has no
-  public getter for its data/error, and its own `dispatchResponse()` calls `exit()`, so this
-  trait uses Reflection instead of calling it).
+- Example tests: `tests-php/ModuleOpenWrtHelperTest.php` (pure logic + a mocked ubus call) and
+  `tests-php/DemoControllerTest.php` (dispatches the real `DemoController` and reads the
+  response via the shared `tests-php/Support/DispatchesControllers.php` trait —
+  `ResponseHandler` has no public getter for its data/error, and its own `dispatchResponse()`
+  calls `exit()`, so this trait uses Reflection instead of calling it).
 - See `CHEATSHEET.md`'s Testing section for the mocking technique
   (`php-mock/php-mock-phpunit` intercepting `exec()`/`file()`/etc. at the PHP namespace level).
 

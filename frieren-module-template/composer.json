@@ -20,7 +20,7 @@
     "autoload-dev": {
         "psr-4": {
             "frieren\\modules\\demo\\": "public/",
-            "frieren\\modules\\demo\\Tests\\": "tests/"
+            "frieren\\modules\\demo\\Tests\\": "tests-php/"
         }
     },
     "scripts": {

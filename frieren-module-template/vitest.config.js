@@ -38,6 +38,6 @@ export default defineConfig({
         setupFiles: ['./vitest.setup.jsx'],
         // .js AND .jsx on purpose — a pure-logic test (e.g. queryKeys) shouldn't be forced
         // into a .jsx filename just to be discovered.
-        include: ['src/**/*.test.{js,jsx}'],
+        include: ['tests-js/**/*.test.{js,jsx}'],
     },
 });
