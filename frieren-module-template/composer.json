@@ -1,0 +1,37 @@
+{
+    "name": "frieren/module-template",
+    "description": "Third-party module scaffold — test-only Composer manifest. Production PHP (public/*.php) is loaded by the host framework's own autoloader on-device; this manifest exists purely to run PHPUnit tests locally/in CI against the example Controller/Helper. Nothing here is shipped to the device — see CHEATSHEET.md.",
+    "type": "project",
+    "license": "LGPL-3.0-or-later",
+    "require": {
+        "php": ">=8.1"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../frieren-back"
+        }
+    ],
+    "require-dev": {
+        "frieren/back": "*",
+        "phpunit/phpunit": "^11.0",
+        "php-mock/php-mock-phpunit": "^2.10"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "frieren\\modules\\demo\\": "public/",
+            "frieren\\modules\\demo\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --colors=always"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
+    }
+}

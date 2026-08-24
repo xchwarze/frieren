@@ -9,6 +9,8 @@
   ],
   "scripts": {
     "build": "vite build",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
     "wizard": "node ./bin/wizard.js",
     "validate": "node ./bin/validate.js",
     "update-module": "node ./bin/update-module.js",
@@ -31,9 +33,16 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@hookform/resolvers": "^5.2.2",
     "@inquirer/prompts": "^8.4.2",
     "@tanstack/eslint-plugin-query": "^5.100.9",
+    "@tanstack/react-query": "^5.100.9",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^4.7.0",
+    "bootstrap": "^5.3.8",
     "chalk": "^5.6.2",
     "commander": "^14.0.3",
     "eslint": "^9.39.4",
@@ -42,9 +51,20 @@
     "eslint-plugin-react-refresh": "^0.4.26",
     "fs-extra": "^11.3.5",
     "globals": "^17.6.0",
+    "jotai": "^2.20.0",
+    "jsdom": "^29.1.1",
+    "prop-types": "^15.8.1",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.75.0",
+    "react-toastify": "^11.1.0",
     "vite": "^7.3.3",
     "vite-bundle-analyzer": "^1.3.8",
-    "vite-plugin-compression2": "^2.5.3"
+    "vite-plugin-compression2": "^2.5.3",
+    "vitest": "^4.1.10",
+    "wouter": "^3.9.0",
+    "yup": "^1.7.1"
   },
   "engines": {
     "node": ">=22.0.0"
