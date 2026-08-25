@@ -14,11 +14,11 @@
  *   ModulesController itself, so that one is mocked in this controller's own
  *   namespace, `frieren\modules\modules`.
  * - `getModuleList()`/`getInstalledModules()` scan
- *   `\DeviceConfig::MODULE_ROOT_FOLDER` via `new \DirectoryIterator(...)`. That
- *   constant is a hardcoded '/frieren/modules' class const (no injection seam)
- *   and DirectoryIterator is a class, not a mockable global function, so unlike
- *   every other read here this one can't be pointed at a fixture. See the two
- *   tests below for what that means in practice.
+ *   `\DeviceConfig::MODULE_ROOT_FOLDER` through `ModuleOpenWrtHelper::getModuleFolders()`
+ *   (`is_readable()` + `glob()`, both mocked in this controller's own namespace,
+ *   `frieren\modules\modules`, same as `disk_free_space()` below) instead of
+ *   `new \DirectoryIterator(...)` directly (TODO-1.5.md M13 — DirectoryIterator is a
+ *   class, not a mockable global function).
  */
 
 namespace frieren\modules\modules;
@@ -56,22 +56,48 @@ class ModulesControllerTest extends TestCase
 
     // ---- getModuleList ----------------------------------------------------
 
-    public function testGetModuleListThrowsWhenTheHardcodedModulesRootIsMissing(): void
+    public function testGetModuleListFailsWhenTheModulesRootIsNotReadable(): void
     {
-        // DeviceConfig::MODULE_ROOT_FOLDER is a hardcoded '/frieren/modules' const
-        // with no injection seam, and getModuleList() reads it via
-        // `new \DirectoryIterator(...)` rather than a wrappable function like
-        // scandir(). On any host where that folder doesn't exist (true here; on a
-        // real device the OS image guarantees it), the constructor throws before
-        // the `isReadable()` guard ever runs, and nothing in ModulesController or
-        // Controller::handleActions() catches it — only ApiCore::handleRequest()'s
-        // top-level try/catch does, and DispatchesControllers::dispatch() bypasses
-        // ApiCore entirely by constructing the controller directly. This test pins
-        // that real, current behavior; the happy-path scan/shape isn't exercisable
-        // here without a filesystem fixture at that exact absolute path.
-        $this->expectException(\UnexpectedValueException::class);
+        $this->getFunctionMock('frieren\modules\modules', 'is_readable')->expects($this->once())->willReturn(false);
+        $this->getFunctionMock('frieren\modules\modules', 'glob')->expects($this->never());
 
-        $this->dispatch(ModulesController::class, 'modules', ['action' => 'getModuleList']);
+        $result = $this->dispatch(ModulesController::class, 'modules', ['action' => 'getModuleList']);
+
+        $this->assertSame('Unable to access modules directory', $result['error']);
+    }
+
+    public function testGetModuleListReturnsSidebarAndExternalModulesFromTheScannedFolders(): void
+    {
+        $this->getFunctionMock('frieren\modules\modules', 'is_readable')->expects($this->once())->willReturn(true);
+        $this->getFunctionMock('frieren\modules\modules', 'glob')->expects($this->once())
+            ->willReturn(['/frieren/modules/dashboard', '/frieren/modules/demo']);
+        $this->getFunctionMock('frieren\modules\modules', 'file_exists')->expects($this->exactly(2))->willReturn(true);
+        $this->getFunctionMock('frieren\modules\modules', 'file_get_contents')->expects($this->exactly(2))
+            ->willReturnOnConsecutiveCalls(
+                json_encode([
+                    'name' => 'dashboard', 'title' => 'Dashboard', 'version' => '1.0.0',
+                    'system' => true, 'forceSidebar' => true, 'icon' => 'speedometer2',
+                ]),
+                json_encode([
+                    'name' => 'demo', 'title' => 'Demo', 'version' => '2.0.0',
+                    'system' => false, 'forceSidebar' => false,
+                ])
+            );
+
+        // uciGetJson() readback of the pinned-sidebar settings — no pins here.
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0;
+            return json_encode([]);
+        });
+
+        $result = $this->dispatch(ModulesController::class, 'modules', ['action' => 'getModuleList']);
+
+        $this->assertNull($result['error']);
+        $this->assertCount(1, $result['data']['sidebar']);
+        $this->assertSame('dashboard', $result['data']['sidebar'][0]['name']);
+        $this->assertCount(1, $result['data']['external']);
+        $this->assertSame('demo', $result['data']['external'][0]['name']);
     }
 
     // ---- getAvailableModules ------------------------------------------------
@@ -119,13 +145,51 @@ class ModulesControllerTest extends TestCase
 
     // ---- getInstalledModules ------------------------------------------------
 
-    public function testGetInstalledModulesThrowsWhenTheHardcodedModulesRootIsMissing(): void
+    public function testGetInstalledModulesFailsWhenTheModulesRootIsNotReadable(): void
     {
-        // See testGetModuleListThrowsWhenTheHardcodedModulesRootIsMissing() above
-        // for why this pins current behavior instead of the happy-path shape.
-        $this->expectException(\UnexpectedValueException::class);
+        $this->getFunctionMock('frieren\modules\modules', 'is_readable')->expects($this->once())->willReturn(false);
+        $this->getFunctionMock('frieren\modules\modules', 'glob')->expects($this->never());
 
-        $this->dispatch(ModulesController::class, 'modules', ['action' => 'getInstalledModules']);
+        $result = $this->dispatch(ModulesController::class, 'modules', ['action' => 'getInstalledModules']);
+
+        $this->assertSame('Unable to access modules directory', $result['error']);
+    }
+
+    public function testGetInstalledModulesReturnsManifestDataMergedWithDiskUsage(): void
+    {
+        $this->getFunctionMock('frieren\modules\modules', 'is_readable')->expects($this->once())->willReturn(true);
+        $this->getFunctionMock('frieren\modules\modules', 'glob')->expects($this->once())
+            ->willReturn(['/frieren/modules/demo']);
+        $this->getFunctionMock('frieren\modules\modules', 'file_exists')->expects($this->once())->willReturn(true);
+        $this->getFunctionMock('frieren\modules\modules', 'file_get_contents')->expects($this->once())->willReturn(json_encode([
+            'name' => 'demo', 'title' => 'Demo', 'icon' => 'package', 'forceSidebar' => false,
+            'description' => 'A demo module.', 'authors' => [['name' => 'DSR!']],
+            'version' => '2.0.0', 'repository' => 'demo-repo', 'system' => false,
+        ]));
+
+        // 1st exec: getAllModuleSizes()'s `du -sh` call. 2nd exec: uciGetJson() readback
+        // of the pinned-sidebar settings.
+        $callCount = 0;
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->exactly(2))->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$callCount) {
+            $callCount++;
+            $retval = 0;
+            if ($callCount === 1) {
+                $output = ["1.5M\t/frieren/modules/demo/"];
+                return '';
+            }
+
+            return json_encode([]);
+        });
+
+        $result = $this->dispatch(ModulesController::class, 'modules', ['action' => 'getInstalledModules']);
+
+        $this->assertNull($result['error']);
+        $this->assertCount(1, $result['data']);
+        $this->assertSame('demo', $result['data'][0]['name']);
+        $this->assertSame('DSR!', $result['data'][0]['author']);
+        $this->assertSame('1.5M', $result['data'][0]['size']);
+        $this->assertFalse($result['data'][0]['sidebar']);
     }
 
     // ---- downloadModule / downloadStatus ------------------------------------

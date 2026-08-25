@@ -258,7 +258,7 @@ writing that suite, each backed by a reproducing test.
     the pattern already used elsewhere in the codebase (e.g. `execUbusCall`) when the caller
     has already escaped every interpolated piece itself.
 
-- [ ] Not started — **M13. `ModulesController::getModuleList()`/`getInstalledModules()` are not unit-testable without touching the real filesystem root**
+- [x] Done — **M13. `ModulesController::getModuleList()`/`getInstalledModules()` are not unit-testable without touching the real filesystem root**
   - **Area:** Backend core `frieren-back` (`modules/modules/ModulesController.php`) — test
     infrastructure note, not a functional bug.
   - **Evidence:** Both actions scan `\DeviceConfig::MODULE_ROOT_FOLDER` (hardcoded

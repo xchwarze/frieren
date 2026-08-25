@@ -30,8 +30,8 @@ class ModulesController extends \frieren\core\Controller
 
     public function getModuleList()
     {
-        $modulesDir = new \DirectoryIterator(\DeviceConfig::MODULE_ROOT_FOLDER);
-        if (!$modulesDir->isReadable()) {
+        $moduleFolders = self::setupModuleHelper()::getModuleFolders(\DeviceConfig::MODULE_ROOT_FOLDER);
+        if ($moduleFolders === false) {
             return self::setError('Unable to access modules directory');
         }
 
@@ -42,12 +42,7 @@ class ModulesController extends \frieren\core\Controller
         ];
         $sidebarSettings = self::setupCoreHelper()::uciGetJson(self::UCI_SIDEBAR, false);
 
-        foreach ($modulesDir as $file) {
-            if ($file->isDot() || !$file->isDir()) {
-                continue;
-            }
-
-            $moduleFolder = $file->getRealPath();
+        foreach ($moduleFolders as $moduleFolder) {
             $moduleManifest = "{$moduleFolder}/manifest.json";
             if (!file_exists($moduleManifest)) {
                 continue;
@@ -139,8 +134,8 @@ class ModulesController extends \frieren\core\Controller
     public function getInstalledModules()
     {
         $moduleRoot = \DeviceConfig::MODULE_ROOT_FOLDER;
-        $modulesDir = new \DirectoryIterator($moduleRoot);
-        if (!$modulesDir->isReadable()) {
+        $moduleFolders = self::setupModuleHelper()::getModuleFolders($moduleRoot);
+        if ($moduleFolders === false) {
             return self::setError('Unable to access modules directory');
         }
 
@@ -148,12 +143,7 @@ class ModulesController extends \frieren\core\Controller
         $modules = [];
         $sidebarSettings = self::setupCoreHelper()::uciGetJson(self::UCI_SIDEBAR, false);
 
-        foreach ($modulesDir as $file) {
-            if ($file->isDot() || !$file->isDir()) {
-                continue;
-            }
-
-            $moduleFolder = $file->getRealPath();
+        foreach ($moduleFolders as $moduleFolder) {
             $moduleManifest = "{$moduleFolder}/manifest.json";
             if (!file_exists($moduleManifest)) {
                 continue;
