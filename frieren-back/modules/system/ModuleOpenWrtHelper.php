@@ -87,7 +87,10 @@ class ModuleOpenWrtHelper
             $command .= ' -e ' . escapeshellarg($searchPattern);
         }
 
-        $output = OpenWrtHelper::exec($command, false);
+        // $raw=true: $searchPattern is already escapeshellarg()'d above; running the whole
+        // command through escapeshellcmd() too would additionally backslash-escape shell
+        // metacharacters *inside* that already-quoted segment, corrupting the search term.
+        $output = OpenWrtHelper::exec($command, false, true);
         if (!$output) {
             return false;
         }

@@ -239,7 +239,7 @@ writing that suite, each backed by a reproducing test.
     suggests it does; the current behavior is accidental, not designed.
   - **Fix:** Add explicit parentheses: `$radioInfo['up'] && ($iwinfo['phy'] ?? null)`.
 
-- [ ] Not started — **M12. `SystemController::getSystemLogs()`'s `search` param is double-shell-escaped, corrupting patterns with shell metacharacters**
+- [x] Done — **M12. `SystemController::getSystemLogs()`'s `search` param is double-shell-escaped, corrupting patterns with shell metacharacters**
   - **Area:** Backend core `frieren-back` (`modules/system/`)
   - **Evidence:** `getSystemLogs()` builds the `logread -e '<search>'` argument with its own
     `escapeshellarg()`, but the resulting full command string is then passed through

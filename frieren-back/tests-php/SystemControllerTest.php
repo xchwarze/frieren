@@ -193,7 +193,15 @@ class SystemControllerTest extends TestCase
      * for search terms containing shell metacharacters. Functional quirk, not
      * a security bug.
      */
-    public function testGetSystemLogsEscapesShellMetacharactersInSearchParameter(): void
+    /**
+     * Regression test for TODO-1.5.md's M12: getSystemLogs() used to call
+     * OpenWrtHelper::exec($command, false) — non-raw — so the whole command line, including
+     * the already-escapeshellarg()'d search term, went through escapeshellcmd() a second
+     * time, backslash-mangling any shell metacharacter inside it. It's now called with
+     * $raw=true, so the search term arrives at logread exactly as escapeshellarg() quoted it
+     * (still safe — no injection either way, this was a correctness bug, not a security one).
+     */
+    public function testGetSystemLogsPassesTheSearchTermThroughExactlyOnceEscaped(): void
     {
         $malicious = 'kern; rm -rf / #';
         $captured = null;
@@ -208,8 +216,9 @@ class SystemControllerTest extends TestCase
             'search' => $malicious,
         ]);
 
-        $expected = escapeshellcmd('logread -l 1000 -e ' . escapeshellarg($malicious));
+        $expected = 'logread -l 1000 -e ' . escapeshellarg($malicious);
         $this->assertSame($expected, $captured);
+        $this->assertStringContainsString($malicious, $captured, 'The literal search term must survive, not a backslash-mangled copy');
     }
 
     public function testGetSystemLogsReturnsErrorWhenTheCommandFails(): void
