@@ -856,32 +856,6 @@ x-circle x-octagon x-square zap zap-off zoom-in zoom-out
 
 ## 8. Known gotchas (verified against source, not assumptions)
 
-- **`VITE_SOURCEMAP` has no effect in this template.** The `.env.*` files (and older docs) use
-  `VITE_SOURCEMAP`, but `vite.config.js` actually reads `VITE_SOURCEMAP_ENABLE`. To get
-  sourcemaps, set `VITE_SOURCEMAP_ENABLE=true` (inline or edit the code) — the documented
-  variable name is currently dead.
-- **`yup` is undeclared *and currently unresolvable* — `yarn wizard`/`yarn validate` fail out of
-  the box.** `bin/manifestSchema.js` and `bin/validate.js` do `import * as yup from 'yup'`, but
-  `yup` is listed only as a `peerDependency` (never installed by `yarn install`) and — unlike
-  `semver` below — nothing else hoists a copy into `node_modules`. Verified: a fresh `yarn
-  install` then `node ./bin/validate.js` throws `ERR_MODULE_NOT_FOUND: Cannot find package
-  'yup'`, and the same happens for `yarn wizard`. **Workaround: `yarn add -D yup` once**, in the
-  module directory, before using either tool.
-- **`semver` is also an undeclared dependency, but currently harmless.** `bin/manifestSchema.js`,
-  `bin/update-module.js`, and `bin/version-bump.js` import it directly too, but it's not in
-  `package.json` either — it happens to still resolve because it's hoisted transitively via
-  other deps. Less urgent than the `yup` problem above, but the same future dependency-bump risk
-  applies: it could start throwing "Cannot find module 'semver'" with no warning.
-- **`yarn wizard`'s `.env` bootstrap is a no-op.** It looks for `.env`/`.env.prod` at the
-  project root, but the real env files live in `config/` (`vite.config.js` loads
-  `${cwd}/config`) — so it never actually copies anything, and a root `.env` wouldn't be read
-  by the build even if it existed. Ignore that step; edit `config/.env.{dev,prod,release}`
-  directly (§6.1) or pass flags inline on the build command.
-- **A default `yarn build` opens a bundle-analyzer server that never exits.**
-  `config/.env.prod` ships `VITE_ANALYZER_ENABLE=true`; the analyzer plugin's default mode is
-  `"server"`, which starts an HTTP server and blocks — an unattended build hangs. Use
-  `yarn build --mode release` (analyzer off by default) or set `VITE_ANALYZER_ENABLE=false`
-  for a scripted/CI build.
 - **Release builds gzip `module.umd.js` in place, same filename.** `yarn build --mode release`
   with compression enabled overwrites `dist/module.umd.js` with its own gzip'd bytes (no `.gz`
   suffix) — opening it expecting plain JS will look corrupted. That's expected; the device's

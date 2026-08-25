@@ -148,7 +148,7 @@ VITE_COMMON_ALIAS=../frieren-front/src
 # for build
 VITE_COMPRESSION_ENABLE=true
 VITE_ANALYZER_ENABLE=false
-VITE_SOURCEMAP=false
+VITE_SOURCEMAP_ENABLE=false
 VITE_MANUAL_CHUNKS_ENABLE=false
 ```
 
@@ -158,7 +158,7 @@ VITE_MANUAL_CHUNKS_ENABLE=false
 - `VITE_COMMON_ALIAS`: Filesystem path to `frieren-front/src`, which backs the `@src` and `@common` aliases (the shared `PanelCard`, `PanelStack`, `Button`, … components). Defaults to `../frieren-front/src`, i.e. it assumes `frieren-front` sits next to the module. When `frieren-front` lives elsewhere (e.g. a monorepo where it is under `frieren/frieren-front`), point this at the correct `frieren-front/src`.
 - `VITE_COMPRESSION_ENABLE`: When set to true, it enables compression of the build files, reducing their size and improving load times. This option is primarily used for creating distributable releases and for testing with real hardware in actual environments.
 - `VITE_ANALYZER_ENABLE`: Enables the bundle analyzer plugin when set to `true`. This is useful for analyzing and visualizing the size of the output files.
-- `VITE_SOURCEMAP`: Controls the generation of sourcemaps. Setting this to `true` helps in debugging by mapping the compiled code back to the original source code.
+- `VITE_SOURCEMAP_ENABLE`: Controls the generation of sourcemaps. Setting this to `true` helps in debugging by mapping the compiled code back to the original source code.
 - `VITE_MANUAL_CHUNKS_ENABLE`: When enabled, this allows for manual chunking of the build output, which can be particularly useful during development and testing with real hardware. This option helps to optimize the loading strategy by separating vendor code from the core code.
 
 ### Overriding flags from the CLI

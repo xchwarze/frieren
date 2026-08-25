@@ -127,7 +127,7 @@ Legend: `- [ ] Not started` → update to `- [x] Done` (with commit/PR ref) as i
     `implements HelperInterface` to `OpenWrtHelper` so the compiler enforces it going
     forward.
 
-- [ ] Not started — **I6. `VITE_SOURCEMAP` vs `VITE_SOURCEMAP_ENABLE` mismatch — affects both `frieren-module-template` AND `frieren-front`**
+- [x] Done — **I6. `VITE_SOURCEMAP` vs `VITE_SOURCEMAP_ENABLE` mismatch — affects both `frieren-module-template` AND `frieren-front`**
   - **Area:** Module Template tooling / Frontend SDK `frieren-front`
   - **Evidence:**
     - `frieren-module-template/vite.config.js:148` reads `env.VITE_SOURCEMAP_ENABLE`, but
