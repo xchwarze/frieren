@@ -115,9 +115,6 @@ yarn wizard
 # 3. compile
 yarn build                  # vite build defaults to production mode -> config/.env.prod
                              # (there's no separate "dev build"; module.umd.js + public/ copied into dist/)
-#    config/.env.prod defaults VITE_ANALYZER_ENABLE=true, which opens a bundle-analyzer HTTP
-#    server that does NOT exit on its own (§8) — pass VITE_ANALYZER_ENABLE=false for an
-#    unattended/CI build, or just use the release build below (analyzer off there).
 yarn build --mode release   # release build — gzip-compresses dist output in place (§8)
 
 # 4. self-check

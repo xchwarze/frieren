@@ -93,7 +93,7 @@ Legend: `- [ ] Not started` → update to `- [x] Done` (with commit/PR ref) as i
     an editable default too), or explicitly document in the README that these are
     intentionally fixed and why.
 
-- [ ] Not started — **I4. Plain `yarn build` hangs indefinitely (bundle analyzer defaults to server mode)**
+- [x] Done — **I4. Plain `yarn build` hangs indefinitely (bundle analyzer defaults to server mode)**
   - **Area:** Module Template tooling
   - **Evidence:** `frieren-module-template/config/.env.prod:7` ships
     `VITE_ANALYZER_ENABLE=true` by default. `vite.config.js:142-146` wires that flag straight
