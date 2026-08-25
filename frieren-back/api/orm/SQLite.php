@@ -105,7 +105,7 @@ class SQLite
      * @param array $columns Columns to select.
      * @return array|null The record as assoc. array, or null if not found.
      */
-    public function find(string $table, array $conditions, array $columns = []): array
+    public function find(string $table, array $conditions, array $columns = []): ?array
     {
         $columnString = $this->processColumns($columns);
         $whereClause = $this->buildWhereClause($conditions);

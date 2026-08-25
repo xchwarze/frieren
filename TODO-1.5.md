@@ -31,7 +31,7 @@ Legend: `- [ ] Not started` → update to `- [x] Done` (with commit/PR ref) as i
     *built module's* runtime, but the *tooling scripts* need their own real copy). Do the same
     audit for `semver` (see I1).
 
-- [ ] Not started — **C2. `SQLite::find()` throws a fatal `TypeError` instead of returning `null`/`[]` on no match**
+- [x] Done — **C2. `SQLite::find()` throws a fatal `TypeError` instead of returning `null`/`[]` on no match**
   - **Area:** Backend core `frieren-back`
   - **Evidence:** `frieren-back/api/orm/SQLite.php:108` declares
     `public function find(string $table, array $conditions, array $columns = []): array`

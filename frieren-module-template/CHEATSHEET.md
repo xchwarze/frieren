@@ -433,7 +433,7 @@ calling it instead of `killall` leaves the job running while `isRunning()` false
 $db = new \frieren\orm\SQLite('/path/to/db.sqlite');
 $db->query($sql, $params = []);              // SELECT -> array of assoc rows
 $db->exec($sql, $params = []);                // INSERT/UPDATE/DELETE -> bool
-$db->find($table, $conditions, $columns = []);   // one row (assoc array) — see warning below
+$db->find($table, $conditions, $columns = []);   // one row (assoc array), or null if not found
 $db->findAll($table, $columns = []);
 $db->insert($table, $data);                   // assoc array of column => value
 $db->update($table, $data, $conditions);
@@ -442,12 +442,9 @@ $db->count($table, $conditions);              // int
 $db->each($table, $conditions = [], $columns = []); // Generator — lazy iteration
 ```
 
-**Warning: `find()` fatals on a miss, it does not return `[]`.** Its signature is declared
-`: array`, but on no match it does `return $result->fetchArray(...) ?: null;` — PHP then throws
-`TypeError: find(): Return value must be of type array, null returned`. Since `ApiCore` only
-catches `\Exception`, not `\Throwable` (§8), that surfaces as a broken response instead of a
-clean `{"error": ...}`. Don't rely on "or `[]`" — call `count($table, $conditions)` first, or
-use `query($sql, $params)` and take `$rows[0] ?? null` yourself.
+`find()` returns `null` on a miss (declared `: ?array`) — check for `null`, don't assume a
+truthy/falsy shortcut, and don't confuse it with `[]` (an empty-columns match still returns an
+associative array, just possibly with fewer keys).
 
 Only *values* are parameterized/bound above — table names, column lists, and the **keys** of
 `$conditions`/`$data` are interpolated directly into the SQL string. Never build those from

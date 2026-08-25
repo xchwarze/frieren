@@ -76,17 +76,12 @@ class SQLiteTest extends TestCase
     }
 
     /**
-     * Regression test for TODO-1.5.md's SQLite::find() bug: the method is
-     * declared `: array` but does `fetchArray() ?: null` on a miss, so PHP
-     * throws a TypeError instead of returning null/[] for "not found". This
-     * test PINS today's (buggy) behavior. Once the bug is fixed (return type
-     * changed to `?array`), update this test to assert null instead.
+     * Regression test for TODO-1.5.md's C2: find() is now `: ?array` and returns
+     * null on a miss instead of fatally throwing a TypeError.
      */
-    public function testFindOnAMissCurrentlyThrowsTypeErrorInsteadOfReturningNull(): void
+    public function testFindOnAMissReturnsNull(): void
     {
-        $this->expectException(\TypeError::class);
-
-        $this->db->find('items', ['name' => 'does-not-exist']);
+        $this->assertNull($this->db->find('items', ['name' => 'does-not-exist']));
     }
 
     public function testEachOnAnEmptyTableYieldsNothing(): void
