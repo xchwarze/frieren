@@ -14,6 +14,7 @@ import packageJson from './package.json';
 const FRIEREN_MODULE_PREFIX = 'FrierenModule';
 
 const EXTERNAL_DEPS = [
+  '@frieren/terminal-core',
   '@hookform/resolvers',
   '@hookform/resolvers/yup',
   '@tanstack/react-query',
@@ -32,6 +33,7 @@ const EXTERNAL_DEPS = [
 ];
 
 const GLOBALS_MAP = {
+  '@frieren/terminal-core': 'Frieren.TerminalCore',
   '@hookform/resolvers': 'Frieren.HookformResolvers',
   '@hookform/resolvers/yup': 'Frieren.HookformResolversYup',
   '@tanstack/react-query': 'Frieren.ReactQuery',

@@ -310,7 +310,7 @@ writing that suite, each backed by a reproducing test.
   - **Fix:** Either document this as an intentional global mutex, or scope the task name per
     module, e.g. `"fm-dependencies-{$moduleName}"`.
 
-- [ ] Not started — **M3. `@frieren/terminal-core` missing from the module template's externals/globals**
+- [x] Done — **M3. `@frieren/terminal-core` missing from the module template's externals/globals**
   - **Area:** Module Template tooling / Frontend SDK `frieren-front`
   - **Evidence:** `frieren-front/src/helpers/umdSupport.js:22,45` imports
     `@frieren/terminal-core` and exposes it as `window.Frieren.TerminalCore`, but

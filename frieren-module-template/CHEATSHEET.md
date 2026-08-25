@@ -140,8 +140,8 @@ yarn update-module ../{name} --force --build     # -f/--force also exists as a s
 #   semver per package) instead of overwriting package.json wholesale.
 #   --no-files / --no-install skip copying template files / running yarn install.
 #   CAUTION even without --force: it deletes and reinstalls the target's yarn.lock, and
-#   SYNCED_FILES silently overwrites vite.config.js — including any hand-added external
-#   (e.g. the @frieren/terminal-core entry from §8). --force also replaces package.json
+#   SYNCED_FILES silently overwrites vite.config.js — including any hand-added external/global
+#   entry beyond the template's own EXTERNAL_DEPS/GLOBALS_MAP. --force also replaces package.json
 #   wholesale except a short PRESERVED_KEYS allowlist (name/version/description/keywords/
 #   author/repository/bugs/homepage) — a custom "scripts"/"license"/"engines" is NOT preserved.
 ```
@@ -860,9 +860,12 @@ x-circle x-octagon x-square zap zap-off zoom-in zoom-out
   with compression enabled overwrites `dist/module.umd.js` with its own gzip'd bytes (no `.gz`
   suffix) — opening it expecting plain JS will look corrupted. That's expected; the device's
   web server is assumed to serve pre-compressed assets.
-- **The dependency-install task name is a global mutex, not per-module.** `Controller::TASK_DEPENDENCIES`
-  is the same string (`'fm-dependencies'`) for every module — two modules can't install deps at
-  the same time, even though they're unrelated (§5.8).
+- **The dependency-install task name is a global mutex, not per-module — by design.**
+  `Controller::TASK_DEPENDENCIES` is the same string (`'fm-dependencies'`) for every module, so
+  two modules can't "install deps" at the same time from the UI's perspective. This mirrors a
+  real constraint: `dependency-installer.sh` already serializes the actual opkg/apk transaction
+  behind a system-wide `flock`, so per-module task names wouldn't add real parallelism — just a
+  confusing "installing" status for a task that's actually blocked behind another one (§5.8).
 - **A module's install handshake implicitly depends on the built-in `packages` module.**
   `installDependency()` shells out to `{MODULE_ROOT_FOLDER}/packages/bin/dependency-installer.sh`
   unconditionally — this is always present on a real device, but matters if you're ever testing
@@ -872,9 +875,6 @@ x-circle x-octagon x-square zap zap-off zoom-in zoom-out
   defensively (validate types, don't rely on the framework's catch-all for programmer errors).
 - **`execUbusCall` takes 3 arguments** — `($namespace, $method, $args = [])` — not a single
   command string; some older docs simplify this incorrectly.
-- **`@frieren/terminal-core` is not in this template's UMD externals/globals map**, even though
-  the host exposes it as `window.Frieren.TerminalCore`. A module embedding the terminal must add
-  that entry to `vite.config.js`'s `EXTERNAL_DEPS`/`GLOBALS_MAP` itself.
 - **`package.json.name` and `manifest.json.name` drifting apart breaks the UMD load** (§6.1) —
   the wizard keeps them in sync automatically; don't hand-edit one without the other. Also
   note `react-dom` maps to `Frieren.ReactDOM`, which the host publishes from `react-dom/client`
