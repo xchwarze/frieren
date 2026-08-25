@@ -297,7 +297,7 @@ writing that suite, each backed by a reproducing test.
   - **Fix:** Either re-enable the `realpath()` check, or delete it and add a one-line comment
     explaining why the regex alone is considered sufficient.
 
-- [ ] Not started — **M2. `Controller::TASK_DEPENDENCIES` is a single global lock shared by every module**
+- [x] Done — **M2. `Controller::TASK_DEPENDENCIES` is a single global lock shared by every module**
   - **Area:** Backend core `frieren-back`
   - **Evidence:** `frieren-back/api/core/Controller.php:20`:
     `const TASK_DEPENDENCIES = 'fm-dependencies';` — the same fixed string used for

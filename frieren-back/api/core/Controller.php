@@ -17,6 +17,18 @@ abstract class Controller
      * Minimum required disk space in bytes.
      */
     const MIN_DISK_SPACE = 786432;
+
+    /**
+     * Deliberately a single, module-agnostic task name (TODO-1.5.md M2): every module's
+     * dependency install shares one "Installation in progress" gate. This isn't an
+     * accidental collision — `dependency-installer.sh` already serializes the real
+     * package-manager transaction behind a system-wide `flock` on `/tmp/ipkg.lock`, since
+     * opkg/apk's own package database isn't safe for concurrent transactions. Scoping this
+     * constant per module would only let two background tasks *look* independently "in
+     * progress" while one silently blocks on that flock behind the other — a confusing
+     * status for no real parallelism gained. One shared gate keeps the UI honest about
+     * there being exactly one package-manager transaction possible at a time.
+     */
     const TASK_DEPENDENCIES = 'fm-dependencies';
 
     /**
