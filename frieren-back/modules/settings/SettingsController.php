@@ -25,8 +25,24 @@ class SettingsController extends \frieren\core\Controller
         self::setSuccess(self::setupModuleHelper()::getSectionData());
     }
 
+    // RFC-1123 single-label hostname: 1-63 chars, alphanumeric start/end, hyphens allowed
+    // in between (no leading/trailing hyphen, no dots — this is a hostname, not a FQDN).
+    const HOSTNAME_REGEX = '/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/';
+
+    // The panel only ever sends whole-hour GMT offsets from a fixed 25-entry dropdown
+    // (frieren-front/src/features/settings/helpers/timezones.js: "GMT0"/"GMT+N"/"GMT-N",
+    // N in 1..12) or the equivalent computed from the browser clock ("GMT+0" at the zero
+    // offset instead of "GMT0") — never an IANA name or a fractional offset.
+    const TIMEZONE_REGEX = '/^GMT[+-]?(0|[1-9]|1[0-2])$/';
+
+    const VALID_THEMES = ['auto', 'dark', 'light'];
+
     public function setHostname()
     {
+        if (!preg_match(self::HOSTNAME_REGEX, $this->request['hostname'] ?? '')) {
+            return self::setError('Invalid hostname.');
+        }
+
         if (self::setupModuleHelper()::setSystemHostname($this->request['hostname'])) {
             return self::setSuccess();
         }
@@ -36,6 +52,10 @@ class SettingsController extends \frieren\core\Controller
 
     public function setTimezone()
     {
+        if (!preg_match(self::TIMEZONE_REGEX, $this->request['timezone'] ?? '')) {
+            return self::setError('Invalid timezone.');
+        }
+
         if (self::setupModuleHelper()::changeSystemTimeZone($this->request['timezone'])) {
             return self::setSuccess();
         }
@@ -63,6 +83,10 @@ class SettingsController extends \frieren\core\Controller
 
     public function setPanelTheme()
     {
+        if (!in_array($this->request['theme'] ?? null, self::VALID_THEMES, true)) {
+            return self::setError('Invalid theme.');
+        }
+
         if (self::setupModuleHelper()::setPanelTheme($this->request['theme'])) {
             return self::setSuccess();
         }

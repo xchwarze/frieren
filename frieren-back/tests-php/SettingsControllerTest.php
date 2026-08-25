@@ -12,6 +12,7 @@
 
 namespace frieren\modules\settings;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use phpmock\phpunit\PHPMock;
 use frieren\core\Tests\Support\DispatchesControllers;
@@ -87,47 +88,20 @@ class SettingsControllerTest extends TestCase
     }
 
     /**
-     * Finding: setSystemHostname() has no charset/format whitelist. The value is
-     * only ever passed through escapeshellarg() (which prevents shell injection
-     * but does not reject the value itself), so a string with spaces and shell
-     * metacharacters is accepted and round-tripped into UCI + the kernel hostname
-     * write untouched. This test documents the current (unsafe-by-omission)
-     * behavior rather than a desired one.
+     * Regression test for TODO-1.5.md's M10: setHostname() now whitelists the hostname
+     * (RFC-1123 single label) in the controller, before ever calling the helper/exec.
      */
-    public function testSetHostnameAcceptsInvalidCharactersBecauseNoFormatValidationExists(): void
+    public function testSetHostnameRejectsInvalidCharactersWithoutTouchingTheSystem(): void
     {
-        $maliciousHostname = "evil host; rm -rf /";
-        $capturedCommands = [];
-
         $exec = $this->getFunctionMock('frieren\helper', 'exec');
-        $exec->expects($this->exactly(4))->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands, $maliciousHostname) {
-            $capturedCommands[] = $command;
-            $output = [];
-            $retval = 0;
-            if (strpos($command, 'uci -q get') !== false) {
-                return $maliciousHostname;
-            }
-
-            return '';
-        });
+        $exec->expects($this->never());
 
         $result = $this->dispatch(SettingsController::class, 'settings', [
             'action' => 'setHostname',
-            'hostname' => $maliciousHostname,
+            'hostname' => 'evil host; rm -rf /',
         ]);
 
-        $this->assertNull($result['error']);
-        $this->assertSame(['success' => true], $result['data']);
-
-        $hostnameEchoCommand = null;
-        foreach ($capturedCommands as $command) {
-            if (strpos($command, '/proc/sys/kernel/hostname') !== false) {
-                $hostnameEchoCommand = $command;
-            }
-        }
-
-        $this->assertNotNull($hostnameEchoCommand);
-        $this->assertStringContainsString(escapeshellarg($maliciousHostname), $hostnameEchoCommand);
+        $this->assertSame('Invalid hostname.', $result['error']);
     }
 
     public function testSetTimezoneConvertsGmtSignAndWritesWhenChanged(): void
@@ -158,21 +132,41 @@ class SettingsControllerTest extends TestCase
     }
 
     /**
-     * Finding: changeSystemTimeZone() has no whitelist against a known IANA/GMT
-     * offset list either — any string that doesn't contain 'GMT' is written as-is.
+     * Regression test for TODO-1.5.md's M10: setTimezone() now whitelists the value
+     * against the panel's actual GMT-offset format (frieren-front's 25-entry dropdown is
+     * "GMT0"/"GMT+N"/"GMT-N", N in 1..12) before calling the helper/exec.
      */
-    public function testSetTimezoneAcceptsAnyStringWithoutValidatingAgainstAKnownList(): void
+    public function testSetTimezoneRejectsAValueOutsideTheKnownGmtOffsetFormat(): void
     {
-        $bogusTimezone = 'NotARealZone';
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->never());
+
+        $result = $this->dispatch(SettingsController::class, 'settings', [
+            'action' => 'setTimezone',
+            'timezone' => 'NotARealZone',
+        ]);
+
+        $this->assertSame('Invalid timezone.', $result['error']);
+    }
+
+    #[DataProvider('validTimezoneProvider')]
+    public function testSetTimezoneAcceptsEveryRealDropdownValue(string $timezone): void
+    {
+        // changeSystemTimeZone() flips the GMT sign before comparing/writing — replicate
+        // that with the real helper so the mocked uciGet readback matches what the method
+        // actually compares against, regardless of which of the 25 real values is under test.
+        $converted = ModuleOpenWrtHelper::convertOpenWrtTimezoneValue($timezone);
         $callCount = 0;
 
         $exec = $this->getFunctionMock('frieren\helper', 'exec');
-        $exec->expects($this->exactly(5))->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$callCount, $bogusTimezone) {
+        $exec->expects($this->exactly(5))->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$callCount, $converted) {
             $callCount++;
             $output = [];
             $retval = 0;
             if (strpos($command, 'uci -q get') !== false) {
-                return $callCount === 1 ? 'GMT+3' : $bogusTimezone;
+                // 1st read (compare): something different, to force the write path to run.
+                // 2nd read (post-write readback): the value that was "just written".
+                return $callCount === 1 ? "{$converted}-old" : $converted;
             }
 
             return '';
@@ -180,11 +174,19 @@ class SettingsControllerTest extends TestCase
 
         $result = $this->dispatch(SettingsController::class, 'settings', [
             'action' => 'setTimezone',
-            'timezone' => $bogusTimezone,
+            'timezone' => $timezone,
         ]);
 
-        $this->assertNull($result['error']);
-        $this->assertSame(['success' => true], $result['data']);
+        $this->assertNull($result['error'], "Expected {$timezone} to be accepted");
+    }
+
+    public static function validTimezoneProvider(): array
+    {
+        // The exact real-world shapes: the static dropdown's "GMT0" for zero, the
+        // browser-clock helper's "GMT+0" for the same offset, and the +/-1..12 range.
+        return [
+            ['GMT0'], ['GMT+0'], ['GMT+12'], ['GMT-12'], ['GMT+5'], ['GMT-3'],
+        ];
     }
 
     public function testSetDatetimeFromBrowserSyncsTheClockWhenTimezoneIsAlreadyCurrent(): void
@@ -317,29 +319,19 @@ class SettingsControllerTest extends TestCase
     }
 
     /**
-     * Finding: setPanelTheme() has no whitelist against the panel's known theme
-     * set ('auto'|'dark'|'light') — any string is written as-is.
+     * Regression test for TODO-1.5.md's M10: setPanelTheme() now whitelists against the
+     * panel's known theme set ('auto'|'dark'|'light') before calling the helper/exec.
      */
-    public function testSetPanelThemeAcceptsAnyStringWithoutValidatingAgainstTheKnownThemeList(): void
+    public function testSetPanelThemeRejectsAnUnknownTheme(): void
     {
-        $bogusTheme = 'neon-green-nonsense';
-
         $exec = $this->getFunctionMock('frieren\helper', 'exec');
-        $exec->expects($this->exactly(3))->willReturnCallback(function ($command, &$output = null, &$retval = null) use ($bogusTheme) {
-            $retval = 0;
-            if (strpos($command, 'uci -q get') !== false) {
-                return $bogusTheme;
-            }
-
-            return '';
-        });
+        $exec->expects($this->never());
 
         $result = $this->dispatch(SettingsController::class, 'settings', [
             'action' => 'setPanelTheme',
-            'theme' => $bogusTheme,
+            'theme' => 'neon-green-nonsense',
         ]);
 
-        $this->assertNull($result['error']);
-        $this->assertSame(['success' => true], $result['data']);
+        $this->assertSame('Invalid theme.', $result['error']);
     }
 }

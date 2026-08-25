@@ -203,7 +203,7 @@ writing that suite, each backed by a reproducing test.
     path is built instead of "borrowed" from a cleanup method — a readability/defensive-order
     improvement, not a bug fix.
 
-- [ ] Not started — **M10. `SettingsController` accepts `hostname`/`timezone`/`theme` values with no format/enum validation**
+- [x] Done — **M10. `SettingsController` accepts `hostname`/`timezone`/`theme` values with no format/enum validation**
   - **Area:** Backend core `frieren-back` (`modules/settings/`)
   - **Evidence:** Neither `ModuleOpenWrtHelper::setSystemHostname()` nor
     `SettingsController::setHostname()` whitelist the hostname's charset (only
