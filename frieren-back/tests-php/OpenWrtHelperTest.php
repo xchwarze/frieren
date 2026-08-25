@@ -133,4 +133,19 @@ class OpenWrtHelperTest extends TestCase
 
         $this->assertFalse(OpenWrtHelper::hasInternetConnection());
     }
+
+    /**
+     * Regression test for TODO-1.5.md's I7: a command that succeeds with zero lines of
+     * output must not leave $output null/unset — exec() initializes it to [] up front, so
+     * implode() never fatals with a TypeError.
+     */
+    public function testExecReturnsAnEmptyStringInsteadOfFatalingWhenTheCommandProducesNoOutput(): void
+    {
+        $exec = $this->getFunctionMock(__NAMESPACE__, 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0; // succeeds, but never touches $output — mirrors a real silent command
+        });
+
+        $this->assertSame('', OpenWrtHelper::exec('true'));
+    }
 }

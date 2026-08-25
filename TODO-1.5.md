@@ -155,7 +155,7 @@ A full PHPUnit battery was added for all 10 built-in `frieren-back` modules
 regression tests that pin some of these behaviors). These items surfaced organically while
 writing that suite, each backed by a reproducing test.
 
-- [ ] Not started — **I7. `OpenWrtHelper::exec()` can fatal with a `TypeError` instead of returning `false` when the underlying `exec()` call doesn't populate `$output`**
+- [x] Done — **I7. `OpenWrtHelper::exec()` can fatal with a `TypeError` instead of returning `false` when the underlying `exec()` call doesn't populate `$output`**
   - **Area:** Backend core `frieren-back`
   - **Evidence:** `frieren-back/api/helper/OpenWrtHelper.php`, `exec($command, $merge=true, $raw=false)`:
     calls the global `exec($command, $output, $retval)`, then when `$merge` is true (the

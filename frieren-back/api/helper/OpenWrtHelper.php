@@ -28,6 +28,10 @@ class OpenWrtHelper implements HelperInterface
         if (!$raw) {
             $command = escapeshellcmd($command);
         }
+        // Always start from a real array: a command that legitimately succeeds with zero
+        // lines of output would otherwise leave $output null/unset, and implode() below
+        // would fatal with a TypeError instead of exec() returning cleanly.
+        $output = [];
         exec($command, $output, $retval);
 
         // Check if the command executed successfully
