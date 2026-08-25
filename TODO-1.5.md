@@ -173,7 +173,7 @@ writing that suite, each backed by a reproducing test.
   - **Fix:** Initialize `$output = [];` before the global `exec()` call in `OpenWrtHelper::exec()`
     so `implode()` always has a real (possibly empty) array to work with.
 
-- [ ] Not started — **M9. `ModulesController::installModule()`/`downloadModule()` build a filesystem path from `moduleName` before the whitelist check runs (code-hygiene note — no security/functional impact; re-reviewed and downgraded, see below)**
+- [x] Done — **M9. `ModulesController::installModule()`/`downloadModule()` build a filesystem path from `moduleName` before the whitelist check runs (code-hygiene note — no security/functional impact; re-reviewed and downgraded, see below)**
   - **Area:** Backend core `frieren-back` (`modules/modules/ModulesController.php`)
   - **Does NOT affect real usage — confirmed on real hardware against the real module feed.**
     `moduleName` always comes from `getAvailableModules()` (the official

@@ -224,26 +224,20 @@ class ModulesControllerTest extends TestCase
         $this->assertStringContainsString(escapeshellarg($filePath), $captured);
     }
 
-    public function testInstallModuleChecksumLookupIsReachableViaPathTraversalBeforeNameValidation(): void
+    /**
+     * Regression test for TODO-1.5.md's M9: installModule() now validates moduleName
+     * *before* building any path or reading the filesystem for the checksum check. Proven
+     * here by using a checksum that would NOT match the trap file — if the old ordering were
+     * still in place, that would produce "Checksum mismatch" (proving hash_file() ran first);
+     * getting "Invalid module name" instead proves the whitelist runs before hash_file() is
+     * ever called.
+     */
+    public function testInstallModuleValidatesModuleNameBeforeTouchingTheFilesystem(): void
     {
-        // BUG (real, current behavior): installModule() builds
-        // "/tmp/{moduleName}.tar.gz" and runs hash_file() on it *before* the
-        // moduleName is ever validated — the '^[a-zA-Z0-9_-]+$' whitelist only
-        // lives in removeModuleFiles(), called afterwards. A moduleName carrying
-        // a path separator (or "../") is concatenated as-is, so the checksum
-        // lookup escapes the intended flat /tmp/{moduleName}.tar.gz layout and
-        // can read/hash an arbitrary file the web server user can access. That's
-        // an existence/content oracle: an attacker who can already guess a
-        // target file's sha256 can confirm it matches without further access.
-        // It's not a write primitive — removeModuleFiles() still rejects the
-        // traversal-bearing name right after and (in production, one layer up)
-        // ApiCore turns that uncaught Exception into a normal JSON error — but
-        // the checksum step itself operates on an unsanitized path first.
         $trapDir = '/tmp/orphan';
         @mkdir($trapDir, 0777, true);
         $trapFile = "{$trapDir}/evil.tar.gz";
         file_put_contents($trapFile, 'not a real module, just a marker file');
-        $checksum = hash_file('sha256', $trapFile);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Invalid module name');
@@ -251,8 +245,27 @@ class ModulesControllerTest extends TestCase
         $this->dispatch(ModulesController::class, 'modules', [
             'action' => 'installModule',
             'moduleName' => 'orphan/evil',
-            'checksum' => $checksum,
+            'checksum' => 'this-would-never-match-the-trap-file-checksum',
             'destination' => 'internal',
+        ]);
+    }
+
+    /**
+     * Regression test for TODO-1.5.md's M9: downloadModule() now validates moduleName before
+     * building the remote URL / local path or checking internet connectivity.
+     */
+    public function testDownloadModuleValidatesModuleNameBeforeBuildingAnyPathOrUrl(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->never());
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid module name');
+
+        $this->dispatch(ModulesController::class, 'modules', [
+            'action' => 'downloadModule',
+            'moduleName' => '../etc/passwd',
+            'version' => '1.0.0',
         ]);
     }
 

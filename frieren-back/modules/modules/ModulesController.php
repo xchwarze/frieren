@@ -196,6 +196,8 @@ class ModulesController extends \frieren\core\Controller
 
     public function downloadModule()
     {
+        $this->validateModuleName($this->request['moduleName']);
+
         if (!self::setupCoreHelper()::hasInternetConnection()) {
             return self::setError('No internet connection available.');
         }
@@ -227,6 +229,7 @@ class ModulesController extends \frieren\core\Controller
     public function installModule()
     {
         $moduleName = $this->request['moduleName'];
+        $this->validateModuleName($moduleName);
         $fileName = self::getModuleCompressName($moduleName);
         $filePath = "/tmp/{$fileName}";
         if (hash_file('sha256', $filePath) !== $this->request['checksum']) {
@@ -284,11 +287,24 @@ class ModulesController extends \frieren\core\Controller
         self::setSuccess();
     }
 
-    private function removeModuleFiles($moduleName)
+    /**
+     * Whitelists a module name before it's used to build any filesystem path, URL, or shell
+     * argument. Called up front by installModule()/downloadModule() (TODO-1.5.md M9 — the
+     * checksum/path-building in installModule() used to run before this check) and by
+     * removeModuleFiles(), which owns the original check.
+     *
+     * @throws \Exception If the module name doesn't match the allowed charset.
+     */
+    private function validateModuleName($moduleName)
     {
         if (!preg_match('/^[a-zA-Z0-9_-]+$/', $moduleName)) {
             throw new \Exception('Invalid module name');
         }
+    }
+
+    private function removeModuleFiles($moduleName)
+    {
+        $this->validateModuleName($moduleName);
 
         $moduleDirPath = \DeviceConfig::MODULE_ROOT_FOLDER;
         $moduleSDDirPath = \DeviceConfig::MODULE_SD_ROOT_FOLDER;
