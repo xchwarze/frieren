@@ -64,7 +64,7 @@ Legend: `- [ ] Not started` → update to `- [x] Done` (with commit/PR ref) as i
   - **Why it matters:** Same class of bug as C1 but not yet triggering — a ticking time bomb.
   - **Fix:** Declare `semver` explicitly in `devDependencies`.
 
-- [ ] Not started — **I2. Wizard's ".env from .env.prod" step is a silent no-op**
+- [x] Done — **I2. Wizard's ".env from .env.prod" step is a silent no-op**
   - **Area:** Module Template tooling
   - **Evidence:** `frieren-module-template/bin/wizard.js`, `prepareProjectConfig()`
     (lines 105-113) looks for `.env`/`.env.prod` at `process.cwd()` (the project root).

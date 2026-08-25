@@ -103,12 +103,14 @@ const updatePackageFile = async ({ name, description }) => {
 };
 
 const prepareProjectConfig = async () => {
-    const envPath = path.join(process.cwd(), '.env');
-    const envProdPath = path.join(process.cwd(), '.env.prod');
+    // Env files live in config/ (see vite.config.js's loadEnv(mode, `${cwd}/config`)), not the
+    // project root — this used to look in the wrong place and silently never fire.
+    const envPath = path.join(process.cwd(), 'config', '.env');
+    const envProdPath = path.join(process.cwd(), 'config', '.env.prod');
 
     if (!await fs.pathExists(envPath) && await fs.pathExists(envProdPath)) {
         await fs.copy(envProdPath, envPath);
-        console.log(chalk.yellow('[*] .env was created based on .env.prod'));
+        console.log(chalk.yellow('[*] config/.env was created based on config/.env.prod'));
     }
 }
 
