@@ -120,4 +120,75 @@ interface HelperInterface
      * @return mixed|false The parsed response as an associative array if the JSON decoding is successful, false otherwise.
      */
     public static function execUbusCall($namespace, $method, $args = []);
+
+    /**
+     * Checks if a command is available in the system's PATH.
+     *
+     * @param string $commandName The name of the command to check.
+     * @return bool True if the command exists, false otherwise.
+     */
+    public static function commandExists($commandName);
+
+    /**
+     * Parses a UCI config file into an array.
+     *
+     * @param string $configName Config file name without extension.
+     * @return array Parsed config data.
+     * @throws \Exception If file does not exist.
+     */
+    public static function uciReadConfig($configName);
+
+    /**
+     * Retrieves and deserializes a JSON value from UCI.
+     *
+     * @param string $uciString The UCI string to retrieve.
+     * @param bool $throwOnError If true, throws when the entry does not exist; if false, returns an empty array instead.
+     * @return mixed The deserialized JSON value, or an empty array when the entry is missing and $throwOnError is false.
+     */
+    public static function uciGetJson($uciString, $throwOnError = true);
+
+    /**
+     * Serializes a value to JSON and sets it in UCI.
+     *
+     * @param string $settingString The UCI setting string.
+     * @param mixed $value The value to be serialized and set.
+     * @param bool $autoCommit If true, automatically commits the changes.
+     */
+    public static function uciSetJson($settingString, $value, $autoCommit = true);
+
+    /**
+     * Reads a whole UCI config through ubus (the live uci engine), returning its
+     * sections keyed by their real identifier.
+     *
+     * @param string $configName Config name (e.g. 'wireless', 'network').
+     * @return array Sections keyed by name/id; empty array on failure.
+     */
+    public static function uciGetConfig($configName);
+
+    /**
+     * Reads a single UCI section's options through ubus.
+     *
+     * @param string $configName Config name (e.g. 'wireless').
+     * @param string $section Section identifier as reported by ubus (a real name
+     *                        like 'radio0'/'wifinet0', or an anonymous cfgXXXXXX id).
+     * @return array The section's option map; empty array when the section is missing.
+     */
+    public static function uciGetSection($configName, $section);
+
+    /**
+     * Checks internet connectivity by pinging a public DNS server.
+     *
+     * @return bool True if internet is reachable, false otherwise.
+     */
+    public static function hasInternetConnection();
+
+    /**
+     * Logs a message via the system logger.
+     *
+     * @param string $message The message to log.
+     * @param string $level The severity level of the log ('emerg', 'alert', 'crit', 'err',
+     *                       'warning', 'notice', 'info', 'debug'). Default is 'err'.
+     * @return null|false Null if the command executes successfully, false if it fails.
+     */
+    public static function logger($message, $level = 'err');
 }

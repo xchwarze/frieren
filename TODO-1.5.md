@@ -109,7 +109,7 @@ Legend: `- [ ] Not started` → update to `- [x] Done` (with commit/PR ref) as i
     force `analyzerMode: 'static'` in `vite.config.js` so the plugin never blocks even if
     enabled.
 
-- [ ] Not started — **I5. `HelperInterface.php` is out of sync with `OpenWrtHelper` and isn't even enforced**
+- [x] Done — **I5. `HelperInterface.php` is out of sync with `OpenWrtHelper` and isn't even enforced**
   - **Area:** Backend core `frieren-back`
   - **Evidence:** `frieren-back/api/helper/HelperInterface.php` is missing 8 methods that
     `frieren-back/api/helper/OpenWrtHelper.php` actually implements and that other code

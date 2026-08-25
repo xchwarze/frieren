@@ -882,10 +882,6 @@ x-circle x-octagon x-square zap zap-off zoom-in zoom-out
   `"server"`, which starts an HTTP server and blocks — an unattended build hangs. Use
   `yarn build --mode release` (analyzer off by default) or set `VITE_ANALYZER_ENABLE=false`
   for a scripted/CI build.
-- **`HelperInterface.php` is aspirational, not authoritative.** `OpenWrtHelper` doesn't actually
-  `implements` it, and has several real methods missing from the interface (`commandExists`,
-  `uciReadConfig`, `uciGetJson`, `uciSetJson`, `uciGetConfig`, `uciGetSection`,
-  `hasInternetConnection`, `logger`). Trust the table in §5.5, not the interface file.
 - **Release builds gzip `module.umd.js` in place, same filename.** `yarn build --mode release`
   with compression enabled overwrites `dist/module.umd.js` with its own gzip'd bytes (no `.gz`
   suffix) — opening it expecting plain JS will look corrupted. That's expected; the device's

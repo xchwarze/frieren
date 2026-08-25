@@ -13,7 +13,7 @@ namespace frieren\helper;
  * This class includes methods for executing system commands, managing configurations, and other utilities
  * that are commonly used in the context of OpenWrt system management.
  */
-class OpenWrtHelper
+class OpenWrtHelper implements HelperInterface
 {
     /**
      * Executes a shell command, returning its output or false if it fails.
