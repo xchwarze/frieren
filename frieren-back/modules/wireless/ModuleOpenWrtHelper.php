@@ -147,7 +147,7 @@ class ModuleOpenWrtHelper
             ];
 
             // Enrich with iwinfo runtime data (txpower, frequency) if radio is up
-            if ($radioInfo['up'] && $iwinfo['phy'] ?? null) {
+            if ($radioInfo['up'] && ($iwinfo['phy'] ?? null)) {
                 $infoData = OpenWrtHelper::execUbusCall('iwinfo', 'info', ['device' => $iwinfo['phy']]);
                 if ($infoData !== false) {
                     $radioInfo['txpower']   = $infoData['txpower'] ?? null;

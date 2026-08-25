@@ -137,14 +137,8 @@ class WirelessControllerTest extends TestCase
                     'radio0' => [
                         'up' => true,
                         // phy explicitly null so the extra iwinfo/info enrichment call is
-                        // skipped. NOTE: getWirelessOverview()'s enrichment check is
-                        // `$radioInfo['up'] && $iwinfo['phy'] ?? null` — because `??` binds
-                        // looser than `&&`, this parses as `($up && $iwinfo['phy']) ?? null`,
-                        // NOT `$up && ($iwinfo['phy'] ?? null)`. If the 'phy' key were absent
-                        // entirely (rather than present-but-null) this line throws a PHP
-                        // "Undefined array key" warning instead of being silently coalesced —
-                        // a real (if harmless) operator-precedence bug in the source. Keeping
-                        // the key present-with-null here avoids exercising it.
+                        // skipped (see testGetWirelessOverviewToleratesAMissingPhyKey below for
+                        // the "key entirely absent" case — TODO-1.5.md M11, now fixed).
                         'iwinfo' => [
                             'phy' => null,
                             'country' => 'US',
@@ -192,6 +186,42 @@ class WirelessControllerTest extends TestCase
                 ],
             ],
         ], $result['data']);
+    }
+
+    /**
+     * Regression test for TODO-1.5.md's M11: getWirelessOverview() used to check
+     * `$radioInfo['up'] && $iwinfo['phy'] ?? null`, which — because `??` binds looser than
+     * `&&` — parsed as `($up && $iwinfo['phy']) ?? null`, not the intended
+     * `$up && ($iwinfo['phy'] ?? null)`. With the 'phy' key entirely absent (not just null),
+     * that used to hit PHP's "Undefined array key" warning instead of coalescing cleanly.
+     */
+    public function testGetWirelessOverviewToleratesAMissingPhyKeyWithoutWarning(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->exactly(3))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0;
+            if (str_contains($command, "'uci' 'get'")) {
+                $output = [json_encode([
+                    'values' => [
+                        'radio0' => ['.type' => 'wifi-device', '.name' => 'radio0', 'channel' => '8', 'htmode' => 'HT20'],
+                    ],
+                ])];
+            } elseif (str_contains($command, "'network.wireless' 'status'")) {
+                $output = [json_encode(['radio0' => ['up' => true, 'interfaces' => []]])];
+            } elseif (str_contains($command, "'luci-rpc' 'getWirelessDevices'")) {
+                // No 'phy' key at all — the exact case the operator-precedence bug mishandled.
+                $output = [json_encode(['radio0' => ['up' => true, 'iwinfo' => ['country' => 'US']]])];
+            } else {
+                $output = [];
+            }
+        });
+
+        $result = $this->dispatch(WirelessController::class, 'wireless', ['action' => 'getWirelessOverview']);
+
+        $this->assertNull($result['error']);
+        $this->assertArrayHasKey('radio0', $result['data']);
+        $this->assertNull($result['data']['radio0']['txpower'], 'Enrichment must be skipped, not attempted, when phy is unknown');
+        $this->assertNull($result['data']['radio0']['frequency']);
     }
 
     // -----------------------------------------------------------------

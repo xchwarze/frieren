@@ -225,7 +225,7 @@ writing that suite, each backed by a reproducing test.
     IANA timezone/offset whitelist, and the same 3-value enum check used for
     `cursorStyle`, applied consistently to `theme`.
 
-- [ ] Not started — **M11. `WirelessController::getWirelessOverview()` has an operator-precedence bug (`&&` vs `??`)**
+- [x] Done — **M11. `WirelessController::getWirelessOverview()` has an operator-precedence bug (`&&` vs `??`)**
   - **Area:** Backend core `frieren-back` (`modules/wireless/ModuleOpenWrtHelper.php`, around
     line 150 as of this writing)
   - **Evidence:** `if ($radioInfo['up'] && $iwinfo['phy'] ?? null) { ... }` — PHP's `??` binds
