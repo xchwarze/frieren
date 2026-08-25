@@ -80,7 +80,7 @@ Legend: `- [ ] Not started` → update to `- [x] Done` (with commit/PR ref) as i
   - **Fix:** Point `envPath`/`envProdPath` at `config/.env` / `config/.env.prod`, or remove
     the step (and the README claim) if it isn't actually needed.
 
-- [ ] Not started — **I3. Wizard hardcodes `forceSidebar: false` and `version: '1.0.0'` without asking**
+- [x] Done — **I3. Wizard hardcodes `forceSidebar: false` and `version: '1.0.0'` without asking**
   - **Area:** Module Template tooling
   - **Evidence:** `frieren-module-template/bin/wizard.js`, `buildManifest()`, lines 137-139:
     `manifest.system = false; manifest.forceSidebar = false; manifest.version = '1.0.0';`

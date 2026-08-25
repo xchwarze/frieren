@@ -72,6 +72,7 @@ const promptUser = async () => {
     });
     const dependenciesString = await input({ message: 'Extra dependencies (comma separated):' });
     const minPanelVersion = await promptWithValidation('Minimum panel version (x.y.z, optional):', optionalSemverSchema, { default: '1.0.0' });
+    const forceSidebar = await confirm({ message: 'Show in the sidebar by default?', default: false });
 
     return {
         title,
@@ -86,6 +87,7 @@ const promptUser = async () => {
         guestType,
         dependencies: toList(dependenciesString),
         minPanelVersion,
+        forceSidebar,
     };
 };
 
@@ -137,7 +139,7 @@ const buildManifest = (data) => {
         manifest.minPanelVersion = data.minPanelVersion;
     }
     manifest.system = false;
-    manifest.forceSidebar = false;
+    manifest.forceSidebar = data.forceSidebar;
     manifest.version = '1.0.0';
 
     return manifest;

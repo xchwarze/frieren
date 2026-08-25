@@ -100,11 +100,11 @@ mechanically.
 cd frieren-module-template && yarn install
 
 # 1. scaffold identity — prompts for title, name, description, authors, keywords, icon,
-#    repository, documentation, license, guestType, dependencies, minPanelVersion (§4)
+#    repository, documentation, license, guestType, dependencies, minPanelVersion,
+#    forceSidebar (§4)
 yarn wizard
-#    → writes public/manifest.json (ALWAYS with forceSidebar:false, version:1.0.0 — hand-edit
-#      forceSidebar to true afterwards if you want a default sidebar entry; icon then becomes
-#      required, §4) and updates package.json's name+description. It does NOT reliably create
+#    → writes public/manifest.json (version is always fixed at 1.0.0; forceSidebar:true makes
+#      icon required, §4) and updates package.json's name+description. It does NOT reliably create
 #      a working .env from config/.env.prod — see §8.
 
 # 2. build the feature
@@ -159,7 +159,7 @@ hand-writing the manifest just because the tool is missing a dependency.
 ## 4. `manifest.json` reference
 
 Illustrative example (field shapes are accurate; the literal values don't match any one real
-manifest — `yarn wizard` always writes `forceSidebar:false`/`version:"1.0.0"`, see §3):
+manifest — `yarn wizard` prompts for `forceSidebar` but always writes `version:"1.0.0"`, see §3):
 
 ```json
 {
@@ -197,7 +197,7 @@ manifest — `yarn wizard` always writes `forceSidebar:false`/`version:"1.0.0"`,
 | `dependencies` | no | opkg/apk package names — drives the install handshake (§5.8). `[]` = no system deps. |
 | `minPanelVersion` | no | Semver; panel blocks install + shows a notice if its own version is older. |
 | `system` | yes | **Always `false`** for a third-party module. |
-| `forceSidebar` | yes | Whether the module shows in the sidebar by default (vs. only reachable once pinned). **`yarn wizard` always writes `false`** — hand-edit to `true` for a default sidebar entry (which then makes `icon` required, per the row above). |
+| `forceSidebar` | yes | Whether the module shows in the sidebar by default (vs. only reachable once pinned). `yarn wizard` prompts for it directly — answering yes makes `icon` required, per the row above. |
 | `order` | no | Reserved for built-in sidebar layout — don't set it. |
 
 **What `yarn validate` actually checks** (beyond the table above):
