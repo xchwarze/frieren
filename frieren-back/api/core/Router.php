@@ -53,10 +53,14 @@ class Router {
         $baseDir = \DeviceConfig::MODULE_ROOT_FOLDER;
         $controllerName = ucfirst($moduleName) . 'Controller';
 
+        // $moduleName is already restricted to /^[a-z0-9_]+$/i by routeModule(), which
+        // rules out '.'/'/' and therefore any '../' traversal on its own. The realpath()
+        // check below is a second, independent layer so a future change to that regex
+        // can't silently reopen a traversal path through $moduleFilePath.
         $moduleFilePath = "{$baseDir}/{$moduleName}/{$controllerName}.php";
-        //$moduleRealPath = realpath($moduleFilePath);
-        //if (!$moduleRealPath || strpos($moduleRealPath, $baseDir) !== 0) {
-        if (!file_exists($moduleFilePath)) {
+        $moduleRealPath = realpath($moduleFilePath);
+        $baseRealPath = realpath($baseDir);
+        if (!$moduleRealPath || !$baseRealPath || strpos($moduleRealPath, $baseRealPath . DIRECTORY_SEPARATOR) !== 0) {
             throw new \Exception("Module file for '{$moduleName}' does not exist.");
         }
 

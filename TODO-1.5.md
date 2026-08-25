@@ -280,7 +280,7 @@ writing that suite, each backed by a reproducing test.
 
 ## Minor
 
-- [ ] Not started — **M1. `Router::loadModule()` has a path-traversal defense commented out**
+- [x] Done — **M1. `Router::loadModule()` has a path-traversal defense commented out**
   - **Area:** Backend core `frieren-back`
   - **Evidence:** `frieren-back/api/core/Router.php:57-58`:
     ```php
