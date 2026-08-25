@@ -203,6 +203,11 @@ manifest — `yarn wizard` prompts for `forceSidebar` but always writes `version
    212 supported Feather glyphs (§6.7) — an unknown name silently renders nothing at runtime.
 3. If `forceSidebar: true` and the icon is one of the **reserved nav glyphs** (§6.7), it prints
    a non-fatal **warning** (your sidebar entry will look like a core nav item).
+4. `manifest.json`'s `version` must match `package.json`'s `version` exactly — a fatal error, not
+   a warning. `yarn version-bump` is the only tool that bumps both files together; any other
+   edit path (hand-editing one file, a release script touching the manifest independently) that
+   lets them drift apart is caught here instead of silently shipping (TODO-1.5.md M4 — this drift
+   has happened for real, repo-wide, across published modules).
 
 ---
 

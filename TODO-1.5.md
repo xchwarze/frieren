@@ -322,7 +322,7 @@ writing that suite, each backed by a reproducing test.
   - **Fix:** Add `@frieren/terminal-core` → `Frieren.TerminalCore` to both arrays in the
     template.
 
-- [ ] Not started — **M4. `manifest.json` version drifts one patch ahead of `package.json` across published modules**
+- [x] Done — **M4. `manifest.json` version drifts one patch ahead of `package.json` across published modules**
   - **Area:** Specs/docs (release pipeline)
   - **Evidence:** Checked all 9 modules in the `frieren-modules` repo:
     | module | package.json | manifest.json |
@@ -348,6 +348,23 @@ writing that suite, each backed by a reproducing test.
     `yarn version-bump` (`frieren-module-template/bin/version-bump.js`, which bumps both
     files together) should be the mandatory single entry point for version bumps, and audit
     whatever script currently touches the manifest independently.
+  - **Root cause (investigated):** Not a script — a manual hand-edit in `frieren-modules`
+    commit `7704146` ("manifests: migrate to schema v2") bumped 8 of 9 manifests' `version` by
+    one patch as an undocumented side effect of an otherwise-intentional schema restructuring
+    (the parallel `frieren-modules-private` commit `c15ba7d`, same day, does the identical
+    restructuring *without* touching `version` — confirming this wasn't tool-driven). The drift
+    never reaches end users: `frieren-modules-release`'s CI already has a pre-existing `jq`
+    failsafe that overwrites `manifest.json`'s version from `package.json` before packaging, so
+    published tarballs/`modules.json` are unaffected — only `frieren-modules`' own committed
+    working tree carries the stale drift, undetected because nothing in this repo enforces the
+    two files stay in sync at edit/commit time (that CI failsafe lives in a different, sibling
+    repo not visible from here).
+  - **Resolution:** `frieren-module-template/bin/validate.js` (synced into every module via
+    `update-module.js`) now fails validation if `manifest.json`'s `version` doesn't exactly
+    match `package.json`'s — this is the one check that actually runs where the manual edit
+    happened, instead of relying on a downstream release repo's CI to paper over it after the
+    fact. Fixing the already-drifted files in `frieren-modules` itself is out of scope here
+    (that's a different repo, not checked out in this workspace).
 
 - [ ] Not started — **M5. Double-slash typo in an import path**
   - **Area:** Module Template tooling
