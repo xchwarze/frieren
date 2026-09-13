@@ -27,13 +27,17 @@ describe('PanelCard', () => {
     });
 
     /**
-     * Documents a known, intentional-for-now UX footgun (TODO-1.5.md item M8): a PanelCard
-     * with no `refetch` still renders an enabled refresh button. This test PINS today's
-     * behavior; if `showRefresh`'s default is ever changed to derive from `refetch`, update
-     * this test alongside the fix rather than being surprised by it.
+     * TODO-1.5.md item M8 (fixed): `showRefresh` now derives from whether `refetch` was
+     * passed, so a static card with no refetch handler renders no dead button.
      */
-    it('shows an enabled refresh button by default, even without a refetch handler', () => {
+    it('hides the refresh button by default when no refetch handler is passed', () => {
         render(<PanelCard title={'Static'}>content</PanelCard>);
+
+        expect(screen.queryByRole('button', { name: 'Refresh' })).not.toBeInTheDocument();
+    });
+
+    it('shows an enabled refresh button by default when a refetch handler is passed', () => {
+        render(<PanelCard title={'X'} refetch={vi.fn()}>content</PanelCard>);
 
         const refreshButton = screen.getByRole('button', { name: 'Refresh' });
         expect(refreshButton).toBeInTheDocument();
@@ -46,6 +50,12 @@ describe('PanelCard', () => {
         expect(screen.queryByRole('button', { name: 'Refresh' })).not.toBeInTheDocument();
     });
 
+    it('shows the refresh button when showRefresh is explicitly true, even without refetch', () => {
+        render(<PanelCard title={'Static'} showRefresh={true}>content</PanelCard>);
+
+        expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument();
+    });
+
     it('calls refetch when the refresh button is clicked', async () => {
         const refetch = vi.fn();
         render(<PanelCard title={'X'} refetch={refetch}>content</PanelCard>);
@@ -56,7 +66,7 @@ describe('PanelCard', () => {
     });
 
     it('disables the refresh button while fetching', () => {
-        render(<PanelCard title={'X'} isFetching>content</PanelCard>);
+        render(<PanelCard title={'X'} refetch={vi.fn()} isFetching>content</PanelCard>);
 
         expect(screen.getByRole('button', { name: 'Refresh' })).toBeDisabled();
     });

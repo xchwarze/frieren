@@ -366,7 +366,7 @@ writing that suite, each backed by a reproducing test.
     fact. Fixing the already-drifted files in `frieren-modules` itself is out of scope here
     (that's a different repo, not checked out in this workspace).
 
-- [ ] Not started — **M5. Double-slash typo in an import path**
+- [x] Done — **M5. Double-slash typo in an import path**
   - **Area:** Module Template tooling
   - **Evidence:** `frieren-module-template/src/feature/hooks/useSystemStats.js:9`:
     `import { DEMO_GET_SYSTEM_STATS } from '@module/feature//helpers/queryKeys.js';`
@@ -376,7 +376,7 @@ writing that suite, each backed by a reproducing test.
     are based on, so it gets propagated.
   - **Fix:** Remove the duplicate slash.
 
-- [ ] Not started — **M6. Template README references an image path that breaks when the template is used standalone**
+- [x] Done — **M6. Template README references an image path that breaks when the template is used standalone (decision: leaving as-is, see below)**
   - **Area:** Module Template tooling
   - **Evidence:** `frieren-module-template/README.md:3`: `![Mascot](../assets/blueprint.png)`
     — resolves correctly only when `frieren-module-template/` sits inside the `frieren/`
@@ -385,10 +385,11 @@ writing that suite, each backed by a reproducing test.
     as a base" — step 1 in the "Getting Started" section).
   - **Why it matters:** Minor cosmetic breakage for anyone who follows the README's own
     suggested standalone-clone workflow.
-  - **Fix:** Either use an absolute GitHub URL for the image, or drop it from the standalone
-    README.
+  - **Fix (considered, not applied):** Either use an absolute GitHub URL for the image, or
+    drop it from the standalone README. A GitHub-URL fix was tried and reverted — decided the
+    broken relative path isn't worth changing for a purely cosmetic issue. Closing as-is.
 
-- [ ] Not started — **M7. `ui-layout.spec.md` component-variants table incorrectly bans plain `Tab` (not just `Tabs`)**
+- [x] Done — **M7. `ui-layout.spec.md` component-variants table incorrectly bans plain `Tab` (not just `Tabs`)**
   - **Area:** Specs/docs
   - **Evidence:** `frieren/specs/ui-layout.spec.md:80` (under "Component variants over raw
     react-bootstrap", heading at line 67):
@@ -405,20 +406,27 @@ writing that suite, each backed by a reproducing test.
   - **Why it matters:** The spec as written would make a linter/reviewer flag correct,
     required code as a violation. `Tabs` (the container) is the thing that should never be
     imported raw; `Tab` (the item passed as a child) always must be.
-  - **Fix:** Change the table cell to `Tabs` only, and add a note clarifying that `Tab`
+  - **Fix applied:** `frieren/specs/ui-layout.spec.md:80` now reads `Tabs` only in the
+    "do NOT import directly" column, with a note in the third column explaining `Tab`
     (singular) is always imported directly as the child element for `renderPanelTab`.
 
-- [ ] Not started — **M8. `PanelCard.showRefresh` defaults to `true` even with no `refetch` handler**
+- [x] Done — **M8. `PanelCard.showRefresh` defaults to `true` even with no `refetch` handler**
   - **Area:** Frontend SDK `frieren-front`
   - **Evidence:** `frieren-front/src/components/PanelCard/index.jsx:36`:
     `showRefresh = true` — a `<PanelCard>` used without passing `refetch` still renders an
     enabled-looking refresh button whose `onClick` is `undefined`, unless the consumer
     explicitly passes `showRefresh={false}`.
+  - **Confirmed a real occurrence, not just theoretical:** of 35 `<PanelCard>` usages across
+    `frieren`/`frieren-modules`/`frieren-modules-private`, 34 pass `showRefresh` explicitly.
+    The one that didn't — `frieren-modules-private/firewall/src/feature/components/
+    HardeningCard/index.jsx:60` — passes neither `refetch` nor `showRefresh`, so it rendered
+    the exact dead button this item describes.
   - **Why it matters:** UX footgun that's easy to carry into new modules/cards that don't
     have a refetchable query — a visible button that silently does nothing on click.
-  - **Fix:** Either default `showRefresh` to `false` and require it to be opted in, or derive
-    it automatically from whether `refetch` was passed (`showRefresh = !!refetch` unless
-    explicitly overridden).
+  - **Fix applied:** derived the default from whether `refetch` was passed instead of a hard
+    `true` — `frieren-front/src/components/PanelCard/index.jsx:36`: `showRefresh = !!refetch`
+    (still overridable by an explicit `showRefresh` prop). `HardeningCard` needed no change —
+    it now correctly renders no refresh button.
 
 ---
 

@@ -6,7 +6,7 @@
  */
 import useAuthenticatedQuery from '@common/hooks/useAuthenticatedQuery.js';
 import { fetchPost } from '@common/services/fetchService.js';
-import { DEMO_GET_SYSTEM_STATS } from '@module/feature//helpers/queryKeys.js';
+import { DEMO_GET_SYSTEM_STATS } from '@module/feature/helpers/queryKeys.js';
 
 /**
  * Generate a query to fetch system statistics data.

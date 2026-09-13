@@ -20,8 +20,10 @@ import Button from '@src/components/Button';
  * @param {String} title - The title of the panel card.
  * @param {String} [icon] - Optional leading icon name (feather) shown before the title.
  * @param {String} [subtitle] - Optional descriptive subtitle.
- * @param {Boolean} [showRefresh=true] - Whether to show the refresh button.
  * @param {Function} [refetch] - Refetch handler for the refresh button.
+ * @param {Boolean} [showRefresh] - Whether to show the refresh button. Defaults to whether
+ *   `refetch` was passed (`!!refetch`), so a card with no refetch handler renders no button
+ *   unless explicitly opted in with `showRefresh={true}`.
  * @param {Boolean} [isFetching] - Disables and spins the refresh button while fetching.
  * @param {Boolean} [fill=false] - Make the body a flex column so a trailing child with
  *   `mt-auto` anchors to the bottom (pairs with `className="h-100"` for equal-height rows).
@@ -33,8 +35,8 @@ const PanelCard = ({
                        title,
                        icon,
                        subtitle,
-                       showRefresh = true,
                        refetch,
+                       showRefresh = !!refetch,
                        isFetching,
                        fill = false,
                        className = '',
