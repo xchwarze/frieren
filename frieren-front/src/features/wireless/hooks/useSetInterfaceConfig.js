@@ -15,7 +15,7 @@ import { fetchPost } from '@src/services/fetchService.js';
  */
 const useSetInterfaceConfig = () => {
     return useAuthenticatedMutation({
-        mutationFn: ({ section, ssid, encryption, key, mode, network, hidden, disabled, isManagement, isRecon }) => fetchPost({
+        mutationFn: ({ section, ssid, encryption, key, mode, network, hidden, disabled, isManagement, isRecon, ieee80211w, bssid }) => fetchPost({
             module: 'wireless',
             action: 'setInterfaceConfig',
             section,
@@ -28,6 +28,8 @@ const useSetInterfaceConfig = () => {
             disabled,
             isManagement,
             isRecon,
+            ieee80211w,
+            bssid,
         }),
     });
 };

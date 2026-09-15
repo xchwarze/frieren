@@ -32,6 +32,19 @@ export const interfaceSchema = yup.object({
     disabled: yup.boolean(),
     isManagement: yup.boolean(),
     isRecon: yup.boolean(),
+    ieee80211w: yup.string().when('mode', {
+        is: 'ap',
+        then: (schema) => schema.required('Management Frame Protection is mandatory'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    bssid: yup.string().when('mode', {
+        is: 'sta',
+        then: (schema) => schema.matches(/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/, {
+            message: 'Invalid BSSID',
+            excludeEmptyString: true,
+        }),
+        otherwise: (schema) => schema.notRequired(),
+    }),
 });
 
 export const radioConfigSchema = yup.object({
@@ -40,4 +53,9 @@ export const radioConfigSchema = yup.object({
     htmode: yup.string().required('Mode is mandatory'),
     country: yup.string().required('Country is mandatory'),
     disabled: yup.boolean(),
+    cellDensity: yup.string().required('Cell density is mandatory'),
+    distance: yup.number()
+        .typeError('Distance must be a number')
+        .min(0, 'Distance cannot be negative')
+        .required('Distance is mandatory'),
 }).required();

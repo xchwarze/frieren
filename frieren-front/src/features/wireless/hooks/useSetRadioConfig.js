@@ -22,7 +22,7 @@ const useSetRadioConfig = () => {
     const queryClient = useQueryClient();
 
     return useAuthenticatedMutation({
-        mutationFn: ({ radio, channel, txpower, htmode, country, disabled }) => fetchPost({
+        mutationFn: ({ radio, channel, txpower, htmode, country, disabled, cellDensity, distance }) => fetchPost({
             module: 'wireless',
             action: 'setRadioConfig',
             radio,
@@ -31,6 +31,8 @@ const useSetRadioConfig = () => {
             htmode,
             country,
             disabled,
+            cell_density: cellDensity,
+            distance,
         }),
         onSuccess: async () => {
             toast.success('Radio configuration updated');

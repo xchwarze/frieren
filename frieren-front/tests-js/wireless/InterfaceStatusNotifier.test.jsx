@@ -19,11 +19,11 @@ import useGetInterfaceStatus from '@src/features/wireless/hooks/useGetInterfaceS
 import { WIRELESS_GET_WIRELESS_OVERVIEW } from '@src/features/wireless/helpers/queryKeys.js';
 
 vi.mock('@src/features/wireless/hooks/useGetInterfaceStatus.js', () => ({ default: vi.fn() }));
-vi.mock('react-toastify', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+vi.mock('react-toastify', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
 
-const renderNotifier = (section, onDone, queryClient) => render(
+const renderNotifier = (section, onDone, queryClient, radioDisabled) => render(
     <QueryClientProvider client={queryClient}>
-        <InterfaceStatusNotifier section={section} onDone={onDone} />
+        <InterfaceStatusNotifier section={section} onDone={onDone} radioDisabled={radioDisabled} />
     </QueryClientProvider>
 );
 
@@ -34,6 +34,7 @@ describe('InterfaceStatusNotifier', () => {
     beforeEach(() => {
         toast.success.mockReset();
         toast.error.mockReset();
+        toast.info.mockReset();
         queryClient = new QueryClient();
         invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
     });
@@ -108,6 +109,24 @@ describe('InterfaceStatusNotifier', () => {
 
         expect(toast.error).toHaveBeenCalledWith('Monitor interface failed to start.');
         expect(toast.success).not.toHaveBeenCalled();
+        expect(onDone).toHaveBeenCalledTimes(1);
+    });
+
+    it('skips polling and shows an accurate info toast instead of a false "failed to start" when the radio is disabled', () => {
+        vi.useFakeTimers();
+        useGetInterfaceStatus.mockReturnValue({ data: undefined });
+        const onDone = vi.fn();
+
+        renderNotifier('wifinet0', onDone, queryClient, true);
+
+        // Never actually got the chance to time out into a failure message.
+        act(() => { vi.advanceTimersByTime(15000); });
+
+        expect(useGetInterfaceStatus).toHaveBeenCalledWith('wifinet0', { enabled: false });
+        expect(toast.info).toHaveBeenCalledWith(expect.stringContaining('radio is disabled'));
+        expect(toast.error).not.toHaveBeenCalled();
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: [WIRELESS_GET_WIRELESS_OVERVIEW] });
         expect(onDone).toHaveBeenCalledTimes(1);
     });
 });

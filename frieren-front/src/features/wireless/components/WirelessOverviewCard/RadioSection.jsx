@@ -108,7 +108,13 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                                     <td>{iface.encryption || 'None'}</td>
                                     <td>
                                         <StatusBadge status={iface.disabled ? 'disabled' : (iface.up ? 'up' : 'degraded')}>
-                                            {iface.disabled ? 'Disabled' : (iface.up ? 'Up' : 'Down')}
+                                            {iface.disabled
+                                                ? 'Disabled'
+                                                : iface.up
+                                                    ? 'Up'
+                                                    // The interface's own config is enabled, but its radio is off —
+                                                    // say so, or "Down" reads as a config problem with the interface.
+                                                    : radio.disabled ? 'Down (radio disabled)' : 'Down'}
                                         </StatusBadge>
                                     </td>
                                     <td>

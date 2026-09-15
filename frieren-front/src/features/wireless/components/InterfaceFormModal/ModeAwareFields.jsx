@@ -11,6 +11,7 @@ import InputField from '@src/components/Form/InputField';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
 import { ucfirst } from '@src/helpers/actionsHelper.js';
+import { IEEE80211W_OPTIONS } from '@src/features/wireless/helpers/constants.js';
 import useGetEncryptionOptions from '@src/features/wireless/hooks/useGetEncryptionOptions.js';
 import useGetNetworkInterfaces from '@src/features/wireless/hooks/useGetNetworkInterfaces.js';
 
@@ -93,6 +94,20 @@ const ModeAwareFields = ({ radio }) => {
             {mode === 'ap' && <SwitchField name={'hidden'} label={'Hidden AP'} />}
             {mode === 'ap' && (
                 <SwitchField name={'isManagement'} label={'Management Interface'} />
+            )}
+            {mode === 'ap' && (
+                <SelectField
+                    name={'ieee80211w'}
+                    label={'Management Frame Protection'}
+                    options={IEEE80211W_OPTIONS}
+                />
+            )}
+            {mode === 'sta' && (
+                <InputField
+                    name={'bssid'}
+                    label={'BSSID (optional)'}
+                    placeholder={'Pin to a specific AP, e.g. AA:BB:CC:DD:EE:FF'}
+                />
             )}
         </>
     );

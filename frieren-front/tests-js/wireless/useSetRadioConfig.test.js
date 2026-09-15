@@ -65,6 +65,27 @@ describe('useSetRadioConfig', () => {
         });
     });
 
+    it('maps the form\'s camelCase cellDensity to the wire\'s cell_density key', () => {
+        renderHook(() => useSetRadioConfig());
+
+        capturedOptions.mutationFn({
+            radio: 'radio0',
+            channel: '11',
+            txpower: '20',
+            htmode: 'HE40',
+            country: 'US',
+            disabled: false,
+            cellDensity: '2',
+            distance: 500,
+        });
+
+        expect(fetchPost).toHaveBeenCalledWith(expect.objectContaining({
+            cell_density: '2',
+            distance: 500,
+        }));
+        expect(fetchPost).not.toHaveBeenCalledWith(expect.objectContaining({ cellDensity: expect.anything() }));
+    });
+
     it('invalidates both the overview and the radio config caches after a delay on success', async () => {
         renderHook(() => useSetRadioConfig());
 

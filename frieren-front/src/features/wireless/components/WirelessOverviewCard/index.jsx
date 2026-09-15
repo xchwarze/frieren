@@ -59,6 +59,12 @@ const WirelessOverviewCard = () => {
                 key: '',
                 hidden: false,
                 disabled: false,
+                isManagement: false,
+                isRecon: false,
+                ieee80211w: '0',
+                // Pin to the exact AP the scan found, so connecting doesn't drift to a
+                // different AP sharing the same SSID.
+                bssid: network.bssid || '',
             },
         });
     }, [scanModal.radioName]);
@@ -124,6 +130,7 @@ const WirelessOverviewCard = () => {
             {checkingSection && (
                 <InterfaceStatusNotifier
                     section={checkingSection}
+                    radioDisabled={radios[checkingRadio]?.disabled}
                     onDone={handleCheckingDone}
                 />
             )}

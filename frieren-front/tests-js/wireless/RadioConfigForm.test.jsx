@@ -27,7 +27,7 @@ const populatedConfig = {
         htmodes: ['HT20', 'HT40'],
         countries: [{ code: 'US', name: 'United States' }],
     },
-    current: { channel: '6', txpower: '17', htmode: 'HT20', country: 'US', disabled: '0' },
+    current: { channel: '6', txpower: '17', htmode: 'HT20', country: 'US', disabled: '0', cell_density: '1', distance: '250' },
 };
 
 describe('RadioConfigForm', () => {
@@ -100,8 +100,31 @@ describe('RadioConfigForm', () => {
             htmode: 'HT20',
             country: 'US',
             disabled: true,
+            cellDensity: '1',
+            distance: 250,
         }));
         await waitFor(() => expect(onHide).toHaveBeenCalledTimes(1));
+    });
+
+    it('pre-selects the radio\'s current cell density and distance', () => {
+        useGetRadioConfig.mockReturnValue({ data: populatedConfig, isFetching: false });
+
+        render(<RadioConfigForm radio={'radio0'} onHide={vi.fn()} />);
+
+        expect(screen.getByLabelText('Cell Density')).toHaveValue('1');
+        expect(screen.getByLabelText('Distance (meters)')).toHaveValue(250);
+    });
+
+    it('defaults cell density and distance to "0" when the radio reports no current value', () => {
+        useGetRadioConfig.mockReturnValue({
+            data: { ...populatedConfig, current: { ...populatedConfig.current, cell_density: null, distance: null } },
+            isFetching: false,
+        });
+
+        render(<RadioConfigForm radio={'radio0'} onHide={vi.fn()} />);
+
+        expect(screen.getByLabelText('Cell Density')).toHaveValue('0');
+        expect(screen.getByLabelText('Distance (meters)')).toHaveValue(0);
     });
 
     it('shows the loading spinner only while there is no cached config to render yet', () => {

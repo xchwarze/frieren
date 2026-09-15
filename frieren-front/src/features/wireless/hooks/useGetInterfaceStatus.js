@@ -15,9 +15,12 @@ const POLL_INTERVAL = 1500;
  * For STA: stops on COMPLETED. For AP/monitor: stops on UP.
  *
  * @param {string|null} section UCI section name to check.
+ * @param {Object} [options]
+ * @param {boolean} [options.enabled=true] Set false to skip polling entirely (e.g. the
+ *   interface's radio is known to be disabled, so it can never come up).
  * @return {Object} The query result with interface status data.
  */
-const useGetInterfaceStatus = (section) => {
+const useGetInterfaceStatus = (section, { enabled = true } = {}) => {
     return useAuthenticatedQuery({
         queryKey: [WIRELESS_GET_INTERFACE_STATUS, section],
         queryFn: () => fetchPost({
@@ -34,7 +37,7 @@ const useGetInterfaceStatus = (section) => {
             }
             return POLL_INTERVAL;
         },
-        enabled: !!section,
+        enabled: !!section && enabled,
     });
 };
 

@@ -95,6 +95,37 @@ describe('RadioSection', () => {
         expect(screen.getByText('Disabled')).toBeInTheDocument();
     });
 
+    it('clarifies that a down interface is down because its radio is disabled, not its own config', () => {
+        renderSection({
+            radio: {
+                ...baseRadio,
+                disabled: true,
+                up: false,
+                interfaces: [
+                    { section: 'wifinet0', ifname: 'wlan0', ssid: 'MyNet', mode: 'ap', bssid: null, encryption: 'psk2', disabled: false, up: false },
+                ],
+            },
+        });
+
+        expect(within(rowFor('MyNet')).getByText('Down (radio disabled)')).toBeInTheDocument();
+    });
+
+    it('shows a plain Down for an interface that is down while its own radio is up', () => {
+        renderSection({
+            radio: {
+                ...baseRadio,
+                disabled: false,
+                up: true,
+                interfaces: [
+                    { section: 'wifinet0', ifname: 'wlan0', ssid: 'MyNet', mode: 'ap', bssid: null, encryption: 'psk2', disabled: false, up: false },
+                ],
+            },
+        });
+
+        expect(within(rowFor('MyNet')).getByText('Down')).toBeInTheDocument();
+        expect(within(rowFor('MyNet')).queryByText('Down (radio disabled)')).not.toBeInTheDocument();
+    });
+
     it('shows the empty-state row only when there are no interfaces and no interface is pending', () => {
         renderSection({ radio: { ...baseRadio, interfaces: [] } });
         expect(screen.getByText('No interfaces configured')).toBeInTheDocument();

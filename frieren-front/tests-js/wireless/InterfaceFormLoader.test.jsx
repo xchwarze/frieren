@@ -62,6 +62,7 @@ describe('InterfaceFormLoader', () => {
             data: {
                 ssid: 'MyAP', mode: 'ap', network: 'lan', encryption: 'psk2', key: 'secret123',
                 hidden: '1', disabled: '1', isManagement: '1', isRecon: '0',
+                ieee80211w: '2', bssid: '',
             },
             isFetching: false,
         });
@@ -71,7 +72,19 @@ describe('InterfaceFormLoader', () => {
         expect(renderedDefaults()).toEqual({
             ssid: 'MyAP', mode: 'ap', network: 'lan', encryption: 'psk2+ccmp', key: 'secret123',
             hidden: true, disabled: true, isManagement: true, isRecon: false,
+            ieee80211w: '2', bssid: '',
         });
+    });
+
+    it('falls back ieee80211w to "0" when the fetched config has no value for it', () => {
+        useGetInterfaceConfig.mockReturnValue({
+            data: { ssid: 'MyAP', mode: 'ap', network: 'lan', encryption: 'none', key: '', ieee80211w: '' },
+            isFetching: false,
+        });
+
+        render(<InterfaceFormLoader section={'wlan0'} onHide={vi.fn()} />);
+
+        expect(renderedDefaults()).toMatchObject({ ieee80211w: '0' });
     });
 
     it.each([

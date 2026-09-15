@@ -250,4 +250,40 @@ describe('ModeAwareFields', () => {
         expect(select).toBeDisabled();
         expect(select).toHaveValue('sae');
     });
+
+    it('shows Management Frame Protection in ap mode only, not sta or monitor', () => {
+        fetchPost.mockImplementation(({ module }) => (
+            module === 'network'
+                ? Promise.resolve({ interfaces: [{ name: 'lan' }] })
+                : Promise.resolve({ options: [{ value: 'none', label: 'None' }] })
+        ));
+
+        const { unmount } = renderModeAwareFields({ defaultValues: { ieee80211w: '0' } });
+        expect(screen.getByLabelText('Management Frame Protection')).toBeInTheDocument();
+        unmount();
+
+        renderModeAwareFields({ defaultValues: { mode: 'sta', ieee80211w: '0' } });
+        expect(screen.queryByLabelText('Management Frame Protection')).not.toBeInTheDocument();
+
+        renderModeAwareFields({ defaultValues: { mode: 'monitor' } });
+        expect(screen.queryByLabelText('Management Frame Protection')).not.toBeInTheDocument();
+    });
+
+    it('shows BSSID in sta mode only, not ap or monitor', () => {
+        fetchPost.mockImplementation(({ module }) => (
+            module === 'network'
+                ? Promise.resolve({ interfaces: [{ name: 'lan' }] })
+                : Promise.resolve({ options: [{ value: 'none', label: 'None' }] })
+        ));
+
+        const { unmount } = renderModeAwareFields({ defaultValues: { mode: 'sta', bssid: '' } });
+        expect(screen.getByLabelText('BSSID (optional)')).toBeInTheDocument();
+        unmount();
+
+        renderModeAwareFields({ defaultValues: { ieee80211w: '0' } });
+        expect(screen.queryByLabelText('BSSID (optional)')).not.toBeInTheDocument();
+
+        renderModeAwareFields({ defaultValues: { mode: 'monitor' } });
+        expect(screen.queryByLabelText('BSSID (optional)')).not.toBeInTheDocument();
+    });
 });

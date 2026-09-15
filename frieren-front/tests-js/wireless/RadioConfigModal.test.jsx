@@ -27,7 +27,7 @@ const radioConfig = {
         htmodes: ['HT20'],
         countries: [{ code: 'US', name: 'United States' }],
     },
-    current: { channel: '6', txpower: '17', htmode: 'HT20', country: 'US', disabled: '0' },
+    current: { channel: '6', txpower: '17', htmode: 'HT20', country: 'US', disabled: '0', cell_density: '0', distance: '0' },
 };
 
 describe('RadioConfigModal', () => {
@@ -73,6 +73,8 @@ describe('RadioConfigModal', () => {
             htmode: 'HT20',
             country: 'US',
             disabled: false,
+            cellDensity: '0',
+            distance: 0,
         }));
         await waitFor(() => expect(onHide).toHaveBeenCalledTimes(1));
     });

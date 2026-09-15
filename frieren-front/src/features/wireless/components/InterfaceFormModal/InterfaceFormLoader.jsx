@@ -28,6 +28,8 @@ const ADD_DEFAULTS = {
     disabled: false,
     isManagement: false,
     isRecon: false,
+    ieee80211w: '0',
+    bssid: '',
 };
 
 const InterfaceFormLoader = ({ radio, section, onHide, initialValues, onInterfaceSaved }) => {
@@ -52,6 +54,8 @@ const InterfaceFormLoader = ({ radio, section, onHide, initialValues, onInterfac
             disabled: interfaceConfig?.disabled === '1',
             isManagement: interfaceConfig?.isManagement === '1',
             isRecon: interfaceConfig?.isRecon === '1',
+            ieee80211w: interfaceConfig?.ieee80211w || '0',
+            bssid: interfaceConfig?.bssid ?? '',
         }
         : (initialValues || ADD_DEFAULTS);
 

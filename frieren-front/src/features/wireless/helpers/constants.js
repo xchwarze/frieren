@@ -10,3 +10,18 @@ export const MODE_OPTIONS = [
     { value: 'sta', label: 'Station' },
     { value: 'monitor', label: 'Monitor' },
 ];
+
+// mac80211/hostapd-defined enums, fixed across every driver — unlike channels/txpower/country,
+// these are not hardware-reported capabilities, so they are safe to hardcode here.
+export const CELL_DENSITY_OPTIONS = [
+    { value: '0', label: 'Disabled (default)' },
+    { value: '1', label: 'Normal' },
+    { value: '2', label: 'High' },
+    { value: '3', label: 'Very High' },
+];
+
+export const IEEE80211W_OPTIONS = [
+    { value: '0', label: 'Disabled' },
+    { value: '1', label: 'Optional' },
+    { value: '2', label: 'Required' },
+];

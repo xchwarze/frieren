@@ -35,6 +35,8 @@ const apDefaults = {
     disabled: false,
     isManagement: false,
     isRecon: false,
+    ieee80211w: '0',
+    bssid: '',
 };
 
 describe('InterfaceForm', () => {

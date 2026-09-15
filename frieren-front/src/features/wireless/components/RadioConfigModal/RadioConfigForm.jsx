@@ -10,10 +10,12 @@ import PropTypes from 'prop-types';
 import Button from '@src/components/Button';
 import Loading from '@src/components/Loading';
 import FormProvider from '@src/components/Form/FormProvider';
+import InputField from '@src/components/Form/InputField';
 import SelectField from '@src/components/Form/SelectField';
 import SwitchField from '@src/components/Form/SwitchField';
 import SubmitButton from '@src/components/Form/SubmitButton';
 import FormActions from '@src/components/FormActions';
+import { CELL_DENSITY_OPTIONS } from '@src/features/wireless/helpers/constants.js';
 import { radioConfigSchema } from '@src/features/wireless/helpers/validationSchemas.js';
 import useGetRadioConfig from '@src/features/wireless/hooks/useGetRadioConfig.js';
 import useSetRadioConfig from '@src/features/wireless/hooks/useSetRadioConfig.js';
@@ -54,6 +56,8 @@ const RadioConfigForm = ({ radio, onHide }) => {
         htmode: radioConfig?.current?.htmode ?? '',
         country: radioConfig?.current?.country ?? '',
         disabled: radioConfig?.current?.disabled === '1',
+        cellDensity: radioConfig?.current?.cell_density ?? '0',
+        distance: radioConfig?.current?.distance ?? '0',
     };
 
     const handleSubmit = useCallback(async (values) => {
@@ -75,6 +79,14 @@ const RadioConfigForm = ({ radio, onHide }) => {
             <SelectField name={'txpower'} label={'TX Power'} options={txpowerOptions} />
             <SelectField name={'htmode'} label={'Mode / Bandwidth'} options={htmodeOptions} />
             <SelectField name={'country'} label={'Country'} options={countryOptions} />
+            <SelectField name={'cellDensity'} label={'Cell Density'} options={CELL_DENSITY_OPTIONS} />
+            <InputField
+                name={'distance'}
+                label={'Distance (meters)'}
+                type={'number'}
+                min={0}
+                placeholder={'0 = auto/default'}
+            />
             <SwitchField name={'disabled'} label={'Disabled'} />
             <FormActions>
                 <SubmitButton />

@@ -16,6 +16,8 @@ describe('interfaceSchema', () => {
         disabled: false,
         isManagement: false,
         isRecon: false,
+        ieee80211w: '0',
+        bssid: '',
     };
 
     it('requires ssid, network and encryption outside monitor mode', async () => {
@@ -52,16 +54,46 @@ describe('interfaceSchema', () => {
 
         expect(await interfaceSchema.isValid(monitorValues)).toBe(true);
     });
+
+    it('requires ieee80211w in ap mode but not elsewhere', async () => {
+        expect(await interfaceSchema.isValid({ ...apValues, ieee80211w: '' })).toBe(false);
+        expect(await interfaceSchema.isValid({ ...apValues, mode: 'sta', ieee80211w: '' })).toBe(true);
+        expect(await interfaceSchema.isValid({ ...apValues, mode: 'monitor', ieee80211w: '' })).toBe(true);
+    });
+
+    it('validates bssid format only in sta mode, and only when non-empty', async () => {
+        const staValues = { ...apValues, mode: 'sta' };
+
+        expect(await interfaceSchema.isValid({ ...staValues, bssid: '' })).toBe(true);
+        expect(await interfaceSchema.isValid({ ...staValues, bssid: 'AA:BB:CC:DD:EE:FF' })).toBe(true);
+        expect(await interfaceSchema.isValid({ ...staValues, bssid: 'not-a-mac' })).toBe(false);
+        // Same malformed value is ignored outside sta mode - the field isn't shown there.
+        expect(await interfaceSchema.isValid({ ...apValues, bssid: 'not-a-mac' })).toBe(true);
+    });
 });
 
 describe('radioConfigSchema', () => {
-    const fullConfig = { channel: '6', txpower: '20', htmode: 'HE40', country: '00', disabled: false };
+    const fullConfig = {
+        channel: '6',
+        txpower: '20',
+        htmode: 'HE40',
+        country: '00',
+        disabled: false,
+        cellDensity: '0',
+        distance: '0',
+    };
 
     it('accepts a fully populated radio configuration', async () => {
         expect(await radioConfigSchema.isValid(fullConfig)).toBe(true);
     });
 
-    it.each(['channel', 'txpower', 'htmode', 'country'])('requires %s', async (field) => {
+    it.each(['channel', 'txpower', 'htmode', 'country', 'cellDensity'])('requires %s', async (field) => {
         expect(await radioConfigSchema.isValid({ ...fullConfig, [field]: '' })).toBe(false);
+    });
+
+    it('requires distance and rejects a negative value', async () => {
+        expect(await radioConfigSchema.isValid({ ...fullConfig, distance: '' })).toBe(false);
+        expect(await radioConfigSchema.isValid({ ...fullConfig, distance: -5 })).toBe(false);
+        expect(await radioConfigSchema.isValid({ ...fullConfig, distance: 500 })).toBe(true);
     });
 });

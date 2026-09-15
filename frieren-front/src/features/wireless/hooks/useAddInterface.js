@@ -15,7 +15,7 @@ import { fetchPost } from '@src/services/fetchService.js';
  */
 const useAddInterface = () => {
     return useAuthenticatedMutation({
-        mutationFn: ({ radio, ssid, encryption, key, mode, network, hidden, disabled, isManagement, isRecon }) => fetchPost({
+        mutationFn: ({ radio, ssid, encryption, key, mode, network, hidden, disabled, isManagement, isRecon, ieee80211w, bssid }) => fetchPost({
             module: 'wireless',
             action: 'addInterface',
             radio,
@@ -28,6 +28,8 @@ const useAddInterface = () => {
             disabled,
             isManagement,
             isRecon,
+            ieee80211w,
+            bssid,
         }),
     });
 };
