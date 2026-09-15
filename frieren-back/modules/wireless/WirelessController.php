@@ -14,6 +14,7 @@ class WirelessController extends \frieren\core\Controller
         'scanForNetworks' => true,
         'getWirelessOverview' => true,
         'getRadioConfig' => true,
+        'getEncryptionOptions' => true,
         'setRadioConfig' => true,
         'getAssociationList' => true,
         'getInterfaceStatus' => true,
@@ -45,6 +46,16 @@ class WirelessController extends \frieren\core\Controller
     {
         return self::setSuccess(
             self::setupModuleHelper()::getRadioConfig($this->request['radio'])
+        );
+    }
+
+    public function getEncryptionOptions()
+    {
+        return self::setSuccess(
+            self::setupModuleHelper()::getEncryptionOptions(
+                $this->request['radio'] ?? null,
+                $this->request['mode'] ?? null
+            )
         );
     }
 

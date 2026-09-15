@@ -124,11 +124,19 @@ class ModuleOpenWrtHelper
         foreach ($radios as $radioName => $radioConfig) {
             $ch = $radioConfig['channel'] ?? null;
             $chNum = is_numeric($ch) ? (int)$ch : 0;
-            $band = (($chNum >= 36 && $chNum <= 64) || ($chNum >= 100 && $chNum <= 165)) ? '5 GHz' : '2.4 GHz';
 
             $luciRadio = $wirelessDevices[$radioName] ?? [];
             $iwinfo = $luciRadio['iwinfo'] ?? [];
             $statusRadio = $wirelessStatus[$radioName] ?? [];
+            $configuredBand = $radioConfig['band'] ?? ($luciRadio['config']['band'] ?? null);
+            $band = match ($configuredBand) {
+                '2g' => '2.4 GHz',
+                '5g' => '5 GHz',
+                '6g' => '6 GHz',
+                default => (($chNum >= 36 && $chNum <= 64) || ($chNum >= 100 && $chNum <= 165))
+                    ? '5 GHz'
+                    : '2.4 GHz',
+            };
 
             $radioInfo = [
                 'channel'    => $ch,
@@ -255,6 +263,49 @@ class ModuleOpenWrtHelper
                 'htmodes'   => $htmodes,
             ],
         ];
+    }
+
+    /**
+     * Returns encryption options supported by the installed wireless authentication stack.
+     *
+     * @param mixed $radio The UCI radio name.
+     * @param mixed $mode The wireless mode ('ap' or 'sta').
+     * @return array Array containing the supported encryption options.
+     */
+    public static function getEncryptionOptions($radio, $mode)
+    {
+        if (!is_string($radio) || strlen($radio) > 64 || !preg_match('/^[a-zA-Z0-9_]+$/', $radio)) {
+            return ['options' => []];
+        }
+
+        if (!in_array($mode, ['ap', 'sta'], true)) {
+            return ['options' => []];
+        }
+
+        if (OpenWrtHelper::uciGet("wireless.{$radio}", false) !== 'wifi-device') {
+            return ['options' => []];
+        }
+
+        $features = OpenWrtHelper::execUbusCall('luci', 'getFeatures');
+        if (!is_array($features)) {
+            return ['options' => []];
+        }
+
+        $stack = $features[$mode === 'ap' ? 'hostapd' : 'wpasupplicant'] ?? null;
+        $options = [
+            ['value' => 'none', 'label' => 'None'],
+        ];
+
+        if (is_array($stack)) {
+            $options[] = ['value' => 'psk2+ccmp', 'label' => 'WPA2-PSK'];
+            $options[] = ['value' => 'psk-mixed+ccmp', 'label' => 'WPA/WPA2 Mixed'];
+
+            if (($stack['sae'] ?? false) === true) {
+                $options[] = ['value' => 'sae', 'label' => 'WPA3-SAE'];
+            }
+        }
+
+        return ['options' => $options];
     }
 
     /**

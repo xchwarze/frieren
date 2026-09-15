@@ -54,7 +54,7 @@ const InterfaceForm = ({ radio, section, onHide, defaultValues, onInterfaceSaved
                 label={'Mode'}
                 options={MODE_OPTIONS}
             />
-            <ModeAwareFields />
+            <ModeAwareFields radio={radio} />
             <SwitchField
                 name={'disabled'}
                 label={'Disabled'}

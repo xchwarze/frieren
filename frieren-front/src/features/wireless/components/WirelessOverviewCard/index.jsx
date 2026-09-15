@@ -54,7 +54,7 @@ const WirelessOverviewCard = () => {
             initialValues: {
                 ssid: network.ssid || '',
                 mode: 'sta',
-                network: 'wwan',
+                network: '',
                 encryption: mapScanSecurityToEncryption(network.security),
                 key: '',
                 hidden: false,

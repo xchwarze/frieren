@@ -12,3 +12,5 @@ export const WIRELESS_GET_INTERFACE_CONFIG = 'wireless-get-interface-config';
 export const WIRELESS_GET_RAW_CONFIG = 'wireless-get-raw-config';
 export const WIRELESS_GET_INTERFACE_STATUS = 'wireless-get-interface-status';
 export const WIRELESS_SCAN = 'wireless-scan';
+export const WIRELESS_GET_NETWORK_INTERFACES = 'wireless-get-network-interfaces';
+export const WIRELESS_GET_ENCRYPTION_OPTIONS = 'wireless-get-encryption-options';

@@ -92,6 +92,85 @@ class WirelessControllerTest extends TestCase
     }
 
     // -----------------------------------------------------------------
+    // getEncryptionOptions
+    // -----------------------------------------------------------------
+
+    public function testGetEncryptionOptionsUsesHostapdFeaturesForApMode(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->exactly(2))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0;
+            $output = [];
+
+            if (str_contains($command, "uci -q get 'wireless.radio0'")) {
+                return 'wifi-device';
+            }
+
+            if (str_contains($command, "'luci' 'getFeatures'")) {
+                $output = [json_encode([
+                    'hostapd' => ['sae' => true],
+                    'wpasupplicant' => ['sae' => false],
+                ])];
+            }
+
+            return '';
+        });
+
+        $result = $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'getEncryptionOptions',
+            'radio' => 'radio0',
+            'mode' => 'ap',
+        ]);
+
+        $this->assertNull($result['error']);
+        $this->assertSame([
+            'options' => [
+                ['value' => 'none', 'label' => 'None'],
+                ['value' => 'psk2+ccmp', 'label' => 'WPA2-PSK'],
+                ['value' => 'psk-mixed+ccmp', 'label' => 'WPA/WPA2 Mixed'],
+                ['value' => 'sae', 'label' => 'WPA3-SAE'],
+            ],
+        ], $result['data']);
+    }
+
+    public function testGetEncryptionOptionsUsesWpaSupplicantFeaturesForStaMode(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->exactly(2))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0;
+            $output = [];
+
+            if (str_contains($command, "uci -q get 'wireless.radio0'")) {
+                return 'wifi-device';
+            }
+
+            if (str_contains($command, "'luci' 'getFeatures'")) {
+                $output = [json_encode([
+                    'hostapd' => ['sae' => true],
+                    'wpasupplicant' => ['sae' => false],
+                ])];
+            }
+
+            return '';
+        });
+
+        $result = $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'getEncryptionOptions',
+            'radio' => 'radio0',
+            'mode' => 'sta',
+        ]);
+
+        $this->assertNull($result['error']);
+        $this->assertSame([
+            'options' => [
+                ['value' => 'none', 'label' => 'None'],
+                ['value' => 'psk2+ccmp', 'label' => 'WPA2-PSK'],
+                ['value' => 'psk-mixed+ccmp', 'label' => 'WPA/WPA2 Mixed'],
+            ],
+        ], $result['data']);
+    }
+
+    // -----------------------------------------------------------------
     // getWirelessOverview
     // -----------------------------------------------------------------
 
@@ -222,6 +301,41 @@ class WirelessControllerTest extends TestCase
         $this->assertArrayHasKey('radio0', $result['data']);
         $this->assertNull($result['data']['radio0']['txpower'], 'Enrichment must be skipped, not attempted, when phy is unknown');
         $this->assertNull($result['data']['radio0']['frequency']);
+    }
+
+    public function testGetWirelessOverviewUsesTheConfiguredSixGigahertzBand(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->exactly(3))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0;
+            if (str_contains($command, "'uci' 'get'")) {
+                $output = [json_encode([
+                    'values' => [
+                        'radio3' => [
+                            '.type' => 'wifi-device',
+                            '.name' => 'radio3',
+                            'band' => '6g',
+                            'channel' => '1',
+                            'htmode' => 'EHT80',
+                        ],
+                    ],
+                ])];
+            } elseif (str_contains($command, "'network.wireless' 'status'")) {
+                $output = [json_encode(['radio3' => ['up' => false, 'interfaces' => []]])];
+            } elseif (str_contains($command, "'luci-rpc' 'getWirelessDevices'")) {
+                $output = [json_encode(['radio3' => [
+                    'up' => false,
+                    'iwinfo' => ['htmodes' => ['EHT80']],
+                ]])];
+            } else {
+                $output = [];
+            }
+        });
+
+        $result = $this->dispatch(WirelessController::class, 'wireless', ['action' => 'getWirelessOverview']);
+
+        $this->assertNull($result['error']);
+        $this->assertSame('6 GHz', $result['data']['radio3']['band']);
     }
 
     // -----------------------------------------------------------------

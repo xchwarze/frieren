@@ -41,11 +41,11 @@ const SelectField = ({ name, label, options, ...rest }) => {
                 {...register(name)}
                 {...rest}
             >
-                {options.map((option, index) => {
+                {options.map((option) => {
                     const value = isOptionObject ? option.value : option;
                     const label = isOptionObject ? option.label : option;
                     return (
-                        <option key={index} value={value}>
+                        <option key={String(value)} value={value}>
                             {label}
                         </option>
                     );

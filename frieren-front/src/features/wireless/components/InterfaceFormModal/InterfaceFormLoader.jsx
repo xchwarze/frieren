@@ -8,7 +8,6 @@ import PropTypes from 'prop-types';
 
 import Loading from '@src/components/Loading';
 import useGetInterfaceConfig from '@src/features/wireless/hooks/useGetInterfaceConfig.js';
-import { ENCRYPTION_OPTIONS } from '@src/features/wireless/helpers/constants.js';
 import InterfaceForm from './InterfaceForm';
 
 const normalizeEncryption = (enc) => {
@@ -16,14 +15,13 @@ const normalizeEncryption = (enc) => {
     if (enc === 'psk2') return 'psk2+ccmp';
     if (enc === 'psk' || enc === 'psk-mixed') return 'psk-mixed+ccmp';
     if (enc === 'sae+ccmp') return 'sae';
-    const valid = ENCRYPTION_OPTIONS.map(o => o.value);
-    return valid.includes(enc) ? enc : 'none';
+    return enc;
 };
 
 const ADD_DEFAULTS = {
     ssid: '',
     mode: 'ap',
-    network: 'lan',
+    network: '',
     encryption: 'none',
     key: '',
     hidden: false,
@@ -47,7 +45,7 @@ const InterfaceFormLoader = ({ radio, section, onHide, initialValues, onInterfac
         ? {
             ssid: interfaceConfig?.ssid ?? '',
             mode: interfaceConfig?.mode ?? 'ap',
-            network: interfaceConfig?.network ?? 'lan',
+            network: interfaceConfig?.network ?? '',
             encryption: normalizeEncryption(interfaceConfig?.encryption),
             key: interfaceConfig?.key ?? '',
             hidden: interfaceConfig?.hidden === '1',
