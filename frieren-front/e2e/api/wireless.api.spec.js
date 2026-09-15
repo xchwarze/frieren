@@ -33,6 +33,45 @@ test.describe('API: Wireless', () => {
         });
         expect(response.ok()).toBeTruthy();
         expect(json).not.toHaveProperty('error');
+        expect(json.current).toHaveProperty('cell_density');
+        expect(json.current).toHaveProperty('distance');
+    });
+
+    test('setRadioConfig round-trips cell_density and distance, restoring the original values after', async ({ api }) => {
+        const overview = await api.post('wireless', 'getWirelessOverview');
+        const radioNames = Object.keys(overview.json);
+        test.skip(radioNames.length === 0, 'No radios available');
+        const radio = radioNames[0];
+
+        const before = await api.post('wireless', 'getRadioConfig', { radio });
+        const { current } = before.json;
+
+        const applyAndRead = async (cellDensity, distance) => {
+            const set = await api.post('wireless', 'setRadioConfig', {
+                radio,
+                channel: current.channel,
+                txpower: current.txpower,
+                htmode: current.htmode,
+                country: current.country,
+                disabled: current.disabled === '1',
+                cell_density: cellDensity,
+                distance,
+            });
+            expect(set.response.ok()).toBeTruthy();
+            expect(set.json).not.toHaveProperty('error');
+
+            const after = await api.post('wireless', 'getRadioConfig', { radio });
+            return after.json.current;
+        };
+
+        try {
+            const changed = await applyAndRead('2', 300);
+            expect(changed.cell_density).toBe('2');
+            expect(changed.distance).toBe('300');
+        } finally {
+            // Restore, so the round-trip test leaves the device exactly as it found it.
+            await applyAndRead(current.cell_density ?? '0', current.distance ?? '0');
+        }
     });
 
     test('getAssociationList returns stations for interface', async ({ api }) => {

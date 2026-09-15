@@ -60,4 +60,27 @@ test.describe('Wireless', () => {
         await page.getByRole('tab', { name: /Advanced Config/ }).click();
         await expect(page.getByRole('tab', { name: /Advanced Config/ })).toHaveAttribute('aria-selected', 'true');
     });
+
+    test('Radio Configuration shows Cell Density and Distance fields', async ({ page }) => {
+        await page.getByRole('button', { name: 'Configure radio' }).first().click();
+
+        await expect(page.getByLabel('Cell Density')).toBeVisible();
+        await expect(page.getByLabel('Distance (meters)')).toBeVisible();
+    });
+
+    test('Add Interface (default AP mode) shows the Management Frame Protection field', async ({ page }) => {
+        await page.getByRole('button', { name: 'Add interface' }).first().click();
+
+        await expect(page.getByLabel('Management Frame Protection')).toBeVisible();
+        await expect(page.getByLabel('BSSID (optional)')).not.toBeVisible();
+    });
+
+    test('Switching Add Interface to Station mode shows the BSSID field instead', async ({ page }) => {
+        await page.getByRole('button', { name: 'Add interface' }).first().click();
+
+        await page.getByLabel('Mode').selectOption('sta');
+
+        await expect(page.getByLabel('BSSID (optional)')).toBeVisible();
+        await expect(page.getByLabel('Management Frame Protection')).not.toBeVisible();
+    });
 });
