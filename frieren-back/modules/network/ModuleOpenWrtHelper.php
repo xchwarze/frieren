@@ -278,6 +278,11 @@ class ModuleOpenWrtHelper
                 'dns' => self::normalizeList($uci['dns'] ?? null),
                 'uptime' => isset($status['uptime']) ? (int)$status['uptime'] : 0,
                 'device' => $status['l3_device'] ?? ($status['device'] ?? null),
+                'mtu' => $uci['mtu'] ?? null,
+                'macaddr' => $uci['macaddr'] ?? null,
+                // Absent option means netifd's own default, which is "use the proto's
+                // own DNS" (true); only an explicit '0' turns that off.
+                'peerdns' => ($uci['peerdns'] ?? null) !== '0',
             ];
         }
 
@@ -296,6 +301,82 @@ class ModuleOpenWrtHelper
     }
 
     /**
+     * Lists real network devices (kernel netdevs/bridges) an interface can attach to,
+     * via the live ubus device dump — never a hardcoded list, since which devices exist
+     * (br-lan, eth0, a wifi ap0 device, ...) varies by hardware/config. Loopback is
+     * excluded; it is never a meaningful attachment for a new logical interface.
+     *
+     * @return array<int, string> Device names.
+     */
+    public static function getAvailableDevices()
+    {
+        $status = OpenWrtHelper::execUbusCall('network.device', 'status');
+        if (!is_array($status)) {
+            return [];
+        }
+
+        $devices = array_keys($status);
+        sort($devices);
+
+        return array_values(array_diff($devices, ['lo']));
+    }
+
+    /**
+     * Creates a new interface section in /etc/config/network and reloads.
+     *
+     * @param string $name Already validated interface name; must not already exist.
+     * @param string $device Real network device/bridge to attach (e.g. 'br-lan', 'eth0').
+     * @param string $proto A whitelisted proto ('static' or a dynamic one).
+     * @param string $ipaddr Validated IPv4 (static only).
+     * @param string $netmask Validated IPv4 mask (static only).
+     * @param string $gateway Validated IPv4 gateway or '' (static only).
+     * @param array $dns Validated IPv4 DNS servers (static only).
+     * @param string $mtu Interface MTU, or '' to leave it at the kernel default.
+     * @param string $macaddr Override MAC address, or '' to keep the hardware one.
+     * @param bool $peerdns Whether to accept DNS servers advertised by the proto.
+     * @return bool True on success.
+     * @throws \Exception If an interface with this name already exists.
+     */
+    public static function addInterface($name, $device, $proto, $ipaddr, $netmask, $gateway, $dns, $mtu = '', $macaddr = '', $peerdns = true)
+    {
+        if (self::interfaceExists($name)) {
+            throw new \Exception("Interface '{$name}' already exists");
+        }
+
+        OpenWrtHelper::exec('uci set ' . escapeshellarg("network.{$name}=interface"));
+        OpenWrtHelper::uciSet("network.{$name}.device", $device, false, false);
+
+        self::writeProtoOptions($name, $proto, $ipaddr, $netmask, $gateway, $dns);
+        self::writeOptionalOptions($name, $mtu, $macaddr, $peerdns);
+
+        OpenWrtHelper::uciCommit();
+        OpenWrtHelper::execUbusCall('network', 'reload');
+
+        return true;
+    }
+
+    /**
+     * Deletes an interface section from /etc/config/network and reloads.
+     *
+     * @param string $name Already validated interface name.
+     * @return bool True on success.
+     * @throws \Exception If the interface does not exist.
+     */
+    public static function removeInterface($name)
+    {
+        if (!self::interfaceExists($name)) {
+            throw new \Exception("Interface '{$name}' not found");
+        }
+
+        OpenWrtHelper::uciDelete("network.{$name}", false);
+        OpenWrtHelper::uciCommit();
+
+        OpenWrtHelper::execUbusCall('network', 'reload');
+
+        return true;
+    }
+
+    /**
      * Writes the L3 config of an interface to /etc/config/network and reloads.
      * On any non-static proto the static address fields are cleared/ignored.
      *
@@ -305,9 +386,68 @@ class ModuleOpenWrtHelper
      * @param string $netmask Validated IPv4 mask (static only).
      * @param string $gateway Validated IPv4 gateway or '' (static only).
      * @param array $dns Validated IPv4 DNS servers (static only).
+     * @param string $mtu Interface MTU, or '' to leave it at the kernel default.
+     * @param string $macaddr Override MAC address, or '' to keep the hardware one.
+     * @param bool $peerdns Whether to accept DNS servers advertised by the proto.
      * @return bool True on success.
      */
-    public static function setInterface($name, $proto, $ipaddr, $netmask, $gateway, $dns)
+    public static function setInterface($name, $proto, $ipaddr, $netmask, $gateway, $dns, $mtu = '', $macaddr = '', $peerdns = true)
+    {
+        self::writeProtoOptions($name, $proto, $ipaddr, $netmask, $gateway, $dns);
+        self::writeOptionalOptions($name, $mtu, $macaddr, $peerdns);
+
+        OpenWrtHelper::uciCommit();
+        OpenWrtHelper::execUbusCall('network', 'reload');
+
+        return true;
+    }
+
+    /**
+     * Brings an interface up, down, or fully restarts it (down then up) via ubus
+     * (never touches wireless `disabled`).
+     *
+     * @param string $name Already validated interface name.
+     * @param string $action 'up', 'down', or 'restart'.
+     * @return bool True on success.
+     */
+    public static function toggleInterface($name, $action)
+    {
+        if ($action === 'restart') {
+            $down = self::runInterfaceAction($name, 'down');
+            $up = self::runInterfaceAction($name, 'up');
+
+            return $down && $up;
+        }
+
+        return self::runInterfaceAction($name, $action);
+    }
+
+    /**
+     * Runs a single ubus up/down verb against an interface.
+     *
+     * @param string $name Already validated interface name.
+     * @param string $action 'up' or 'down'.
+     * @return bool True on success.
+     */
+    private static function runInterfaceAction($name, $action)
+    {
+        // ubus up/down emit no output on success, so execUbusCall (which needs
+        // valid JSON back) would misreport failure. Use a plain exec + exit code.
+        return OpenWrtHelper::exec("ubus call network.interface.{$name} {$action}") !== false;
+    }
+
+    /**
+     * Writes the proto + static/dynamic address options shared by addInterface()
+     * and setInterface(). Does not commit.
+     *
+     * @param string $name
+     * @param string $proto
+     * @param string $ipaddr
+     * @param string $netmask
+     * @param string $gateway
+     * @param array $dns
+     */
+    private static function writeProtoOptions($name, $proto, $ipaddr, $netmask, $gateway, $dns)
     {
         OpenWrtHelper::uciSet("network.{$name}.proto", $proto, false, false);
 
@@ -337,25 +477,33 @@ class ModuleOpenWrtHelper
             OpenWrtHelper::uciDelete("network.{$name}.gateway", false);
             OpenWrtHelper::uciDelete("network.{$name}.dns", false);
         }
-
-        OpenWrtHelper::uciCommit();
-        OpenWrtHelper::execUbusCall('network', 'reload');
-
-        return true;
     }
 
     /**
-     * Brings an interface up or down via ubus (never touches wireless `disabled`).
+     * Writes the mtu/macaddr/peerdns options shared by addInterface() and
+     * setInterface(). Unlike the static address fields, these apply regardless of
+     * proto. Does not commit.
      *
-     * @param string $name Already validated interface name.
-     * @param string $action 'up' or 'down'.
-     * @return bool True on success.
+     * @param string $name
+     * @param string $mtu '' deletes the option (kernel default).
+     * @param string $macaddr '' deletes the option (hardware default).
+     * @param bool $peerdns Always written as '1' or '0'.
      */
-    public static function toggleInterface($name, $action)
+    private static function writeOptionalOptions($name, $mtu, $macaddr, $peerdns)
     {
-        // ubus up/down emit no output on success, so execUbusCall (which needs
-        // valid JSON back) would misreport failure. Use a plain exec + exit code.
-        return OpenWrtHelper::exec("ubus call network.interface.{$name} {$action}") !== false;
+        if ($mtu === '') {
+            OpenWrtHelper::uciDelete("network.{$name}.mtu", false);
+        } else {
+            OpenWrtHelper::uciSet("network.{$name}.mtu", $mtu, false, false);
+        }
+
+        if ($macaddr === '') {
+            OpenWrtHelper::uciDelete("network.{$name}.macaddr", false);
+        } else {
+            OpenWrtHelper::uciSet("network.{$name}.macaddr", $macaddr, false, false);
+        }
+
+        OpenWrtHelper::uciSet("network.{$name}.peerdns", $peerdns ? '1' : '0', false, false);
     }
 
     /**

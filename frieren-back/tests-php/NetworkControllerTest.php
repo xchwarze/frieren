@@ -221,9 +221,49 @@ class NetworkControllerTest extends TestCase
             'dns' => ['1.1.1.1', '8.8.8.8'],
             'uptime' => 54516,
             'device' => 'br-lan',
+            'mtu' => null,
+            'macaddr' => null,
+            'peerdns' => true,
         ], $interfaces[0]);
         $this->assertStringContainsString('network.interface', $capturedCommand);
         $this->assertStringContainsString('dump', $capturedCommand);
+    }
+
+    public function testGetInterfacesReturnsMtuMacaddrAndPeerdnsFromUci(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0;
+            $output = [json_encode([
+                'interface' => [
+                    [
+                        'interface' => 'lan',
+                        'proto' => 'static',
+                        'up' => true,
+                        'ipv4-address' => [['address' => '192.0.2.7', 'mask' => 24]],
+                        'uptime' => 54516,
+                        'l3_device' => 'br-lan',
+                    ],
+                ],
+            ])];
+        });
+
+        $this->getFunctionMock('frieren\helper', 'file_exists')->expects($this->once())->willReturn(true);
+        $this->getFunctionMock('frieren\helper', 'file')->expects($this->once())->willReturn([
+            "config interface 'lan'",
+            "\toption proto 'static'",
+            "\toption mtu '1400'",
+            "\toption macaddr 'AA:BB:CC:DD:EE:FF'",
+            "\toption peerdns '0'",
+        ]);
+
+        $result = $this->dispatch(NetworkController::class, 'network', ['action' => 'getInterfaces']);
+
+        $this->assertNull($result['error']);
+        $interface = $result['data']['interfaces'][0];
+        $this->assertSame('1400', $interface['mtu']);
+        $this->assertSame('AA:BB:CC:DD:EE:FF', $interface['macaddr']);
+        $this->assertFalse($interface['peerdns']);
     }
 
     public function testGetInterfacesReturnsNullGatewayAndEmptyDnsWhenUciConfigIsUnavailable(): void
@@ -263,6 +303,9 @@ class NetworkControllerTest extends TestCase
             'dns' => [],
             'uptime' => 54516,
             'device' => 'br-lan',
+            'mtu' => null,
+            'macaddr' => null,
+            'peerdns' => true,
         ], $result['data']['interfaces'][0]);
     }
 
@@ -445,6 +488,447 @@ class NetworkControllerTest extends TestCase
 
         $this->assertSame('Unsupported protocol', $result['error']);
         $this->assertNull($result['data']);
+    }
+
+    public function testSetInterfaceRejectsAnOutOfRangeMtuWithoutWritingAnything(): void
+    {
+        // setInterface() confirms the section exists (one `uci -q get`) before validating
+        // mtu; only that one lookup should fire, no writes.
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0;
+            $output = [];
+
+            return 'interface';
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'setInterface',
+            'name' => 'lan',
+            'proto' => 'dhcp',
+            'mtu' => '100',
+        ]);
+
+        $this->assertSame('Invalid MTU', $result['error']);
+    }
+
+    public function testSetInterfaceWritesMtuMacaddrAndPeerdns(): void
+    {
+        $captured = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->atLeastOnce())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$captured) {
+            $captured[] = $command;
+            $retval = 0;
+            $output = [];
+
+            return strpos($command, 'uci -q get') === 0 ? 'interface' : '';
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'setInterface',
+            'name' => 'lan',
+            'proto' => 'dhcp',
+            'mtu' => '1400',
+            'macaddr' => 'AA:BB:CC:DD:EE:FF',
+            'peerdns' => false,
+        ]);
+
+        $this->assertNull($result['error']);
+
+        $mtuCommand = $this->findCommandContaining($captured, 'network.lan.mtu');
+        $this->assertNotNull($mtuCommand);
+        $this->assertStringContainsString(escapeshellarg('1400'), $mtuCommand);
+
+        $macaddrCommand = $this->findCommandContaining($captured, 'network.lan.macaddr');
+        $this->assertNotNull($macaddrCommand);
+        $this->assertStringContainsString(escapeshellarg('AA:BB:CC:DD:EE:FF'), $macaddrCommand);
+
+        $peerdnsCommand = $this->findCommandContaining($captured, 'network.lan.peerdns');
+        $this->assertNotNull($peerdnsCommand);
+        $this->assertStringContainsString(escapeshellarg('0'), $peerdnsCommand);
+    }
+
+    public function testSetInterfaceDeletesMtuAndMacaddrWhenEmpty(): void
+    {
+        $captured = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->atLeastOnce())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$captured) {
+            $captured[] = $command;
+            $retval = 0;
+            $output = [];
+
+            return strpos($command, 'uci -q get') === 0 ? 'interface' : '';
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'setInterface',
+            'name' => 'lan',
+            'proto' => 'dhcp',
+            'mtu' => '',
+            'macaddr' => '',
+            'peerdns' => true,
+        ]);
+
+        $this->assertNull($result['error']);
+
+        $mtuCommand = $this->findCommandContaining($captured, 'network.lan.mtu');
+        $this->assertNotNull($mtuCommand);
+        $this->assertStringStartsWith('uci -q delete ', $mtuCommand);
+
+        $macaddrCommand = $this->findCommandContaining($captured, 'network.lan.macaddr');
+        $this->assertNotNull($macaddrCommand);
+        $this->assertStringStartsWith('uci -q delete ', $macaddrCommand);
+
+        $peerdnsCommand = $this->findCommandContaining($captured, 'network.lan.peerdns');
+        $this->assertNotNull($peerdnsCommand);
+        $this->assertStringContainsString(escapeshellarg('1'), $peerdnsCommand);
+    }
+
+    // --- toggleInterface: restart -----------------------------------------
+
+    public function testToggleInterfaceRestartBringsTheInterfaceDownThenUp(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->exactly(2))->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            $output = [];
+
+            return '';
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'toggleInterface',
+            'name' => 'lan',
+            'state' => 'restart',
+        ]);
+
+        $this->assertNull($result['error']);
+        $this->assertSame(['success' => true], $result['data']);
+        $this->assertSame([
+            'ubus call network.interface.lan down',
+            'ubus call network.interface.lan up',
+        ], $capturedCommands);
+    }
+
+    public function testToggleInterfaceRejectsAnUnknownAction(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->never());
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'toggleInterface',
+            'name' => 'lan',
+            'state' => 'reboot',
+        ]);
+
+        $this->assertSame('Unsupported action', $result['error']);
+        $this->assertNull($result['data']);
+    }
+
+    // -----------------------------------------------------------------
+    // getAvailableDevices
+    // -----------------------------------------------------------------
+
+    public function testGetAvailableDevicesReturnsTheLiveDeviceListSortedExcludingLoopback(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0;
+            $output = [json_encode([
+                'wan' => [], 'br-lan' => [], 'lo' => [], 'eth0' => [],
+            ])];
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', ['action' => 'getAvailableDevices']);
+
+        $this->assertNull($result['error']);
+        $this->assertSame(['devices' => ['br-lan', 'eth0', 'wan']], $result['data']);
+    }
+
+    public function testGetAvailableDevicesReturnsAnEmptyListWhenUbusFails(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 1;
+            $output = [];
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', ['action' => 'getAvailableDevices']);
+
+        $this->assertNull($result['error']);
+        $this->assertSame(['devices' => []], $result['data']);
+    }
+
+    // -----------------------------------------------------------------
+    // addInterface
+    // -----------------------------------------------------------------
+
+    public function testAddInterfaceCreatesTheSectionAndWritesStaticProtoFields(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            $output = [];
+
+            // interfaceExists() reads the section back through `uci -q get`; report
+            // "not found" (non-zero) so addInterface() proceeds to create it.
+            if (strpos($command, 'uci -q get') === 0) {
+                $retval = 1;
+
+                return '';
+            }
+
+            return '';
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'addInterface',
+            'name' => 'guest',
+            'device' => 'br-lan',
+            'proto' => 'static',
+            'ipaddr' => '192.0.2.10',
+            'netmask' => '255.255.255.0',
+            'gateway' => '192.0.2.1',
+            'dns' => ['1.1.1.1'],
+        ]);
+
+        $this->assertNull($result['error']);
+        $this->assertSame(['success' => true], $result['data']);
+
+        $createCommand = escapeshellcmd('uci set ' . escapeshellarg('network.guest=interface'));
+        $this->assertContains($createCommand, $capturedCommands);
+
+        $deviceCommand = $this->findCommandContaining($capturedCommands, 'network.guest.device');
+        $this->assertNotNull($deviceCommand);
+        $this->assertStringContainsString(escapeshellarg('br-lan'), $deviceCommand);
+
+        $protoCommand = $this->findCommandContaining($capturedCommands, 'network.guest.proto');
+        $this->assertNotNull($protoCommand);
+        $this->assertStringContainsString(escapeshellarg('static'), $protoCommand);
+
+        $ipaddrCommand = $this->findCommandContaining($capturedCommands, 'network.guest.ipaddr');
+        $this->assertNotNull($ipaddrCommand);
+        $this->assertStringContainsString(escapeshellarg('192.0.2.10'), $ipaddrCommand);
+
+        $netmaskCommand = $this->findCommandContaining($capturedCommands, 'network.guest.netmask');
+        $this->assertNotNull($netmaskCommand);
+        $this->assertStringContainsString(escapeshellarg('255.255.255.0'), $netmaskCommand);
+
+        $gatewayCommand = $this->findCommandContaining($capturedCommands, 'network.guest.gateway');
+        $this->assertNotNull($gatewayCommand);
+        $this->assertStringContainsString(escapeshellarg('192.0.2.1'), $gatewayCommand);
+
+        $dnsCommand = array_values(array_filter(
+            $capturedCommands,
+            fn ($c) => strpos($c, 'network.guest.dns') !== false && strpos($c, 'add_list') !== false
+        ));
+        $this->assertNotEmpty($dnsCommand, 'Expected the dns server to be added via uci add_list');
+        $this->assertStringContainsString(escapeshellarg('1.1.1.1'), $dnsCommand[0]);
+    }
+
+    public function testAddInterfaceThrowsWhenTheNameAlreadyExists(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0;
+            $output = [];
+
+            return strpos($command, 'uci -q get') === 0 ? 'interface' : '';
+        });
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Interface 'lan' already exists");
+
+        $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'addInterface',
+            'name' => 'lan',
+            'device' => 'br-lan',
+            'proto' => 'dhcp',
+        ]);
+    }
+
+    public function testAddInterfaceRejectsAMissingDeviceWithoutWritingAnything(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->never());
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'addInterface',
+            'name' => 'guest',
+            'proto' => 'dhcp',
+        ]);
+
+        $this->assertSame('Device is mandatory', $result['error']);
+    }
+
+    public function testAddInterfaceRejectsAnOutOfRangeMtuWithoutWritingAnything(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->never());
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'addInterface',
+            'name' => 'guest',
+            'device' => 'br-lan',
+            'proto' => 'dhcp',
+            'mtu' => '99999',
+        ]);
+
+        $this->assertSame('Invalid MTU', $result['error']);
+    }
+
+    public function testAddInterfaceRejectsANonNumericMtuWithoutWritingAnything(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->never());
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'addInterface',
+            'name' => 'guest',
+            'device' => 'br-lan',
+            'proto' => 'dhcp',
+            'mtu' => 'abc',
+        ]);
+
+        $this->assertSame('Invalid MTU', $result['error']);
+    }
+
+    public function testAddInterfaceWritesMtuMacaddrAndPeerdns(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            $output = [];
+
+            if (strpos($command, 'uci -q get') === 0) {
+                $retval = 1;
+
+                return '';
+            }
+
+            return '';
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'addInterface',
+            'name' => 'guest',
+            'device' => 'br-lan',
+            'proto' => 'dhcp',
+            'mtu' => '1400',
+            'macaddr' => 'AA:BB:CC:DD:EE:FF',
+            'peerdns' => false,
+        ]);
+
+        $this->assertNull($result['error']);
+
+        $mtuCommand = $this->findCommandContaining($capturedCommands, 'network.guest.mtu');
+        $this->assertNotNull($mtuCommand);
+        $this->assertStringContainsString(escapeshellarg('1400'), $mtuCommand);
+
+        $macaddrCommand = $this->findCommandContaining($capturedCommands, 'network.guest.macaddr');
+        $this->assertNotNull($macaddrCommand);
+        $this->assertStringContainsString(escapeshellarg('AA:BB:CC:DD:EE:FF'), $macaddrCommand);
+
+        $peerdnsCommand = $this->findCommandContaining($capturedCommands, 'network.guest.peerdns');
+        $this->assertNotNull($peerdnsCommand);
+        $this->assertStringContainsString(escapeshellarg('0'), $peerdnsCommand);
+    }
+
+    public function testAddInterfaceOmitsMtuAndMacaddrWhenNotProvided(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            $output = [];
+
+            if (strpos($command, 'uci -q get') === 0) {
+                $retval = 1;
+
+                return '';
+            }
+
+            return '';
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'addInterface',
+            'name' => 'guest',
+            'device' => 'br-lan',
+            'proto' => 'dhcp',
+        ]);
+
+        $this->assertNull($result['error']);
+
+        $mtuCommand = $this->findCommandContaining($capturedCommands, 'network.guest.mtu');
+        $this->assertNotNull($mtuCommand);
+        $this->assertStringStartsWith('uci -q delete ', $mtuCommand);
+
+        $macaddrCommand = $this->findCommandContaining($capturedCommands, 'network.guest.macaddr');
+        $this->assertNotNull($macaddrCommand);
+        $this->assertStringStartsWith('uci -q delete ', $macaddrCommand);
+    }
+
+    // -----------------------------------------------------------------
+    // removeInterface
+    // -----------------------------------------------------------------
+
+    public function testRemoveInterfaceDeletesTheSectionAndReloads(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            $output = [];
+
+            if (strpos($command, 'uci -q get') === 0) {
+                return 'interface';
+            }
+
+            return '';
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'removeInterface',
+            'name' => 'guest',
+        ]);
+
+        $this->assertNull($result['error']);
+        $this->assertSame(['success' => true], $result['data']);
+
+        $deleteCommand = array_values(array_filter(
+            $capturedCommands,
+            fn ($c) => strpos($c, 'network.guest') !== false && strpos($c, 'delete') !== false
+        ));
+        $this->assertNotEmpty($deleteCommand, 'Expected the section to be deleted');
+
+        $reloadCommand = $this->findCommandContaining($capturedCommands, 'reload');
+        $this->assertNotNull($reloadCommand, 'Expected the network config to be reloaded');
+    }
+
+    public function testRemoveInterfaceThrowsWhenTheNameDoesNotExist(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 1;
+            $output = [];
+        });
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Interface 'ghost' not found");
+
+        $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'removeInterface',
+            'name' => 'ghost',
+        ]);
     }
 
     // --- getArpTable ---------------------------------------------------
