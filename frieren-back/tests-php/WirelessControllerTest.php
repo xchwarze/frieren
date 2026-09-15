@@ -484,6 +484,26 @@ class WirelessControllerTest extends TestCase
         ], $result['data']);
     }
 
+    /**
+     * Observed live: a down/unassociated interface (e.g. an STA not yet connected) reports a
+     * null `ifname` in the overview. Passing that straight to preg_replace() as the subject
+     * trips a PHP 8.1+ deprecation notice, which corrupts the JSON response. There is no real
+     * device to query in that case anyway, so this should short-circuit to an empty list.
+     */
+    public function testGetAssociationListReturnsEmptyForANullInterfaceInsteadOfCallingExec(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->never());
+
+        $result = $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'getAssociationList',
+            'interface' => null,
+        ]);
+
+        $this->assertNull($result['error']);
+        $this->assertSame([], $result['data']);
+    }
+
     // -----------------------------------------------------------------
     // getInterfaceStatus
     // -----------------------------------------------------------------

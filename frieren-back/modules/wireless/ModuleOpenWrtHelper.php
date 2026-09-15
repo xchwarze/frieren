@@ -632,6 +632,13 @@ class ModuleOpenWrtHelper
      */
     public static function getAssociationList($interface)
     {
+        // A down/unassociated interface (e.g. an STA not yet connected) reports a null
+        // ifname in the overview, so there is no real device to query — short-circuit
+        // before preg_replace() ever sees it (PHP 8.1+ deprecates a null subject there).
+        if (!$interface) {
+            return [];
+        }
+
         $safeInterface = preg_replace('/[^a-zA-Z0-9_\-]/', '', $interface);
 
         // Try ubus first
