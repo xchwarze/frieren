@@ -234,6 +234,29 @@ class SystemControllerTest extends TestCase
         $this->assertNull($result['data']);
     }
 
+    /**
+     * Observed live: a `search` term that legitimately matches zero lines makes logread exit
+     * 0 with empty output. Both ModuleOpenWrtHelper::getSystemLogs() and this controller used
+     * to check the result with plain truthiness, so an empty (but successful) array was
+     * indistinguishable from `exec()`'s false-on-real-failure and got reported as an error.
+     */
+    public function testGetSystemLogsReturnsAnEmptyArrayWhenTheSearchMatchesNothing(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $output = [];
+            $retval = 0;
+        });
+
+        $result = $this->dispatch(SystemController::class, 'system', [
+            'action' => 'getSystemLogs',
+            'search' => 'no-such-tag',
+        ]);
+
+        $this->assertNull($result['error']);
+        $this->assertSame([], $result['data']);
+    }
+
     // -----------------------------------------------------------------
     // startDiagnosticsScript / getDiagnosticsStatus
     // -----------------------------------------------------------------

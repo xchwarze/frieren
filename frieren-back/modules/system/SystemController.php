@@ -49,7 +49,7 @@ class SystemController extends \frieren\core\Controller
     public function getSystemLogs()
     {
         $data = self::setupModuleHelper()::getSystemLogs($this->request['search'] ?? null);
-        if ($data) {
+        if ($data !== false) {
             return self::setSuccess($data);
         }
 

@@ -108,8 +108,11 @@ class ModuleOpenWrtHelper
         // $raw=true: $searchPattern is already escapeshellarg()'d above; running the whole
         // command through escapeshellcmd() too would additionally backslash-escape shell
         // metacharacters *inside* that already-quoted segment, corrupting the search term.
+        // exec() returns [] (not false) for a search that legitimately matches zero lines —
+        // only a real command failure returns false, so check for that explicitly instead of
+        // treating an empty array as falsy.
         $output = OpenWrtHelper::exec($command, false, true);
-        if (!$output) {
+        if ($output === false) {
             return false;
         }
 
