@@ -9,12 +9,15 @@
 namespace frieren\modules\terminal;
 
 use frieren\helper\OpenWrtHelper;
+use frieren\modules\network\ModuleOpenWrtHelper as NetworkHelper;
 use frieren\modules\settings\ModuleOpenWrtHelper as SettingsHelper;
 
 class TerminalController extends \frieren\core\Controller
 {
     const TTYD_PATH = "/usr/bin/ttyd";
     const TTYD_SD_PATH = "/sd/usr/bin/ttyd";
+    const LAN_INTERFACE = 'lan';
+    const FALLBACK_LAN_DEVICE = 'br-lan';
 
     public $endpointRoutes = [
         'startTerminal' => true,
@@ -36,6 +39,26 @@ class TerminalController extends \frieren\core\Controller
         }
 
         return self::TTYD_PATH;
+    }
+
+    /**
+     * Resolves the device backing the `lan` interface, which ttyd binds to.
+     * Not every board bridges its LAN, so the `br-lan` literal this used to
+     * hardcode simply does not exist on some of them (ttyd then fails to bind
+     * with no visible error); the fallback keeps the common case unchanged
+     * when netifd reports nothing.
+     *
+     * @return string Device name (e.g. br-lan, eth0).
+     */
+    private function getLanDevice()
+    {
+        foreach (NetworkHelper::getInterfaces() as $interface) {
+            if ($interface['name'] === self::LAN_INTERFACE && !empty($interface['device'])) {
+                return $interface['device'];
+            }
+        }
+
+        return self::FALLBACK_LAN_DEVICE;
     }
 
     private function waitForRunning($terminal)
@@ -69,8 +92,9 @@ class TerminalController extends \frieren\core\Controller
             $shell = SettingsHelper::getTerminalAutologin() ? '/bin/ash' : '/bin/login';
             // Launch from /root so the (autologin) shell opens there instead of
             // inheriting the PHP process cwd (/usr/share/frieren/api). The cd is
-            // confined to this subshell; all paths here are fixed (no user input).
-            $command = "sh -c 'cd /root && {$terminal} -p 5001 -i br-lan {$shell}'";
+            // confined to this subshell; the paths are fixed and the bind device
+            // comes from netifd, so no user input reaches this command.
+            $command = "sh -c 'cd /root && {$terminal} -p 5001 -i {$this->getLanDevice()} {$shell}'";
             OpenWrtHelper::execBackground($command);
             $status = $this->waitForRunning($terminal);
             if (!$status) {

@@ -47,12 +47,17 @@ class TerminalControllerTest extends TestCase
      *     string passed to the mocked `frieren\helper` exec(), in call order.
      * @param array $moduleCommands Populated (by reference) with every command
      *     string passed to the mocked `frieren\modules\terminal` exec().
+     * @param string|null $lanDevice Device the `lan` interface reports to the
+     *     ubus `network.interface dump` that startTerminal() resolves its ttyd
+     *     bind interface from. Null makes that dump come back empty, which is
+     *     how a board with no `lan` section behaves.
      */
     private function stubTerminalEnvironment(
         array $uciMap,
         array $pgrepSequence,
         array &$helperCommands = [],
-        array &$moduleCommands = []
+        array &$moduleCommands = [],
+        ?string $lanDevice = null
     ): void {
         // No SD card in the test environment: forces getTerminalPath() down the
         // default (non-SD) branch without ever needing to mock file_exists().
@@ -63,8 +68,18 @@ class TerminalControllerTest extends TestCase
         $pgrepQueue = $pgrepSequence;
         $exec = $this->getFunctionMock('frieren\helper', 'exec');
         $exec->expects($this->any())->willReturnCallback(
-            function ($command, &$output = null, &$retval = null) use (&$helperCommands, $uciMap, &$pgrepQueue) {
+            function ($command, &$output = null, &$retval = null) use (&$helperCommands, $uciMap, &$pgrepQueue, $lanDevice) {
                 $helperCommands[] = $command;
+
+                if (strpos($command, 'network.interface') !== false) {
+                    $output = $lanDevice === null ? [] : [json_encode([
+                        'interface' => [
+                            ['interface' => 'lan', 'proto' => 'static', 'up' => true, 'l3_device' => $lanDevice],
+                        ],
+                    ])];
+                    $retval = 0;
+                    return implode("\n", $output);
+                }
 
                 if (strpos($command, '/usr/bin/pgrep') === 0) {
                     $running = count($pgrepQueue) > 1 ? array_shift($pgrepQueue) : ($pgrepQueue[0] ?? false);
@@ -188,7 +203,8 @@ class TerminalControllerTest extends TestCase
     public function testStartTerminalLaunchesTtydOnPort5001WithLoginShellByDefault(): void
     {
         $helperCommands = [];
-        $this->stubTerminalEnvironment([], [false, true], $helperCommands);
+        $moduleCommands = [];
+        $this->stubTerminalEnvironment([], [false, true], $helperCommands, $moduleCommands, 'br-guest');
 
         $result = $this->dispatch(TerminalController::class, 'terminal', ['action' => 'startTerminal']);
 
@@ -204,13 +220,49 @@ class TerminalControllerTest extends TestCase
         $launchCommand = $this->findCommandContaining($helperCommands, '-p 5001');
         $this->assertNotNull($launchCommand, 'Expected a ttyd launch command');
         $this->assertStringStartsWith('/usr/bin/nohup ', $launchCommand);
-        $this->assertStringContainsString('/usr/bin/ttyd -p 5001 -i br-lan /bin/login', $launchCommand);
+        $this->assertStringContainsString('/usr/bin/ttyd -p 5001 -i br-guest /bin/login', $launchCommand);
+    }
+
+    /**
+     * The bind interface used to be the literal `br-lan`, which silently fails
+     * to bind on boards that don't bridge their LAN or name the bridge
+     * differently. It is now resolved from the `lan` interface's real device
+     * (same ubus dump the network module's getInterfaces() reads).
+     */
+    public function testStartTerminalBindsTtydToTheResolvedLanDeviceInsteadOfTheBrLanLiteral(): void
+    {
+        $helperCommands = [];
+        $moduleCommands = [];
+        $this->stubTerminalEnvironment([], [false, true], $helperCommands, $moduleCommands, 'eth0');
+
+        $result = $this->dispatch(TerminalController::class, 'terminal', ['action' => 'startTerminal']);
+
+        $this->assertNull($result['error']);
+        $launchCommand = $this->findCommandContaining($helperCommands, '-p 5001');
+        $this->assertNotNull($launchCommand);
+        $this->assertStringContainsString('-i eth0 ', $launchCommand);
+        $this->assertStringNotContainsString('br-lan', $launchCommand);
+    }
+
+    public function testStartTerminalFallsBackToBrLanWhenTheLanDeviceCannotBeResolved(): void
+    {
+        $helperCommands = [];
+        $moduleCommands = [];
+        $this->stubTerminalEnvironment([], [false, true], $helperCommands, $moduleCommands, null);
+
+        $result = $this->dispatch(TerminalController::class, 'terminal', ['action' => 'startTerminal']);
+
+        $this->assertNull($result['error']);
+        $launchCommand = $this->findCommandContaining($helperCommands, '-p 5001');
+        $this->assertNotNull($launchCommand);
+        $this->assertStringContainsString('-i br-lan ', $launchCommand);
     }
 
     public function testStartTerminalUsesAshShellWhenAutologinIsEnabled(): void
     {
         $helperCommands = [];
-        $this->stubTerminalEnvironment(['terminal_autologin' => 'TRUE'], [false, true], $helperCommands);
+        $moduleCommands = [];
+        $this->stubTerminalEnvironment(['terminal_autologin' => 'TRUE'], [false, true], $helperCommands, $moduleCommands, 'br-guest');
 
         $result = $this->dispatch(TerminalController::class, 'terminal', ['action' => 'startTerminal']);
 
@@ -219,7 +271,7 @@ class TerminalControllerTest extends TestCase
 
         $launchCommand = $this->findCommandContaining($helperCommands, '-p 5001');
         $this->assertNotNull($launchCommand);
-        $this->assertStringContainsString('/usr/bin/ttyd -p 5001 -i br-lan /bin/ash', $launchCommand);
+        $this->assertStringContainsString('/usr/bin/ttyd -p 5001 -i br-guest /bin/ash', $launchCommand);
         $this->assertStringNotContainsString('/bin/login', $launchCommand);
     }
 
