@@ -117,7 +117,7 @@ class PackagesController extends \frieren\core\Controller
         }
 
         $script = $this->getScriptPath();
-        $packageName = escapeshellarg($this->request['packageName']);
+        $packageName = escapeshellarg($this->request['packageName'] ?? '');
         \frieren\helper\BackgroundTaskHelper::start(self::TASK_INSTALL, "{$script} install {$packageName}");
 
         return self::setSuccess();
@@ -135,7 +135,7 @@ class PackagesController extends \frieren\core\Controller
         }
 
         $script = $this->getScriptPath();
-        $packageName = escapeshellarg($this->request['packageName']);
+        $packageName = escapeshellarg($this->request['packageName'] ?? '');
         $autoremove = !empty($this->request['autoremove']);
         $flags = $autoremove ? '--force-removal-of-dependent-packages --autoremove ' : '';
         \frieren\helper\BackgroundTaskHelper::start(self::TASK_REMOVE, "{$script} remove {$flags}{$packageName}");

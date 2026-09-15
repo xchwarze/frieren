@@ -186,7 +186,8 @@ class ModulesController extends \frieren\core\Controller
 
     public function downloadModule()
     {
-        $this->validateModuleName($this->request['moduleName']);
+        $moduleName = $this->request['moduleName'] ?? '';
+        $this->validateModuleName($moduleName);
 
         if (!self::setupCoreHelper()::hasInternetConnection()) {
             return self::setError('No internet connection available.');
@@ -195,10 +196,8 @@ class ModulesController extends \frieren\core\Controller
         $flagPath = \frieren\helper\BackgroundTaskHelper::getFlagPath(self::TASK_DOWNLOAD);
         @unlink($flagPath);
 
-        $remoteFileName = self::getModuleCompressName(
-            "{$this->request['moduleName']}-{$this->request['version']}"
-        );
-        $localFileName = self::getModuleCompressName($this->request['moduleName']);
+        $remoteFileName = self::getModuleCompressName("{$moduleName}-{$this->request['version']}");
+        $localFileName = self::getModuleCompressName($moduleName);
         $filePath = "/tmp/{$localFileName}";
         $url = sprintf(\DeviceConfig::MODULE_PACKAGE_PATH, \DeviceConfig::MODULE_SERVER_URL, $remoteFileName);
         self::setupCoreHelper()::downloadFile($url, $filePath, $flagPath);
@@ -218,7 +217,7 @@ class ModulesController extends \frieren\core\Controller
 
     public function installModule()
     {
-        $moduleName = $this->request['moduleName'];
+        $moduleName = $this->request['moduleName'] ?? '';
         $this->validateModuleName($moduleName);
         $fileName = self::getModuleCompressName($moduleName);
         $filePath = "/tmp/{$fileName}";
@@ -256,7 +255,7 @@ class ModulesController extends \frieren\core\Controller
 
     public function checkDestination()
     {
-        $moduleName = $this->request['moduleName'];
+        $moduleName = $this->request['moduleName'] ?? '';
         $moduleSize = $this->request['moduleSize'];
         $moduleDirPath = \DeviceConfig::MODULE_ROOT_FOLDER;
         $moduleSDDirPath = \DeviceConfig::MODULE_SD_ROOT_FOLDER;
@@ -273,7 +272,8 @@ class ModulesController extends \frieren\core\Controller
 
     public function removeModule()
     {
-        $this->removeModuleFiles($this->request['moduleName']);
+        $moduleName = $this->request['moduleName'] ?? '';
+        $this->removeModuleFiles($moduleName);
         self::setSuccess();
     }
 
@@ -312,7 +312,7 @@ class ModulesController extends \frieren\core\Controller
     public function pinModule()
     {
         self::setupCoreHelper();
-        $moduleName = $this->request['moduleName'];
+        $moduleName = $this->request['moduleName'] ?? '';
         $status = $this->request['status'];
         $currentSettings = $this->coreHelper::uciGetJson(self::UCI_SIDEBAR, false);
 
