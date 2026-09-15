@@ -47,11 +47,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # cache: 'yarn' is deliberately omitted -- setup-node's cache-path lookup
+      # runs 'yarn' itself before corepack is enabled, which hits the runner's
+      # preinstalled Yarn 1.x and fails the packageManager gate before our own
+      # steps even run.
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'yarn'
-          cache-dependency-path: frieren-front/yarn.lock
 
       - run: corepack enable
       - run: corepack yarn install --immutable
@@ -66,11 +68,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # cache: 'yarn' is deliberately omitted -- setup-node's cache-path lookup
+      # runs 'yarn' itself before corepack is enabled, which hits the runner's
+      # preinstalled Yarn 1.x and fails the packageManager gate before our own
+      # steps even run.
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'yarn'
-          cache-dependency-path: frieren-front/yarn.lock
 
       - run: corepack enable
       - run: corepack yarn install --immutable
