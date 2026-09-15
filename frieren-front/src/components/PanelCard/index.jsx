@@ -27,7 +27,8 @@ import Button from '@src/components/Button';
  * @param {Boolean} [isFetching] - Disables and spins the refresh button while fetching.
  * @param {Boolean} [fill=false] - Make the body a flex column so a trailing child with
  *   `mt-auto` anchors to the bottom (pairs with `className="h-100"` for equal-height rows).
- * @param {ReactNode} children - The content to render inside the panel card.
+ * @param {ReactNode} [children] - The content to render inside the panel card. Callers with a
+ *   loading/error/idle state that renders nothing yet may legitimately pass `null`.
  * @param {Object} rest - Additional props forwarded to the Card root (e.g. className).
  * @return {ReactNode} The rendered panel card component.
  */
@@ -84,7 +85,7 @@ PanelCard.propTypes = {
     isFetching: PropTypes.bool,
     fill: PropTypes.bool,
     className: PropTypes.string,
-    children: PropTypes.node.isRequired,
+    children: PropTypes.node,
 };
 
 export default PanelCard;
