@@ -36,6 +36,6 @@ class HeaderController extends \frieren\core\Controller
             return self::setSuccess();
         }
 
-        self::setError('Not Authenticated');
+        return self::setError('Not Authenticated');
     }
 }
