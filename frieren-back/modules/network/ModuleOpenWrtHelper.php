@@ -318,13 +318,13 @@ class ModuleOpenWrtHelper
             // Gateway is optional: delete the option when empty rather than writing
             // the framework's 'UNSET' sentinel, which netifd would read literally.
             if ($gateway === '') {
-                OpenWrtHelper::exec('uci -q delete ' . escapeshellarg("network.{$name}.gateway"));
+                OpenWrtHelper::uciDelete("network.{$name}.gateway", false);
             } else {
                 OpenWrtHelper::uciSet("network.{$name}.gateway", $gateway, false, false);
             }
 
             // Replace the dns list entirely.
-            OpenWrtHelper::exec('uci -q delete ' . escapeshellarg("network.{$name}.dns"));
+            OpenWrtHelper::uciDelete("network.{$name}.dns", false);
             if (is_array($dns)) {
                 foreach ($dns as $server) {
                     OpenWrtHelper::uciSet("network.{$name}.dns", $server, true, false);
@@ -332,10 +332,10 @@ class ModuleOpenWrtHelper
             }
         } else {
             // Dynamic proto: drop static-only fields so they do not linger.
-            OpenWrtHelper::exec('uci -q delete ' . escapeshellarg("network.{$name}.ipaddr"));
-            OpenWrtHelper::exec('uci -q delete ' . escapeshellarg("network.{$name}.netmask"));
-            OpenWrtHelper::exec('uci -q delete ' . escapeshellarg("network.{$name}.gateway"));
-            OpenWrtHelper::exec('uci -q delete ' . escapeshellarg("network.{$name}.dns"));
+            OpenWrtHelper::uciDelete("network.{$name}.ipaddr", false);
+            OpenWrtHelper::uciDelete("network.{$name}.netmask", false);
+            OpenWrtHelper::uciDelete("network.{$name}.gateway", false);
+            OpenWrtHelper::uciDelete("network.{$name}.dns", false);
         }
 
         OpenWrtHelper::uciCommit();

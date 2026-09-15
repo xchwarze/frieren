@@ -192,6 +192,18 @@ class OpenWrtHelper implements HelperInterface
     }
 
     /**
+     * Deletes a UCI option or section. Best-effort: unlike uciSet, does not throw when the
+     * target does not exist (deleting something already absent is not a failure).
+     *
+     * @param string $settingString The UCI setting string (option or section).
+     * @param bool $autoCommit If true, automatically commits the change.
+     */
+    public static function uciDelete($settingString, $autoCommit = true)
+    {
+        UciConfigHelper::uciDelete($settingString, $autoCommit);
+    }
+
+    /**
      * Serializes a value to JSON and sets it in UCI.
      *
      * @param string $settingString The UCI setting string.

@@ -228,6 +228,24 @@ class UciConfigHelper
     }
 
     /**
+     * Deletes a UCI option or section. `-q` makes this a no-op (not an error) when the
+     * target is already absent, so this never throws — unlike uciSet, "already gone" is
+     * a success state for a delete, not a failure to report.
+     *
+     * @param string $settingString The UCI setting string (option or section).
+     * @param bool $autoCommit If true, automatically commits the change.
+     */
+    public static function uciDelete($settingString, $autoCommit = true)
+    {
+        $settingString = escapeshellarg($settingString);
+        exec("uci -q delete {$settingString}");
+
+        if ($autoCommit) {
+            exec("uci commit {$settingString}");
+        }
+    }
+
+    /**
      * Retrieves and deserializes a JSON value from UCI.
      *
      * @param string $uciString The UCI string to retrieve.

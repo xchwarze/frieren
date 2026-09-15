@@ -131,4 +131,42 @@ class UciConfigHelperTest extends TestCase
 
         $this->assertNull(UciConfigHelper::uciGet('network.missing', false));
     }
+
+    public function testUciDeleteRunsAQuietDeleteAndCommitsByDefault(): void
+    {
+        $captured = [];
+        $exec = $this->getFunctionMock(__NAMESPACE__, 'exec');
+        $exec->expects($this->exactly(2))->willReturnCallback(function ($command) use (&$captured) {
+            $captured[] = $command;
+        });
+
+        UciConfigHelper::uciDelete('wireless.wifinet0.bssid');
+
+        $this->assertSame('uci -q delete ' . escapeshellarg('wireless.wifinet0.bssid'), $captured[0]);
+        $this->assertSame('uci commit ' . escapeshellarg('wireless.wifinet0.bssid'), $captured[1]);
+    }
+
+    public function testUciDeleteSkipsTheCommitWhenAutoCommitIsFalse(): void
+    {
+        $captured = [];
+        $exec = $this->getFunctionMock(__NAMESPACE__, 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command) use (&$captured) {
+            $captured[] = $command;
+        });
+
+        UciConfigHelper::uciDelete('wireless.wifinet0.bssid', false);
+
+        $this->assertSame(['uci -q delete ' . escapeshellarg('wireless.wifinet0.bssid')], $captured);
+    }
+
+    public function testUciDeleteDoesNotThrowWhenTheTargetDoesNotExist(): void
+    {
+        $exec = $this->getFunctionMock(__NAMESPACE__, 'exec');
+        $exec->expects($this->exactly(2))->willReturn(null);
+
+        // -q makes "already gone" a success state, not a failure — unlike uciSet, this
+        // must never throw just because exec's own return/exit state looks like a miss.
+        UciConfigHelper::uciDelete('wireless.wifinet0.bssid');
+        $this->addToAssertionCount(1);
+    }
 }
