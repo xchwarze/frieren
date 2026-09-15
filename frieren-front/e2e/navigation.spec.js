@@ -48,9 +48,13 @@ test.describe('Navigation', () => {
     });
 
     test('header has terminal and menu buttons', async ({ page }) => {
+        // The terminal button is gated behind an async settings fetch (useGetSectionData),
+        // so wait for it explicitly before counting — otherwise this races the query and
+        // undercounts on a fast page load.
+        await expect(page.getByRole('button', { name: 'Open terminal' })).toBeVisible();
+
         const headerButtons = page.locator('nav').getByRole('button');
-        const count = await headerButtons.count();
-        expect(count).toBeGreaterThanOrEqual(2);
+        await expect(headerButtons).toHaveCount(2);
     });
 
     test('direct URL navigation works', async ({ page }) => {

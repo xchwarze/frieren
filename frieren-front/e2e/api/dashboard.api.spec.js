@@ -30,6 +30,8 @@ test.describe('API: Dashboard', () => {
 
     test('getNews returns news array', async ({ api }) => {
         const { response, json } = await api.post('dashboard', 'getNews');
+        test.skip(json.error === 'No internet connection available.', 'Device has no internet connection');
+
         expect(response.ok()).toBeTruthy();
         expect(json).not.toHaveProperty('error');
         expect(json).toHaveProperty('news');

@@ -29,6 +29,8 @@ test.describe('API: Modules', () => {
 
     test('getAvailableModules returns remote catalog', async ({ api }) => {
         const { response, json } = await api.post('modules', 'getAvailableModules');
+        test.skip(json.error === 'No internet connection available.', 'Device has no internet connection');
+
         expect(response.ok()).toBeTruthy();
         expect(json).not.toHaveProperty('error');
     });
