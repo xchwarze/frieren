@@ -12,12 +12,18 @@ import PanelTable from '@src/components/PanelTable';
 import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import Button from '@src/components/Button';
 import ActionButtons from '@src/components/ActionButtons';
+import ConfirmationModal from '@src/components/ConfirmationModal';
 import useGetInterfaces from '@src/features/network/hooks/useGetInterfaces.js';
 import useToggleInterface from '@src/features/network/hooks/useToggleInterface.js';
+import useRemoveInterface from '@src/features/network/hooks/useRemoveInterface.js';
 import InterfaceFormModal from '@src/features/network/components/InterfaceFormModal';
 
+const HIDDEN_FORM_STATE = { show: false, iface: null };
+
 /**
- * Lists network interfaces with status, addressing and up/down/edit controls.
+ * Lists network interfaces with status, addressing and add/edit/restart/toggle/delete
+ * controls. No protected-interface list is hardcoded here: the delete confirmation
+ * naming the interface is the safety net for this root-only, LAN-only admin panel.
  *
  * @return {ReactElement} The InterfacesCard component.
  */
@@ -25,15 +31,26 @@ const InterfacesCard = () => {
     const interfacesQuery = useGetInterfaces();
     const { isSuccess } = interfacesQuery;
     const { mutate: toggleInterface, isPending: isToggling } = useToggleInterface();
+    const { mutateAsync: removeInterface, isPending: isRemoving } = useRemoveInterface();
 
     const [togglingName, setTogglingName] = useState(null);
-    const [editing, setEditing] = useState(null);
+    const [formState, setFormState] = useState(HIDDEN_FORM_STATE);
+    const [pendingDelete, setPendingDelete] = useState(null);
 
     const interfaces = interfacesQuery?.data?.interfaces ?? [];
 
-    const handleToggle = (iface) => {
+    const handleToggle = (iface, action) => {
         setTogglingName(iface.name);
-        toggleInterface({ name: iface.name, action: iface.up ? 'down' : 'up' });
+        toggleInterface({ name: iface.name, action });
+    };
+
+    const confirmDelete = async () => {
+        const name = pendingDelete?.name;
+        try {
+            await removeInterface({ name });
+        } finally {
+            setPendingDelete(null);
+        }
     };
 
     const renderContent = () => {
@@ -41,7 +58,7 @@ const InterfacesCard = () => {
             return (
                 <SkeletonTable
                     headers={['Name', 'Proto', 'IP / Netmask', 'Gateway', 'Status', 'Device', 'Uptime', 'Action']}
-                    widths={[90, 60, 160, 110, 70, 90, 80, 150]}
+                    widths={[90, 60, 160, 110, 70, 90, 80, 220]}
                 />
             );
         }
@@ -89,7 +106,7 @@ const InterfacesCard = () => {
                                             size={'sm'}
                                             title={'Edit'}
                                             disabled={busy}
-                                            onClick={() => setEditing(iface)}
+                                            onClick={() => setFormState({ show: true, iface })}
                                         />
                                         <Button
                                             icon={iface.up ? 'toggle-right' : 'toggle-left'}
@@ -98,7 +115,23 @@ const InterfacesCard = () => {
                                             title={iface.up ? 'Bring down' : 'Bring up'}
                                             loading={busy}
                                             disabled={busy}
-                                            onClick={() => handleToggle(iface)}
+                                            onClick={() => handleToggle(iface, iface.up ? 'down' : 'up')}
+                                        />
+                                        <Button
+                                            icon={'refresh-cw'}
+                                            variant={'outline-secondary'}
+                                            size={'sm'}
+                                            title={'Restart'}
+                                            disabled={busy}
+                                            onClick={() => handleToggle(iface, 'restart')}
+                                        />
+                                        <Button
+                                            icon={'trash-2'}
+                                            variant={'outline-danger'}
+                                            size={'sm'}
+                                            title={'Delete'}
+                                            disabled={busy}
+                                            onClick={() => setPendingDelete(iface)}
                                         />
                                     </ActionButtons>
                                 </td>
@@ -123,12 +156,33 @@ const InterfacesCard = () => {
             refetch={interfacesQuery.refetch}
             isFetching={interfacesQuery.isFetching}
         >
+            <div className={'d-flex justify-content-end mb-3'}>
+                <Button
+                    icon={'plus'}
+                    label={'Add'}
+                    onClick={() => setFormState({ show: true, iface: null })}
+                />
+            </div>
+
             {renderContent()}
 
             <InterfaceFormModal
-                show={editing !== null}
-                onHide={() => setEditing(null)}
-                iface={editing}
+                show={formState.show}
+                onHide={() => setFormState(HIDDEN_FORM_STATE)}
+                iface={formState.iface}
+            />
+
+            <ConfirmationModal
+                show={pendingDelete !== null}
+                onHide={() => setPendingDelete(null)}
+                onConfirm={confirmDelete}
+                isConfirmLoading={isRemoving}
+                title={'Delete interface'}
+                description={pendingDelete && (
+                    <>
+                        Remove the interface <code>{pendingDelete.name}</code>? This cannot be undone.
+                    </>
+                )}
             />
         </PanelCard>
     );

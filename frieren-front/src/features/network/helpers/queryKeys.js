@@ -9,3 +9,4 @@ export const NETWORK_GET_INTERFACES = 'network-get-interfaces';
 export const NETWORK_GET_DHCP_LEASES = 'network-get-dhcp-leases';
 export const NETWORK_GET_STATIC_LEASES = 'network-get-static-leases';
 export const NETWORK_GET_ARP_TABLE = 'network-get-arp-table';
+export const NETWORK_GET_AVAILABLE_DEVICES = 'network-get-available-devices';

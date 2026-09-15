@@ -20,7 +20,7 @@ const useSetInterface = () => {
     const queryClient = useQueryClient();
 
     return useAuthenticatedMutation({
-        mutationFn: ({ name, proto, ipaddr, netmask, gateway, dns }) => fetchPost({
+        mutationFn: ({ name, proto, ipaddr, netmask, gateway, dns, mtu, macaddr, peerdns }) => fetchPost({
             module: 'network',
             action: 'setInterface',
             name,
@@ -30,6 +30,9 @@ const useSetInterface = () => {
             gateway,
             // Backend expects dns as an array; the form holds a space/comma-separated string.
             dns: Array.isArray(dns) ? dns : (dns || '').split(/[\s,]+/).filter(Boolean),
+            mtu,
+            macaddr,
+            peerdns,
         }),
         onSuccess: (data, { name }) => {
             toast.success(`${name} updated`);

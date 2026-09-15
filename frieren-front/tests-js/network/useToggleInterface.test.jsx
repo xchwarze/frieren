@@ -77,6 +77,14 @@ describe('useToggleInterface', () => {
         await waitFor(() => expect(toast.success).toHaveBeenCalledWith('wlan0 brought down'));
     });
 
+    it('toasts a "restarted" message instead of "brought restart" for the restart action', async () => {
+        const { result } = renderUseToggleInterface();
+
+        await result.current.mutateAsync({ name: 'wlan0', action: 'restart' });
+
+        await waitFor(() => expect(toast.success).toHaveBeenCalledWith('wlan0 restarted'));
+    });
+
     it('toasts a generic failure message when the request fails', async () => {
         fetchPost.mockRejectedValue(new Error('boom'));
         const { result } = renderUseToggleInterface();

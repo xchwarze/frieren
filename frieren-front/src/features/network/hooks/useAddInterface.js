@@ -9,35 +9,40 @@ import { toast } from 'react-toastify';
 
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
-import { sleep } from '@src/helpers/actionsHelper.js';
 import { NETWORK_GET_INTERFACES } from '@src/features/network/helpers/queryKeys.js';
 
 /**
- * Returns a mutation hook to bring a network interface up or down.
+ * Returns a mutation hook to create a new network interface.
  *
  * @return {Object} The mutation object.
  */
-const useToggleInterface = () => {
+const useAddInterface = () => {
     const queryClient = useQueryClient();
 
     return useAuthenticatedMutation({
-        // The backend routes on `action`, so the contract's `action: 'up'|'down'`
-        // param is forwarded under `state` to avoid colliding with the endpoint name.
-        mutationFn: ({ name, action }) => fetchPost({
+        mutationFn: ({ name, device, proto, ipaddr, netmask, gateway, dns, mtu, macaddr, peerdns }) => fetchPost({
             module: 'network',
-            action: 'toggleInterface',
+            action: 'addInterface',
             name,
-            state: action,
+            device,
+            proto,
+            ipaddr,
+            netmask,
+            gateway,
+            // Backend expects dns as an array; the form holds a space/comma-separated string.
+            dns: Array.isArray(dns) ? dns : (dns || '').split(/[\s,]+/).filter(Boolean),
+            mtu,
+            macaddr,
+            peerdns,
         }),
-        onSuccess: async (data, { name, action }) => {
-            toast.success(`${name} ${action === 'restart' ? 'restarted' : `brought ${action}`}`);
-            await sleep(1500);
+        onSuccess: (data, { name }) => {
+            toast.success(`${name} created`);
             queryClient.invalidateQueries({ queryKey: [NETWORK_GET_INTERFACES] });
         },
         onError: () => {
-            toast.error('Failed to toggle interface');
+            toast.error('Failed to create interface');
         },
     });
 };
 
-export default useToggleInterface;
+export default useAddInterface;

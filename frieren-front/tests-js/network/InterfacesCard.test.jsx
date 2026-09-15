@@ -3,9 +3,10 @@
  * Copyright (C) 2026 DSR! <xchwarze@gmail.com>
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  *
- * `useSetInterface` is mocked purely so the real InterfaceFormModal/InterfaceForm can mount
- * during the edit flow without a QueryClientProvider — their own submit/validation behavior
- * is covered by InterfaceForm.test.jsx, not re-tested here.
+ * `useSetInterface`/`useAddInterface`/`useGetAvailableDevices` are mocked purely so the real
+ * InterfaceFormModal/InterfaceForm (and its add-mode-only DeviceField) can mount during the
+ * add/edit flow without a QueryClientProvider — their own submit/validation behavior is
+ * covered by InterfaceForm.test.jsx, not re-tested here.
  */
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 
@@ -13,10 +14,16 @@ import InterfacesCard from '@src/features/network/components/InterfacesCard/inde
 import useGetInterfaces from '@src/features/network/hooks/useGetInterfaces.js';
 import useToggleInterface from '@src/features/network/hooks/useToggleInterface.js';
 import useSetInterface from '@src/features/network/hooks/useSetInterface.js';
+import useAddInterface from '@src/features/network/hooks/useAddInterface.js';
+import useRemoveInterface from '@src/features/network/hooks/useRemoveInterface.js';
+import useGetAvailableDevices from '@src/features/network/hooks/useGetAvailableDevices.js';
 
 vi.mock('@src/features/network/hooks/useGetInterfaces.js', () => ({ default: vi.fn() }));
 vi.mock('@src/features/network/hooks/useToggleInterface.js', () => ({ default: vi.fn() }));
 vi.mock('@src/features/network/hooks/useSetInterface.js', () => ({ default: vi.fn() }));
+vi.mock('@src/features/network/hooks/useAddInterface.js', () => ({ default: vi.fn() }));
+vi.mock('@src/features/network/hooks/useRemoveInterface.js', () => ({ default: vi.fn() }));
+vi.mock('@src/features/network/hooks/useGetAvailableDevices.js', () => ({ default: vi.fn() }));
 
 const interfaces = [
     { name: 'lan', proto: 'static', ipaddr: '192.168.1.1', netmask: '255.255.255.0', gateway: '', up: true, device: 'br-lan', uptime: '1d 2h' },
@@ -26,10 +33,12 @@ const interfaces = [
 const rowFor = (name) => screen.getByText(name).closest('tr');
 
 const toggleMutate = vi.fn();
+const removeInterfaceMutate = vi.fn();
 
 describe('InterfacesCard', () => {
     beforeEach(() => {
         toggleMutate.mockReset();
+        removeInterfaceMutate.mockReset().mockResolvedValue({});
         useGetInterfaces.mockReturnValue({
             data: { interfaces },
             isSuccess: true,
@@ -38,6 +47,9 @@ describe('InterfacesCard', () => {
         });
         useToggleInterface.mockReturnValue({ mutate: toggleMutate, isPending: false });
         useSetInterface.mockReturnValue({ mutateAsync: vi.fn().mockResolvedValue({}) });
+        useAddInterface.mockReturnValue({ mutateAsync: vi.fn().mockResolvedValue({}) });
+        useRemoveInterface.mockReturnValue({ mutateAsync: removeInterfaceMutate, isPending: false });
+        useGetAvailableDevices.mockReturnValue({ data: { devices: ['br-lan', 'eth0'] }, isError: false });
     });
 
     it('renders each interface row with its addressing, gateway fallback and status', () => {
@@ -88,6 +100,14 @@ describe('InterfacesCard', () => {
         expect(toggleMutate).toHaveBeenCalledWith({ name: 'wan', action: 'up' });
     });
 
+    it('restarts an interface', () => {
+        render(<InterfacesCard />);
+
+        fireEvent.click(within(rowFor('lan')).getByRole('button', { name: 'Restart' }));
+
+        expect(toggleMutate).toHaveBeenCalledWith({ name: 'lan', action: 'restart' });
+    });
+
     it('only disables the row being toggled, not every interface', () => {
         useToggleInterface.mockReturnValue({ mutate: toggleMutate, isPending: true });
         render(<InterfacesCard />);
@@ -122,5 +142,35 @@ describe('InterfacesCard', () => {
         // The modal fades out (react-bootstrap Transition), so it briefly stays in the
         // DOM after the click.
         await waitFor(() => expect(screen.queryByText('Edit Interface')).not.toBeInTheDocument());
+    });
+
+    it('opens the Add Interface modal with blank defaults from the Add button', () => {
+        render(<InterfacesCard />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+
+        expect(screen.getByText('Add Interface')).toBeInTheDocument();
+        expect(screen.getByLabelText('Interface Name')).toHaveValue('');
+        expect(screen.getByLabelText('Device')).toBeInTheDocument();
+    });
+
+    it('deletes an interface after confirming', async () => {
+        render(<InterfacesCard />);
+
+        fireEvent.click(within(rowFor('lan')).getByRole('button', { name: 'Delete' }));
+        expect(screen.getByText('Delete interface')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+        await waitFor(() => expect(removeInterfaceMutate).toHaveBeenCalledWith({ name: 'lan' }));
+    });
+
+    it('does not delete when the confirmation is cancelled', () => {
+        render(<InterfacesCard />);
+
+        fireEvent.click(within(rowFor('lan')).getByRole('button', { name: 'Delete' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+        expect(removeInterfaceMutate).not.toHaveBeenCalled();
     });
 });

@@ -73,6 +73,25 @@ describe('useSetInterface', () => {
         expect(fetchPost).toHaveBeenCalledWith(expect.objectContaining({ dns: [] }));
     });
 
+    it('passes mtu, macaddr and peerdns through to the request', async () => {
+        const { result } = renderUseSetInterface();
+
+        await result.current.mutateAsync({
+            name: 'wan',
+            proto: 'dhcp',
+            dns: '',
+            mtu: '1500',
+            macaddr: 'AA:BB:CC:DD:EE:FF',
+            peerdns: false,
+        });
+
+        expect(fetchPost).toHaveBeenCalledWith(expect.objectContaining({
+            mtu: '1500',
+            macaddr: 'AA:BB:CC:DD:EE:FF',
+            peerdns: false,
+        }));
+    });
+
     it('toasts success naming the interface and invalidates the interfaces list', async () => {
         const { result, queryClient } = renderUseSetInterface();
         const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');

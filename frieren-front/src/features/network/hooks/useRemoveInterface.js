@@ -9,35 +9,30 @@ import { toast } from 'react-toastify';
 
 import useAuthenticatedMutation from '@src/hooks/useAuthenticatedMutation.js';
 import { fetchPost } from '@src/services/fetchService.js';
-import { sleep } from '@src/helpers/actionsHelper.js';
 import { NETWORK_GET_INTERFACES } from '@src/features/network/helpers/queryKeys.js';
 
 /**
- * Returns a mutation hook to bring a network interface up or down.
+ * Returns a mutation hook to delete a network interface by name.
  *
  * @return {Object} The mutation object.
  */
-const useToggleInterface = () => {
+const useRemoveInterface = () => {
     const queryClient = useQueryClient();
 
     return useAuthenticatedMutation({
-        // The backend routes on `action`, so the contract's `action: 'up'|'down'`
-        // param is forwarded under `state` to avoid colliding with the endpoint name.
-        mutationFn: ({ name, action }) => fetchPost({
+        mutationFn: ({ name }) => fetchPost({
             module: 'network',
-            action: 'toggleInterface',
+            action: 'removeInterface',
             name,
-            state: action,
         }),
-        onSuccess: async (data, { name, action }) => {
-            toast.success(`${name} ${action === 'restart' ? 'restarted' : `brought ${action}`}`);
-            await sleep(1500);
+        onSuccess: (data, { name }) => {
+            toast.success(`${name} removed`);
             queryClient.invalidateQueries({ queryKey: [NETWORK_GET_INTERFACES] });
         },
         onError: () => {
-            toast.error('Failed to toggle interface');
+            toast.error('Failed to remove interface');
         },
     });
 };
 
-export default useToggleInterface;
+export default useRemoveInterface;

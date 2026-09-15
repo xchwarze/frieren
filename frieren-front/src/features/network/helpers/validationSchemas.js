@@ -12,12 +12,29 @@ const requiredForStatic = (message) => yup.string().when('proto', {
     otherwise: (schema) => schema.notRequired(),
 });
 
+const MTU_MIN = 576;
+const MTU_MAX = 9216;
+
 export const interfaceSchema = yup.object({
+    name: yup.string()
+        .required('Interface name is mandatory')
+        .matches(/^[a-zA-Z0-9_-]+$/, 'Invalid interface name'),
+    device: yup.string().required('Device is mandatory'),
     proto: yup.string().required('Protocol is mandatory'),
     ipaddr: requiredForStatic('IP address is mandatory'),
     netmask: requiredForStatic('Netmask is mandatory'),
     gateway: yup.string().notRequired(),
     dns: yup.string().notRequired(),
+    mtu: yup.string()
+        .notRequired()
+        .matches(/^\d+$/, { message: 'Invalid MTU', excludeEmptyString: true })
+        .test('mtu-range', `MTU must be between ${MTU_MIN} and ${MTU_MAX}`, (value) => (
+            !value || (Number(value) >= MTU_MIN && Number(value) <= MTU_MAX)
+        )),
+    macaddr: yup.string()
+        .notRequired()
+        .matches(/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/, { message: 'Invalid MAC address', excludeEmptyString: true }),
+    peerdns: yup.boolean(),
 });
 
 export const staticLeaseSchema = yup.object({

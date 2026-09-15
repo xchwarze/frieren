@@ -6,8 +6,11 @@
 import { interfaceSchema, staticLeaseSchema } from '@src/features/network/helpers/validationSchemas.js';
 
 describe('interfaceSchema', () => {
+    const validName = 'wan';
+    const validDevice = 'br-lan';
+
     it('requires ipaddr and netmask only for the static protocol', async () => {
-        const values = { proto: 'static', ipaddr: '', netmask: '', gateway: '', dns: '' };
+        const values = { name: validName, device: validDevice, proto: 'static', ipaddr: '', netmask: '', gateway: '', dns: '' };
 
         expect(await interfaceSchema.isValid(values)).toBe(false);
 
@@ -16,19 +19,21 @@ describe('interfaceSchema', () => {
     });
 
     it('does not require ipaddr/netmask for dhcp', async () => {
-        const values = { proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '' };
+        const values = { name: validName, device: validDevice, proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '' };
 
         expect(await interfaceSchema.isValid(values)).toBe(true);
     });
 
     it('does not require ipaddr/netmask for dhcpv6 either', async () => {
-        const values = { proto: 'dhcpv6', ipaddr: '', netmask: '', gateway: '', dns: '' };
+        const values = { name: validName, device: validDevice, proto: 'dhcpv6', ipaddr: '', netmask: '', gateway: '', dns: '' };
 
         expect(await interfaceSchema.isValid(values)).toBe(true);
     });
 
     it('accepts a fully filled static configuration', async () => {
         const values = {
+            name: validName,
+            device: validDevice,
             proto: 'static',
             ipaddr: '192.168.1.1',
             netmask: '255.255.255.0',
@@ -40,13 +45,15 @@ describe('interfaceSchema', () => {
     });
 
     it('always requires a protocol, regardless of the other fields', async () => {
-        const values = { proto: '', ipaddr: '', netmask: '', gateway: '', dns: '' };
+        const values = { name: validName, device: validDevice, proto: '', ipaddr: '', netmask: '', gateway: '', dns: '' };
 
         expect(await interfaceSchema.isValid(values)).toBe(false);
     });
 
     it('never requires gateway or dns, even for static', async () => {
         const values = {
+            name: validName,
+            device: validDevice,
             proto: 'static',
             ipaddr: '192.168.1.1',
             netmask: '255.255.255.0',
@@ -55,6 +62,92 @@ describe('interfaceSchema', () => {
         };
 
         expect(await interfaceSchema.isValid(values)).toBe(true);
+    });
+
+    it('requires a name', async () => {
+        const values = { name: '', device: validDevice, proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '' };
+
+        expect(await interfaceSchema.isValid(values)).toBe(false);
+
+        const error = await interfaceSchema.validate(values, { abortEarly: false }).catch((e) => e);
+        expect(error.errors).toEqual(expect.arrayContaining(['Interface name is mandatory']));
+    });
+
+    it('rejects a name with characters outside the whitelist', async () => {
+        const values = { name: 'lan; rm -rf /', device: validDevice, proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '' };
+
+        expect(await interfaceSchema.isValid(values)).toBe(false);
+    });
+
+    it('accepts a name with letters, digits, underscores and hyphens', async () => {
+        const values = { name: 'guest_wifi-1', device: validDevice, proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '' };
+
+        expect(await interfaceSchema.isValid(values)).toBe(true);
+    });
+
+    it('requires a device', async () => {
+        const values = { name: validName, device: '', proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '' };
+
+        expect(await interfaceSchema.isValid(values)).toBe(false);
+
+        const error = await interfaceSchema.validate(values, { abortEarly: false }).catch((e) => e);
+        expect(error.errors).toEqual(expect.arrayContaining(['Device is mandatory']));
+    });
+
+    it('does not require mtu, macaddr or peerdns', async () => {
+        const values = { name: validName, device: validDevice, proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '' };
+
+        expect(await interfaceSchema.isValid(values)).toBe(true);
+    });
+
+    it('accepts a valid mtu and macaddr', async () => {
+        const values = {
+            name: validName,
+            device: validDevice,
+            proto: 'dhcp',
+            ipaddr: '',
+            netmask: '',
+            gateway: '',
+            dns: '',
+            mtu: '1500',
+            macaddr: 'AA:BB:CC:DD:EE:FF',
+            peerdns: false,
+        };
+
+        expect(await interfaceSchema.isValid(values)).toBe(true);
+    });
+
+    it('only validates macaddr format when it is non-empty', async () => {
+        const values = { name: validName, device: validDevice, proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '', macaddr: '' };
+
+        expect(await interfaceSchema.isValid(values)).toBe(true);
+    });
+
+    it('rejects a malformed macaddr', async () => {
+        const values = { name: validName, device: validDevice, proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '', macaddr: 'not-a-mac' };
+
+        expect(await interfaceSchema.isValid(values)).toBe(false);
+    });
+
+    it('only validates mtu format/range when it is non-empty', async () => {
+        const values = { name: validName, device: validDevice, proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '', mtu: '' };
+
+        expect(await interfaceSchema.isValid(values)).toBe(true);
+    });
+
+    it('rejects a non-numeric mtu', async () => {
+        const values = { name: validName, device: validDevice, proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '', mtu: 'abc' };
+
+        expect(await interfaceSchema.isValid(values)).toBe(false);
+    });
+
+    it.each([
+        ['too small', '100'],
+        ['too large', '99999'],
+    ])('rejects an out-of-range mtu (%s)', async (_label, mtu) => {
+        const values = { name: validName, device: validDevice, proto: 'dhcp', ipaddr: '', netmask: '', gateway: '', dns: '', mtu };
+
+        expect(await interfaceSchema.isValid(values)).toBe(false);
     });
 });
 
