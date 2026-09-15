@@ -375,6 +375,8 @@ class WirelessControllerTest extends TestCase
                 'htmode' => 'HT20',
                 'country' => null,
                 'disabled' => null,
+                'cell_density' => null,
+                'distance' => null,
             ],
             'available' => [
                 'channels' => [['channel' => 1, 'mhz' => 2412, 'restricted' => false]],
@@ -911,6 +913,7 @@ class WirelessControllerTest extends TestCase
             'disabled' => '0',
             'hidden' => '0',
             'bssid' => '',
+            'ieee80211w' => '',
             'isManagement' => '1',
             'isRecon' => '0',
         ], $result['data']);
