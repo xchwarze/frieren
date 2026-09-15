@@ -148,17 +148,20 @@
         {
           "name": "boot",
           "enabled": true,
-          "running": false
+          "running": false,
+          "critical": false
         },
         {
           "name": "bootcount",
           "enabled": true,
-          "running": false
+          "running": false,
+          "critical": false
         },
         {
           "name": "cron",
           "enabled": true,
-          "running": true
+          "running": true,
+          "critical": false
         }
       ]
     }

@@ -16,6 +16,24 @@ class ModuleOpenWrtHelper
     const INIT_DIR = '/etc/init.d';
 
     /**
+     * Services whose loss can lock the operator out of the device (LAN, SSH,
+     * web UI, firewall). Every known role-equivalent init.d script name is
+     * listed because which implementation a build ships varies by router:
+     * dropbear vs openssh, uhttpd vs nginx/lighttpd. The nftables-based
+     * `firewall4` package still installs its init script as `firewall`, so
+     * no separate entry is needed for it.
+     */
+    const CRITICAL_SERVICES = [
+        'network',
+        'dropbear',
+        'sshd',
+        'uhttpd',
+        'nginx',
+        'lighttpd',
+        'firewall',
+    ];
+
+    /**
      * Get the list of USB devices connected to the system.
      *
      * @return array|false An array of USB device objects, or `false` if the command fails.
@@ -126,7 +144,7 @@ class ModuleOpenWrtHelper
      * Lists every init.d service with its enabled (boot) and running state,
      * sorted by name.
      *
-     * @return array<int, array{name:string, enabled:bool, running:bool}>
+     * @return array<int, array{name:string, enabled:bool, running:bool, critical:bool}>
      */
     public static function listServices()
     {
@@ -150,6 +168,7 @@ class ModuleOpenWrtHelper
                 'name' => $name,
                 'enabled' => isset($enabled[$name]),
                 'running' => isset($running[$name]),
+                'critical' => in_array($name, self::CRITICAL_SERVICES, true),
             ];
         }
 

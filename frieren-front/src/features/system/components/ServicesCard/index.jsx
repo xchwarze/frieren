@@ -23,10 +23,6 @@ import useGetServices from '@src/features/system/hooks/useGetServices.js';
 import useControlService from '@src/features/system/hooks/useControlService.js';
 import useToggleEnabled from '@src/features/system/hooks/useToggleEnabled.js';
 
-// Stopping/disabling these can lock the admin out of the device, so a disruptive
-// action against them is gated behind a confirmation modal.
-const CRITICAL_SERVICES = ['network', 'dropbear', 'uhttpd', 'firewall'];
-
 /**
  * Lists init.d services with boot/running state and start/stop/restart controls.
  *
@@ -76,7 +72,7 @@ const ServicesCard = () => {
     const isDisruptive = (action) => action.command !== 'start' && !(action.type === 'toggle' && action.enabled);
 
     const requestAction = (action) => {
-        if (CRITICAL_SERVICES.includes(action.name) && isDisruptive(action)) {
+        if (action.critical && isDisruptive(action)) {
             setPending(action);
 
             return;
@@ -125,13 +121,12 @@ const ServicesCard = () => {
                     <tbody>
                         {pageData.map((svc) => {
                             const busy = busyName === svc.name;
-                            const critical = CRITICAL_SERVICES.includes(svc.name);
 
                             return (
                                 <tr key={svc.name}>
                                     <td>
                                         <code>{svc.name}</code>
-                                        {critical && (
+                                        {svc.critical && (
                                             <Badge bg={'warning'} text={'dark'} className={'ms-2'}>
                                                 critical
                                             </Badge>
@@ -145,6 +140,7 @@ const ServicesCard = () => {
                                             onChange={() => requestAction({
                                                 type: 'toggle',
                                                 name: svc.name,
+                                                critical: svc.critical,
                                                 enabled: !svc.enabled,
                                             })}
                                             aria-label={`Toggle ${svc.name} on boot`}
@@ -163,7 +159,7 @@ const ServicesCard = () => {
                                                 size={'sm'}
                                                 title={'Start'}
                                                 loading={busy}
-                                                onClick={() => requestAction({ type: 'control', name: svc.name, command: 'start' })}
+                                                onClick={() => requestAction({ type: 'control', name: svc.name, critical: svc.critical, command: 'start' })}
                                             />
                                             <Button
                                                 icon={'square'}
@@ -171,7 +167,7 @@ const ServicesCard = () => {
                                                 size={'sm'}
                                                 title={'Stop'}
                                                 disabled={busy}
-                                                onClick={() => requestAction({ type: 'control', name: svc.name, command: 'stop' })}
+                                                onClick={() => requestAction({ type: 'control', name: svc.name, critical: svc.critical, command: 'stop' })}
                                             />
                                             <Button
                                                 icon={'refresh-cw'}
@@ -179,7 +175,7 @@ const ServicesCard = () => {
                                                 size={'sm'}
                                                 title={'Restart'}
                                                 disabled={busy}
-                                                onClick={() => requestAction({ type: 'control', name: svc.name, command: 'restart' })}
+                                                onClick={() => requestAction({ type: 'control', name: svc.name, critical: svc.critical, command: 'restart' })}
                                             />
                                         </ActionButtons>
                                     </td>

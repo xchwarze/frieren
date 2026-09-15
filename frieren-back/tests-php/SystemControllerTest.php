@@ -307,10 +307,45 @@ class SystemControllerTest extends TestCase
         $this->assertNull($result['error']);
         $this->assertSame([
             'services' => [
-                ['name' => 'cron', 'enabled' => true, 'running' => false],
-                ['name' => 'dropbear', 'enabled' => false, 'running' => true],
+                ['name' => 'cron', 'enabled' => true, 'running' => false, 'critical' => false],
+                ['name' => 'dropbear', 'enabled' => false, 'running' => true, 'critical' => true],
             ],
         ], $result['data']);
+    }
+
+    /**
+     * The panel's "confirm before stopping this" gate used to be a hardcoded
+     * front-end list (network/dropbear/uhttpd/firewall), so a build shipping
+     * openssh, nginx or nftables got no warning at all before the operator cut
+     * their own SSH/web/firewall access. The flag is now computed server-side
+     * over every known role-equivalent init script name.
+     */
+    public function testGetServicesFlagsRoleEquivalentServicesOfNonDefaultBuildsAsCritical(): void
+    {
+        $scandir = $this->getFunctionMock(__NAMESPACE__, 'scandir');
+        $scandir->expects($this->once())->willReturn(['.', '..', 'sshd', 'nginx', 'cron']);
+
+        $isFile = $this->getFunctionMock(__NAMESPACE__, 'is_file');
+        $isFile->expects($this->exactly(3))->willReturn(true);
+
+        $glob = $this->getFunctionMock(__NAMESPACE__, 'glob');
+        $glob->expects($this->once())->willReturn([]);
+
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $output = [json_encode([])];
+            $retval = 0;
+        });
+
+        $result = $this->dispatch(SystemController::class, 'system', ['action' => 'getServices']);
+
+        $this->assertNull($result['error']);
+        $critical = array_column($result['data']['services'], 'critical', 'name');
+        $this->assertSame([
+            'cron' => false,
+            'nginx' => true,
+            'sshd' => true,
+        ], $critical);
     }
 
     public function testGetServicesReturnsAnEmptyListWhenScandirFails(): void
