@@ -421,6 +421,67 @@ class WirelessControllerTest extends TestCase
         $this->assertStringStartsWith('/usr/bin/nohup ', array_values($reloadCommand)[0]);
     }
 
+    public function testSetRadioConfigWritesCellDensityAndDistance(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            $output = [];
+            if (str_contains($command, "uci -q get 'wireless.radio0'")) {
+                return 'wifi-device';
+            }
+
+            return '';
+        });
+
+        $result = $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'setRadioConfig',
+            'radio' => 'radio0',
+            'channel' => '6',
+            'txpower' => 20,
+            'htmode' => 'HT40',
+            'country' => 'US',
+            'disabled' => 0,
+            'cell_density' => 2,
+            'distance' => 500,
+        ]);
+
+        $this->assertNull($result['error']);
+        $this->assertContains('uci set ' . escapeshellarg('wireless.radio0.cell_density') . '=' . escapeshellarg('2'), $capturedCommands);
+        $this->assertContains('uci set ' . escapeshellarg('wireless.radio0.distance') . '=' . escapeshellarg('500'), $capturedCommands);
+    }
+
+    public function testSetRadioConfigDefaultsCellDensityAndDistanceToZeroWhenOmitted(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            $output = [];
+            if (str_contains($command, "uci -q get 'wireless.radio0'")) {
+                return 'wifi-device';
+            }
+
+            return '';
+        });
+
+        $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'setRadioConfig',
+            'radio' => 'radio0',
+            'channel' => '6',
+            'txpower' => 20,
+            'htmode' => 'HT40',
+            'country' => 'US',
+            'disabled' => 0,
+        ]);
+
+        $this->assertContains('uci set ' . escapeshellarg('wireless.radio0.cell_density') . '=' . escapeshellarg('0'), $capturedCommands);
+        $this->assertContains('uci set ' . escapeshellarg('wireless.radio0.distance') . '=' . escapeshellarg('0'), $capturedCommands);
+    }
+
     public function testSetRadioConfigThrowsWhenTheRadioDoesNotExistInUci(): void
     {
         $exec = $this->getFunctionMock('frieren\helper', 'exec');
@@ -631,6 +692,101 @@ class WirelessControllerTest extends TestCase
         $this->assertStringContainsString('radio0rmrf', $deviceCommand[0]);
     }
 
+    public function testAddInterfaceWritesIeee80211wForApModeOnly(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            if (str_contains($command, "'uci' 'get'")) {
+                $output = [json_encode(['values' => []])];
+                return '';
+            }
+            $output = [];
+            return '';
+        });
+
+        $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'addInterface',
+            'radio' => 'radio0',
+            'ssid' => 'MyNetwork',
+            'encryption' => 'psk2+ccmp',
+            'key' => 'supersecret',
+            'mode' => 'ap',
+            'network' => 'lan',
+            'hidden' => 0,
+            'disabled' => 0,
+            'ieee80211w' => 2,
+        ]);
+
+        $expected = 'uci set ' . escapeshellarg('wireless.wifinet0.ieee80211w') . '=' . escapeshellarg('2');
+        $this->assertContains($expected, $capturedCommands);
+    }
+
+    public function testAddInterfaceWritesBssidForStaModeOnlyWhenProvided(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            if (str_contains($command, "'uci' 'get'")) {
+                $output = [json_encode(['values' => []])];
+                return '';
+            }
+            $output = [];
+            return '';
+        });
+
+        $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'addInterface',
+            'radio' => 'radio0',
+            'ssid' => 'TargetNet',
+            'encryption' => 'psk2',
+            'key' => 'supersecret',
+            'mode' => 'sta',
+            'network' => 'wwan',
+            'hidden' => 0,
+            'disabled' => 0,
+            'bssid' => 'AA:BB:CC:DD:EE:FF',
+        ]);
+
+        $expected = 'uci set ' . escapeshellarg('wireless.wifinet0.bssid') . '=' . escapeshellarg('AA:BB:CC:DD:EE:FF');
+        $this->assertContains($expected, $capturedCommands);
+        $this->assertEmpty(array_filter($capturedCommands, fn ($c) => str_contains($c, '.ieee80211w')));
+    }
+
+    public function testAddInterfaceOmitsBssidWhenNotProvided(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            if (str_contains($command, "'uci' 'get'")) {
+                $output = [json_encode(['values' => []])];
+                return '';
+            }
+            $output = [];
+            return '';
+        });
+
+        $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'addInterface',
+            'radio' => 'radio0',
+            'ssid' => 'AnyNet',
+            'encryption' => 'none',
+            'key' => '',
+            'mode' => 'sta',
+            'network' => 'wwan',
+            'hidden' => 0,
+            'disabled' => 0,
+        ]);
+
+        $this->assertEmpty(array_filter($capturedCommands, fn ($c) => str_contains($c, '.bssid')));
+    }
+
     // -----------------------------------------------------------------
     // removeInterface
     // -----------------------------------------------------------------
@@ -657,7 +813,7 @@ class WirelessControllerTest extends TestCase
 
         $this->assertNull($result['error']);
         $this->assertSame(['success' => true], $result['data']);
-        $deleteCommand = array_values(array_filter($capturedCommands, fn ($c) => str_contains($c, 'uci delete')));
+        $deleteCommand = array_values(array_filter($capturedCommands, fn ($c) => str_contains($c, 'delete')));
         $this->assertNotEmpty($deleteCommand);
         $this->assertStringContainsString('wireless.wifinet2', $deleteCommand[0]);
     }
@@ -791,6 +947,74 @@ class WirelessControllerTest extends TestCase
 
         $this->assertNull($result['error']);
         $this->assertSame(['success' => true], $result['data']);
+    }
+
+    public function testSetInterfaceConfigWritesIeee80211wForApModeAndDeletesBssid(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            $output = [];
+            if (str_contains($command, "uci -q get 'wireless.wifinet2'")) {
+                return 'wifi-iface';
+            }
+
+            return '';
+        });
+
+        $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'setInterfaceConfig',
+            'section' => 'wifinet2',
+            'ssid' => 'RenamedNetwork',
+            'encryption' => 'psk2+ccmp',
+            'key' => 'newsecret',
+            'mode' => 'ap',
+            'network' => 'lan',
+            'hidden' => 0,
+            'disabled' => 0,
+            'ieee80211w' => 1,
+        ]);
+
+        $expectedSet = 'uci set ' . escapeshellarg('wireless.wifinet2.ieee80211w') . '=' . escapeshellarg('1');
+        $expectedDelete = 'uci -q delete ' . escapeshellarg('wireless.wifinet2.bssid');
+        $this->assertContains($expectedSet, $capturedCommands);
+        $this->assertContains($expectedDelete, $capturedCommands);
+    }
+
+    public function testSetInterfaceConfigWritesBssidForStaModeAndDeletesIeee80211w(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            $output = [];
+            if (str_contains($command, "uci -q get 'wireless.wifinet2'")) {
+                return 'wifi-iface';
+            }
+
+            return '';
+        });
+
+        $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'setInterfaceConfig',
+            'section' => 'wifinet2',
+            'ssid' => 'TargetNet',
+            'encryption' => 'psk2',
+            'key' => 'newsecret',
+            'mode' => 'sta',
+            'network' => 'wwan',
+            'hidden' => 0,
+            'disabled' => 0,
+            'bssid' => 'AA:BB:CC:DD:EE:FF',
+        ]);
+
+        $expectedSet = 'uci set ' . escapeshellarg('wireless.wifinet2.bssid') . '=' . escapeshellarg('AA:BB:CC:DD:EE:FF');
+        $expectedDelete = 'uci -q delete ' . escapeshellarg('wireless.wifinet2.ieee80211w');
+        $this->assertContains($expectedSet, $capturedCommands);
+        $this->assertContains($expectedDelete, $capturedCommands);
     }
 
     public function testSetInterfaceConfigThrowsWhenTheSectionDoesNotExist(): void

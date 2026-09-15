@@ -67,7 +67,9 @@ class WirelessController extends \frieren\core\Controller
             $this->request['txpower'],
             $this->request['htmode'],
             $this->request['country'],
-            $this->request['disabled']
+            $this->request['disabled'],
+            $this->request['cell_density'] ?? 0,
+            $this->request['distance'] ?? 0
         )) {
             return self::setSuccess();
         }
@@ -101,7 +103,9 @@ class WirelessController extends \frieren\core\Controller
             $this->request['hidden'],
             $this->request['disabled'],
             $this->request['isManagement'] ?? false,
-            $this->request['isRecon'] ?? false
+            $this->request['isRecon'] ?? false,
+            $this->request['ieee80211w'] ?? 0,
+            $this->request['bssid'] ?? ''
         );
 
         if ($section) {
@@ -153,7 +157,9 @@ class WirelessController extends \frieren\core\Controller
             $this->request['hidden'],
             $this->request['disabled'],
             $this->request['isManagement'] ?? false,
-            $this->request['isRecon'] ?? false
+            $this->request['isRecon'] ?? false,
+            $this->request['ieee80211w'] ?? 0,
+            $this->request['bssid'] ?? ''
         )) {
             return self::setSuccess();
         }

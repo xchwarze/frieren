@@ -206,11 +206,13 @@ class ModuleOpenWrtHelper
         // One ubus uci call for the radio section instead of a fork per field.
         $values = OpenWrtHelper::uciGetSection('wireless', $radio);
         $current = [
-            'channel'  => $values['channel']  ?? null,
-            'txpower'  => $values['txpower']  ?? null,
-            'htmode'   => $values['htmode']   ?? null,
-            'country'  => $values['country']  ?? null,
-            'disabled' => $values['disabled'] ?? null,
+            'channel'      => $values['channel']      ?? null,
+            'txpower'      => $values['txpower']      ?? null,
+            'htmode'       => $values['htmode']       ?? null,
+            'country'      => $values['country']      ?? null,
+            'disabled'     => $values['disabled']     ?? null,
+            'cell_density' => $values['cell_density'] ?? null,
+            'distance'     => $values['distance']     ?? null,
         ];
 
         $channelData  = OpenWrtHelper::execUbusCall('iwinfo', 'freqlist', ['device' => $radio]);
@@ -315,12 +317,14 @@ class ModuleOpenWrtHelper
      * @param mixed  $channel  Channel number or 'auto'.
      * @param mixed  $txpower  TX power in dBm.
      * @param string $htmode   HT mode string (e.g. 'VHT80').
-     * @param string $country  Country code (e.g. 'US').
-     * @param mixed  $disabled 0 or 1.
+     * @param string $country     Country code (e.g. 'US').
+     * @param mixed  $disabled    0 or 1.
+     * @param mixed  $cellDensity mac80211 cell density preset (0-3). 0 = disabled/default.
+     * @param mixed  $distance    ACK timeout distance in meters. 0 = auto/default.
      * @return bool True on success.
      * @throws \Exception If the radio name is invalid.
      */
-    public static function setRadioConfig($radio, $channel, $txpower, $htmode, $country, $disabled)
+    public static function setRadioConfig($radio, $channel, $txpower, $htmode, $country, $disabled, $cellDensity = 0, $distance = 0)
     {
         $radio = preg_replace('/[^a-zA-Z0-9_]/', '', $radio);
 
@@ -335,6 +339,8 @@ class ModuleOpenWrtHelper
         OpenWrtHelper::uciSet("wireless.{$radio}.htmode", $htmode, false, false);
         OpenWrtHelper::uciSet("wireless.{$radio}.country", $country, false, false);
         OpenWrtHelper::uciSet("wireless.{$radio}.disabled", $disabled ? 1 : 0, false, false);
+        OpenWrtHelper::uciSet("wireless.{$radio}.cell_density", $cellDensity, false, false);
+        OpenWrtHelper::uciSet("wireless.{$radio}.distance", $distance, false, false);
         OpenWrtHelper::uciCommit();
 
         $safeRadio = escapeshellarg($radio);
@@ -352,9 +358,11 @@ class ModuleOpenWrtHelper
      * @param string $key        Pre-shared key (ignored when encryption is 'none').
      * @param string $mode       Interface mode (e.g. 'ap', 'sta', 'monitor').
      * @param string $network    UCI network name (e.g. 'lan', 'wwan', 'guest').
+     * @param mixed  $ieee80211w AP-only: Management Frame Protection (0=Disabled, 1=Optional, 2=Required).
+     * @param string $bssid      STA-only: pin to a specific AP by BSSID instead of SSID alone.
      * @return bool True on success.
      */
-    public static function addInterface($radio, $ssid, $encryption, $key, $mode, $network, $hidden, $disabled, $isManagement = false, $isRecon = false)
+    public static function addInterface($radio, $ssid, $encryption, $key, $mode, $network, $hidden, $disabled, $isManagement = false, $isRecon = false, $ieee80211w = 0, $bssid = '')
     {
         $radio = preg_replace('/[^a-zA-Z0-9_]/', '', $radio);
 
@@ -381,6 +389,13 @@ class ModuleOpenWrtHelper
             if ($encryption !== 'none') {
                 OpenWrtHelper::uciSet("wireless.{$sectionName}.key", $key, false, false);
             }
+        }
+
+        if ($mode === 'ap') {
+            OpenWrtHelper::uciSet("wireless.{$sectionName}.ieee80211w", $ieee80211w, false, false);
+        }
+        if ($mode === 'sta' && $bssid !== '') {
+            OpenWrtHelper::uciSet("wireless.{$sectionName}.bssid", $bssid, false, false);
         }
 
         OpenWrtHelper::uciCommit();
@@ -492,7 +507,7 @@ class ModuleOpenWrtHelper
             throw new \Exception("Interface section '{$section}' not found in wireless config");
         }
 
-        OpenWrtHelper::exec('uci delete ' . escapeshellarg("wireless.{$section}"));
+        OpenWrtHelper::uciDelete("wireless.{$section}", false);
         OpenWrtHelper::uciCommit();
 
         OpenWrtHelper::execBackground('wifi reload');
@@ -538,7 +553,7 @@ class ModuleOpenWrtHelper
         // One ubus uci call for the whole section instead of a fork per field.
         $values = OpenWrtHelper::uciGetSection('wireless', $section);
 
-        $fields = ['device', 'network', 'mode', 'ssid', 'encryption', 'key', 'disabled', 'hidden', 'bssid'];
+        $fields = ['device', 'network', 'mode', 'ssid', 'encryption', 'key', 'disabled', 'hidden', 'bssid', 'ieee80211w'];
         $config = [];
         foreach ($fields as $field) {
             $config[$field] = $values[$field] ?? '';
@@ -568,10 +583,12 @@ class ModuleOpenWrtHelper
      * @param mixed  $disabled   Whether to disable the interface (1 or 0).
      * @param bool   $isManagement Mark this ap interface as the management interface.
      * @param bool   $isRecon      Mark this monitor interface as the recon interface.
+     * @param mixed  $ieee80211w AP-only: Management Frame Protection (0=Disabled, 1=Optional, 2=Required).
+     * @param string $bssid      STA-only: pin to a specific AP by BSSID instead of SSID alone.
      * @return bool True on success.
      * @throws \Exception If the section does not exist.
      */
-    public static function setInterfaceConfig($section, $ssid, $encryption, $key, $mode, $network, $hidden, $disabled, $isManagement = false, $isRecon = false)
+    public static function setInterfaceConfig($section, $ssid, $encryption, $key, $mode, $network, $hidden, $disabled, $isManagement = false, $isRecon = false, $ieee80211w = 0, $bssid = '')
     {
         $section = preg_replace('/[^a-zA-Z0-9_@\[\]\-]/', '', $section);
 
@@ -591,6 +608,17 @@ class ModuleOpenWrtHelper
             OpenWrtHelper::uciSet("wireless.{$section}.key", $key, false, false);
             OpenWrtHelper::uciSet("wireless.{$section}.network", $network, false, false);
             OpenWrtHelper::uciSet("wireless.{$section}.hidden", $hidden ? 1 : 0, false, false);
+        }
+
+        if ($mode === 'ap') {
+            OpenWrtHelper::uciSet("wireless.{$section}.ieee80211w", $ieee80211w, false, false);
+        } else {
+            OpenWrtHelper::uciDelete("wireless.{$section}.ieee80211w", false);
+        }
+        if ($mode === 'sta' && $bssid !== '') {
+            OpenWrtHelper::uciSet("wireless.{$section}.bssid", $bssid, false, false);
+        } else {
+            OpenWrtHelper::uciDelete("wireless.{$section}.bssid", false);
         }
 
         // Role pointers (frieren config): mirror addInterface so editing an interface can set
