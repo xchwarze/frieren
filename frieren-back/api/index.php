@@ -6,11 +6,9 @@
  * More info at: https://github.com/xchwarze/frieren
  */
 
-// debug — disable in production for performance
-//error_reporting(E_ALL);
-//ini_set('display_errors', '1');
-error_reporting(0);
-ini_set('display_errors', '0');
+// debug - temporarily enabled to diagnose the production 500 response
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 
 /**
  * Autoloader and Application Initializer
@@ -26,6 +24,7 @@ $classMap = [
     'frieren\\core\\Router' => __DIR__ . '/core/Router.php',
     'frieren\\helper\\BackgroundTaskHelper' => __DIR__ . '/helper/BackgroundTaskHelper.php',
     'frieren\\helper\\HelperFactory' => __DIR__ . '/helper/HelperFactory.php',
+    'frieren\\helper\\HelperInterface' => __DIR__ . '/helper/HelperInterface.php',
     'frieren\\helper\\OpenWrtHelper' => __DIR__ . '/helper/OpenWrtHelper.php',
     'frieren\\helper\\UciConfigHelper' => __DIR__ . '/helper/UciConfigHelper.php',
     'frieren\\orm\\SQLite' => __DIR__ . '/orm/SQLite.php',
