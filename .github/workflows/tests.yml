@@ -1,0 +1,113 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Pinned to what each supported OpenWrt release actually ships
+        # (openwrt/packages lang/php8/Makefile PKG_VERSION on each release branch):
+        # 23.05 -> 8.2, 24.10 -> 8.3, 25.12 -> 8.4. Passing here means the suite
+        # behaves the same on every router generation this project targets.
+        php: ['8.2', '8.3', '8.4']
+    defaults:
+      run:
+        working-directory: frieren-back
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: sqlite3
+          coverage: none
+
+      - uses: ramsey/composer-install@v3
+        with:
+          working-directory: frieren-back
+
+      - run: composer test
+
+  frontend-unit:
+    name: Frontend unit tests (Vitest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frieren-front
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'yarn'
+          cache-dependency-path: frieren-front/yarn.lock
+
+      - run: corepack enable
+      - run: yarn install --immutable
+      - run: yarn test
+
+  frontend-mock-e2e:
+    name: Frontend mock e2e (Playwright, no live device)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frieren-front
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'yarn'
+          cache-dependency-path: frieren-front/yarn.lock
+
+      - run: corepack enable
+      - run: yarn install --immutable
+      - run: npx playwright install --with-deps chromium
+
+      # playwright.config.js's launchOptions.executablePath falls back to a
+      # Windows-only default path when CHROME_PATH is unset (a dev-machine
+      # convenience, not meant for CI) - point it at the browser Playwright
+      # itself just installed instead of touching that shared config.
+      - name: Resolve installed Chromium path
+        id: chromium
+        run: |
+          CHROME_BIN=$(find "$HOME/.cache/ms-playwright" -type f -name chrome -path '*chrome-linux*' | head -n1)
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Could not find an installed Chromium binary" >&2
+            exit 1
+          fi
+          echo "path=$CHROME_BIN" >> "$GITHUB_OUTPUT"
+
+      - name: Start dev server
+        run: yarn dev --host 0.0.0.0 --port 5173 &
+
+      - name: Wait for dev server
+        run: npx wait-on http://localhost:5173 --timeout 30000
+
+      - name: Run mock e2e suite
+        env:
+          CHROME_PATH: ${{ steps.chromium.outputs.path }}
+        run: yarn test:mock
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-mock-report
+          path: frieren-front/playwright-report/
+          retention-days: 7
+
+  # 'e2e' and 'api' Playwright projects hit a real OpenWrt router on the
+  # dev LAN (192.168.7.1) and can't run on a GitHub-hosted runner - they stay
+  # local-only (or would need a self-hosted runner on that network).
