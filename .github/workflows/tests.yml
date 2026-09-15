@@ -54,8 +54,8 @@ jobs:
           cache-dependency-path: frieren-front/yarn.lock
 
       - run: corepack enable
-      - run: yarn install --immutable
-      - run: yarn test
+      - run: corepack yarn install --immutable
+      - run: corepack yarn test
 
   frontend-mock-e2e:
     name: Frontend mock e2e (Playwright, no live device)
@@ -73,7 +73,7 @@ jobs:
           cache-dependency-path: frieren-front/yarn.lock
 
       - run: corepack enable
-      - run: yarn install --immutable
+      - run: corepack yarn install --immutable
       - run: npx playwright install --with-deps chromium
 
       # playwright.config.js's launchOptions.executablePath falls back to a
@@ -91,7 +91,7 @@ jobs:
           echo "path=$CHROME_BIN" >> "$GITHUB_OUTPUT"
 
       - name: Start dev server
-        run: yarn dev --host 0.0.0.0 --port 5173 &
+        run: corepack yarn dev --host 0.0.0.0 --port 5173 &
 
       - name: Wait for dev server
         run: npx wait-on http://localhost:5173 --timeout 30000
@@ -99,7 +99,7 @@ jobs:
       - name: Run mock e2e suite
         env:
           CHROME_PATH: ${{ steps.chromium.outputs.path }}
-        run: yarn test:mock
+        run: corepack yarn test:mock
 
       - uses: actions/upload-artifact@v4
         if: failure()
