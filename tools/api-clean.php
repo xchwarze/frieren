@@ -51,8 +51,8 @@ function packer_strips($str) {
         $newStr .= is_array($token) ? $token[1] : $token;
     }
 
-    // Remove block comments and extra blank lines
-    $newStr = preg_replace('!/\*.*?\*/!s', '', $newStr);
+    // Comments are already stripped via the tokenizer above (string-literal safe).
+    // Just collapse the blank lines that leaves behind.
     $newStr = preg_replace('/\n\s*\n/', "\n", $newStr);
 
     return $newStr;
