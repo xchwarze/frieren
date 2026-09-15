@@ -81,6 +81,13 @@ const ModeAwareFields = ({ radio }) => {
     return (
         <>
             <InputField name={'ssid'} label={'SSID'} />
+            {mode === 'sta' && (
+                <InputField
+                    name={'bssid'}
+                    label={'BSSID (optional)'}
+                    placeholder={'Pin to a specific AP, e.g. AA:BB:CC:DD:EE:FF'}
+                />
+            )}
             <SelectField name={'network'} label={'Network'} options={networkOptions} disabled={networkDisabled} />
             <SelectField
                 name={'encryption'}
@@ -91,10 +98,6 @@ const ModeAwareFields = ({ radio }) => {
             {encryption !== 'none' && (
                 <InputField name={'key'} label={'Key / Passphrase'} type={'password'} />
             )}
-            {mode === 'ap' && <SwitchField name={'hidden'} label={'Hidden AP'} />}
-            {mode === 'ap' && (
-                <SwitchField name={'isManagement'} label={'Management Interface'} />
-            )}
             {mode === 'ap' && (
                 <SelectField
                     name={'ieee80211w'}
@@ -102,12 +105,9 @@ const ModeAwareFields = ({ radio }) => {
                     options={IEEE80211W_OPTIONS}
                 />
             )}
-            {mode === 'sta' && (
-                <InputField
-                    name={'bssid'}
-                    label={'BSSID (optional)'}
-                    placeholder={'Pin to a specific AP, e.g. AA:BB:CC:DD:EE:FF'}
-                />
+            {mode === 'ap' && <SwitchField name={'hidden'} label={'Hidden AP'} />}
+            {mode === 'ap' && (
+                <SwitchField name={'isManagement'} label={'Management Interface'} />
             )}
         </>
     );
