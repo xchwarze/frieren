@@ -63,4 +63,35 @@ test.describe('Mock: Network', () => {
         const output = page.getByLabel('Output');
         await expect(output).not.toHaveValue('No output yet.');
     });
+
+    test('Add Interface form has a Device select populated from the mock device list', async ({ mockPage: page }) => {
+        await page.goto('/#/network');
+        await page.getByRole('button', { name: 'Add' }).click();
+
+        await expect(page.getByText('Add Interface')).toBeVisible();
+        const deviceField = page.getByLabel('Device');
+        await expect(deviceField).toBeVisible();
+        await expect(deviceField.getByRole('option', { name: 'br-lan' })).toBeAttached();
+    });
+
+    test('Restart button on a row shows a success toast', async ({ mockPage: page }) => {
+        await page.goto('/#/network');
+
+        const firstRow = page.locator('table tbody tr', { has: page.locator('td button') }).first();
+        await firstRow.getByRole('button', { name: 'Restart' }).click();
+
+        await expect(page.getByText(/restarted$/)).toBeVisible();
+    });
+
+    test('Delete button on a row asks for confirmation before removing', async ({ mockPage: page }) => {
+        await page.goto('/#/network');
+
+        const firstRow = page.locator('table tbody tr', { has: page.locator('td button') }).first();
+        await firstRow.getByRole('button', { name: 'Delete' }).click();
+
+        await expect(page.getByText('Delete interface')).toBeVisible();
+
+        await page.getByRole('button', { name: 'Confirm' }).click();
+        await expect(page.getByText('Delete interface')).not.toBeVisible();
+    });
 });

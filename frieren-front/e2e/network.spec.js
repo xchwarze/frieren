@@ -24,12 +24,30 @@ test.describe('Network', () => {
         expect(await rows.count()).toBeGreaterThan(0);
     });
 
-    test('each interface row has edit and toggle buttons', async ({ page }) => {
+    test('each interface row has edit, toggle, restart and delete buttons', async ({ page }) => {
         const firstRow = page.locator('table tbody tr', { has: page.locator('td button') }).first();
         await expect(firstRow).toBeVisible({ timeout: 15000 });
 
         const buttons = firstRow.locator('td').last().locator('button');
-        expect(await buttons.count()).toBe(2);
+        expect(await buttons.count()).toBe(4);
+    });
+
+    test('Add Interface button opens the form with a Device field', async ({ page }) => {
+        await page.getByRole('button', { name: 'Add' }).click();
+
+        await expect(page.getByText('Add Interface')).toBeVisible();
+        await expect(page.getByLabel('Interface Name')).toBeVisible();
+        await expect(page.getByLabel('Device')).toBeVisible();
+    });
+
+    test('each row has a Restart button', async ({ page }) => {
+        // Not clicked here: restarting a real interface (lan in particular) would disrupt
+        // the very connection this test runs over. The mock suite exercises the actual
+        // click+toast behavior safely against fixture data instead.
+        const firstRow = page.locator('table tbody tr', { has: page.locator('td button') }).first();
+        await expect(firstRow).toBeVisible({ timeout: 15000 });
+
+        await expect(firstRow.getByRole('button', { name: 'Restart' })).toBeVisible();
     });
 
     test('DHCP tab shows leases and static leases', async ({ page }) => {

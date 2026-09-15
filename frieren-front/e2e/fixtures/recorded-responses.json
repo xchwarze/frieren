@@ -432,6 +432,9 @@
         }
       ]
     },
+    "getAvailableDevices": {
+      "devices": ["br-lan", "eth0", "wan"]
+    },
     "getDhcpLeases": {
       "leases": [
         {

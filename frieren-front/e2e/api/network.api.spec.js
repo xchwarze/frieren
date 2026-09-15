@@ -81,4 +81,63 @@ test.describe('API: Network', () => {
         const { json } = await api.post('network', 'runPing', { host: 'bad host; rm -rf /' });
         expect(json).toHaveProperty('error');
     });
+
+    test('getAvailableDevices returns the live device list', async ({ api }) => {
+        const { response, json } = await api.post('network', 'getAvailableDevices');
+        expect(response.ok()).toBeTruthy();
+        expect(json).not.toHaveProperty('error');
+        expect(json).toHaveProperty('devices');
+        expect(Array.isArray(json.devices)).toBe(true);
+        expect(json.devices.length).toBeGreaterThan(0);
+        expect(json.devices).not.toContain('lo');
+    });
+
+    test('addInterface/removeInterface round-trip a real interface with device/mtu/macaddr/peerdns, cleaning up after', async ({ api }) => {
+        const name = 'e2etest';
+
+        // Best-effort pre-clean in case a prior failed run left it behind.
+        await api.post('network', 'removeInterface', { name });
+
+        try {
+            const devicesResult = await api.post('network', 'getAvailableDevices');
+            const device = devicesResult.json.devices[0];
+
+            const added = await api.post('network', 'addInterface', {
+                name,
+                device,
+                proto: 'dhcp',
+                mtu: '1400',
+                macaddr: 'AA:BB:CC:DD:EE:FF',
+                peerdns: false,
+            });
+            expect(added.response.ok()).toBeTruthy();
+            expect(added.json).not.toHaveProperty('error');
+
+            const afterAdd = await api.post('network', 'getInterfaces');
+            const created = afterAdd.json.interfaces.find((iface) => iface.name === name);
+            expect(created).toBeDefined();
+            expect(created.device).toBe(device);
+            expect(created.mtu).toBe('1400');
+            expect(created.macaddr).toBe('AA:BB:CC:DD:EE:FF');
+            expect(created.peerdns).toBe(false);
+
+            const duplicate = await api.post('network', 'addInterface', { name, device, proto: 'dhcp' });
+            expect(duplicate.json.error).toContain('already exists');
+
+            const restarted = await api.post('network', 'toggleInterface', { name, state: 'restart' });
+            expect(restarted.response.ok()).toBeTruthy();
+            expect(restarted.json).not.toHaveProperty('error');
+        } finally {
+            const removed = await api.post('network', 'removeInterface', { name });
+            expect(removed.json).not.toHaveProperty('error');
+
+            // The live ubus dump getInterfaces() reads briefly still lists a just-removed
+            // interface until netifd finishes processing the reload; poll instead of a
+            // single immediate read.
+            await expect.poll(async () => {
+                const afterRemove = await api.post('network', 'getInterfaces');
+                return afterRemove.json.interfaces.some((iface) => iface.name === name);
+            }, { timeout: 5000 }).toBe(false);
+        }
+    });
 });
