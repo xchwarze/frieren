@@ -13,8 +13,11 @@ class NetworkController extends \frieren\core\Controller
     const HOST_REGEX = '/^[a-zA-Z0-9.:_-]+$/';
     const MAC_REGEX = '/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/';
     const NAME_REGEX = '/^[a-zA-Z0-9_-]+$/';
-    const INTERFACE_NAME_REGEX = '/^[a-zA-Z0-9_]+$/';
-    const PROTO_WHITELIST = ['static', 'dhcp'];
+    const INTERFACE_NAME_REGEX = '/^[a-zA-Z0-9_-]+$/';
+    // Only protocols that need no UCI option beyond what setInterface() already
+    // writes. pppoe/6in4 and friends require extra fields (credentials, tunnel
+    // endpoints) the form does not collect, so they stay out.
+    const PROTO_WHITELIST = ['static', 'dhcp', 'dhcpv6'];
     const TOGGLE_ACTIONS = ['up', 'down'];
 
     public $endpointRoutes = [

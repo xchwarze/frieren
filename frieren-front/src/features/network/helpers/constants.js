@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
  * More info at: https://github.com/xchwarze/frieren
  */
-export const DEFAULT_PROTO = 'static';
+export const STATIC_PROTO = 'static';
+
+export const DEFAULT_PROTO = STATIC_PROTO;
 
 export const PROTO_OPTIONS = [
-    { label: 'Static', value: 'static' },
+    { label: 'Static', value: STATIC_PROTO },
     { label: 'DHCP', value: 'dhcp' },
+    { label: 'DHCPv6', value: 'dhcpv6' },
 ];

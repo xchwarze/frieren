@@ -297,10 +297,10 @@ class ModuleOpenWrtHelper
 
     /**
      * Writes the L3 config of an interface to /etc/config/network and reloads.
-     * On `dhcp` the static address fields are cleared/ignored.
+     * On any non-static proto the static address fields are cleared/ignored.
      *
      * @param string $name Already validated interface name (section exists).
-     * @param string $proto 'static' or 'dhcp'.
+     * @param string $proto A whitelisted proto ('static' or a dynamic one).
      * @param string $ipaddr Validated IPv4 (static only).
      * @param string $netmask Validated IPv4 mask (static only).
      * @param string $gateway Validated IPv4 gateway or '' (static only).
@@ -331,7 +331,7 @@ class ModuleOpenWrtHelper
                 }
             }
         } else {
-            // dhcp: drop static-only fields so they do not linger.
+            // Dynamic proto: drop static-only fields so they do not linger.
             OpenWrtHelper::exec('uci -q delete ' . escapeshellarg("network.{$name}.ipaddr"));
             OpenWrtHelper::exec('uci -q delete ' . escapeshellarg("network.{$name}.netmask"));
             OpenWrtHelper::exec('uci -q delete ' . escapeshellarg("network.{$name}.gateway"));

@@ -20,6 +20,17 @@ class NetworkControllerTest extends TestCase
     use PHPMock;
     use DispatchesControllers;
 
+    private function findCommandContaining(array $commands, string $needle): ?string
+    {
+        foreach ($commands as $command) {
+            if (strpos($command, $needle) !== false) {
+                return $command;
+            }
+        }
+
+        return null;
+    }
+
     // --- runPing / runTraceroute / runNslookup: host validation -----------
 
     public function testRunPingRejectsAHostWithShellMetacharactersWithoutExecutingAnything(): void
@@ -330,6 +341,110 @@ class NetworkControllerTest extends TestCase
 
         $this->assertNull($result['error']);
         $this->assertSame(['leases' => []], $result['data']);
+    }
+
+    // --- setInterface / toggleInterface: name + proto validation ----------
+
+    /**
+     * INTERFACE_NAME_REGEX used to be `^[a-zA-Z0-9_]+$`, tighter than netifd
+     * needs for a UCI section name. Widened defensively to allow hyphens.
+     * This is a name-validity check, not a security boundary: the widened
+     * charset still excludes every shell metacharacter (see the rejection test
+     * below), and the name is escapeshellcmd()'d downstream regardless.
+     */
+    public function testToggleInterfaceAcceptsAHyphenatedName(): void
+    {
+        $captured = null;
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->once())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$captured) {
+            $captured = $command;
+            $retval = 0;
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'toggleInterface',
+            'name' => 'br-lan',
+            'state' => 'down',
+        ]);
+
+        $this->assertNull($result['error']);
+        $this->assertSame(['success' => true], $result['data']);
+        $this->assertSame('ubus call network.interface.br-lan down', $captured);
+    }
+
+    public function testToggleInterfaceStillRejectsANameWithShellMetacharacters(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->never());
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'toggleInterface',
+            'name' => 'lan; rm -rf /',
+            'state' => 'down',
+        ]);
+
+        $this->assertSame('Invalid interface', $result['error']);
+        $this->assertNull($result['data']);
+    }
+
+    /**
+     * dhcpv6 needs no UCI option beyond the `proto` that setInterface() already
+     * writes, so it travels the same dynamic-proto path as dhcp: the static-only
+     * options are deleted rather than left behind.
+     */
+    public function testSetInterfaceAcceptsDhcpv6AndClearsTheStaticOnlyOptions(): void
+    {
+        $captured = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->atLeastOnce())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$captured) {
+            $captured[] = $command;
+            $retval = 0;
+            $output = [];
+
+            // interfaceExists() reads the section back through `uci -q get`.
+            return strpos($command, 'uci -q get') === 0 ? 'interface' : '';
+        });
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'setInterface',
+            'name' => 'wan6',
+            'proto' => 'dhcpv6',
+        ]);
+
+        $this->assertNull($result['error']);
+        $this->assertSame(['success' => true], $result['data']);
+
+        $protoCommand = $this->findCommandContaining($captured, 'network.wan6.proto');
+        $this->assertNotNull($protoCommand, 'Expected the proto option to be written');
+        $this->assertStringStartsWith('uci set ', $protoCommand);
+        $this->assertStringContainsString('dhcpv6', $protoCommand);
+
+        foreach (['ipaddr', 'netmask', 'gateway', 'dns'] as $option) {
+            $command = $this->findCommandContaining($captured, "network.wan6.{$option}");
+            $this->assertNotNull($command, "Expected the static-only {$option} option to be deleted");
+            $this->assertStringStartsWith('uci -q delete ', $command);
+        }
+    }
+
+    /**
+     * Deliberate scope boundary: pppoe (and the other tunnel protocols) need
+     * UCI options — credentials, tunnel endpoints — that neither the form nor
+     * setInterface() collects, so writing only `proto` would leave the
+     * interface unusable. They stay rejected until that gets its own design.
+     */
+    public function testSetInterfaceRejectsAProtocolThatNeedsOptionsTheHelperDoesNotWrite(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->never());
+
+        $result = $this->dispatch(NetworkController::class, 'network', [
+            'action' => 'setInterface',
+            'name' => 'wan',
+            'proto' => 'pppoe',
+        ]);
+
+        $this->assertSame('Unsupported protocol', $result['error']);
+        $this->assertNull($result['data']);
     }
 
     // --- getArpTable ---------------------------------------------------

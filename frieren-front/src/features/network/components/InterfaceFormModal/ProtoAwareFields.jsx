@@ -7,18 +7,19 @@
 import { useWatch } from 'react-hook-form';
 
 import InputField from '@src/components/Form/InputField';
-import { DEFAULT_PROTO } from '@src/features/network/helpers/constants.js';
+import { DEFAULT_PROTO, STATIC_PROTO } from '@src/features/network/helpers/constants.js';
 
 /**
  * Renders the protocol-dependent interface fields. Static addressing inputs
- * are hidden when the selected protocol is DHCP.
+ * only apply to the static protocol; every dynamic one gets its addressing
+ * from the network.
  *
  * @return {ReactElement|null} The protocol-aware fields.
  */
 const ProtoAwareFields = () => {
     const proto = useWatch({ name: 'proto', defaultValue: DEFAULT_PROTO });
 
-    if (proto === 'dhcp') {
+    if (proto !== STATIC_PROTO) {
         return null;
     }
 
