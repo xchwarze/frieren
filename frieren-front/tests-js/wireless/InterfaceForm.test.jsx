@@ -171,6 +171,43 @@ describe('InterfaceForm', () => {
         expect(addInterface).not.toHaveBeenCalled();
     });
 
+    it('warns when a client (sta) interface is bound to the lan network zone', () => {
+        render(
+            <InterfaceForm
+                radio={'radio0'}
+                onHide={vi.fn()}
+                defaultValues={{ ...apDefaults, mode: 'sta', network: 'lan' }}
+                onInterfaceSaved={vi.fn()}
+            />
+        );
+
+        expect(screen.getByText(/usually belongs on/)).toBeInTheDocument();
+    });
+
+    it('does not warn for an ap interface on lan', () => {
+        render(
+            <InterfaceForm
+                radio={'radio0'}
+                onHide={vi.fn()}
+                defaultValues={{ ...apDefaults, mode: 'ap', network: 'lan' }}
+                onInterfaceSaved={vi.fn()}
+            />
+        );
+        expect(screen.queryByText(/usually belongs on/)).not.toBeInTheDocument();
+    });
+
+    it('does not warn for a sta interface on wwan', () => {
+        render(
+            <InterfaceForm
+                radio={'radio0'}
+                onHide={vi.fn()}
+                defaultValues={{ ...apDefaults, mode: 'sta', network: 'wwan' }}
+                onInterfaceSaved={vi.fn()}
+            />
+        );
+        expect(screen.queryByText(/usually belongs on/)).not.toBeInTheDocument();
+    });
+
     it('submits successfully in monitor mode without the AP-only ssid/network/encryption fields', async () => {
         const monitorDefaults = {
             ssid: '',

@@ -19,6 +19,7 @@ import { interfaceSchema } from '@src/features/wireless/helpers/validationSchema
 import useAddInterface from '@src/features/wireless/hooks/useAddInterface.js';
 import useSetInterfaceConfig from '@src/features/wireless/hooks/useSetInterfaceConfig.js';
 import ModeAwareFields from './ModeAwareFields';
+import NetworkZoneWarning from './NetworkZoneWarning';
 
 const InterfaceForm = ({ radio, section, onHide, defaultValues, onInterfaceSaved }) => {
     const isEditMode = !!section;
@@ -45,6 +46,7 @@ const InterfaceForm = ({ radio, section, onHide, defaultValues, onInterfaceSaved
             onSubmit={handleSubmit}
             defaultValues={defaultValues}
         >
+            <NetworkZoneWarning />
             <ReadOnlyField
                 label={isEditMode ? 'Section' : 'Radio'}
                 value={isEditMode ? section : radio}
