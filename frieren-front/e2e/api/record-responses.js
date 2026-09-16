@@ -26,6 +26,7 @@ const ENDPOINTS = [
     ['settings', 'getSectionData'],
     ['terminal', 'getStatus'],
     ['network', 'getInterfaces'],
+    ['network', 'getAvailableDevices'],
     ['network', 'getDhcpLeases'],
     ['network', 'getStaticLeases'],
     ['network', 'getArpTable'],
