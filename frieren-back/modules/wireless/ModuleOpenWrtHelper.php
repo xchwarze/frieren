@@ -138,20 +138,40 @@ class ModuleOpenWrtHelper
                     : '2.4 GHz',
             };
 
+            // Bands actually supported by the hardware (not just the one it's currently
+            // tuned to) -- derived from the real frequency list instead of guessing from
+            // hwmodes letters, which are ambiguous for dual-band-capable modes like n/ax.
+            $supportedBands = [];
+            $freqData = OpenWrtHelper::execUbusCall('iwinfo', 'freqlist', ['device' => $radioName]);
+            if ($freqData !== false && isset($freqData['results'])) {
+                foreach ($freqData['results'] as $entry) {
+                    $mhz = $entry['mhz'] ?? 0;
+                    if ($mhz >= 2400 && $mhz < 2500) {
+                        $supportedBands['2.4 GHz'] = true;
+                    } elseif ($mhz >= 5000 && $mhz < 5925) {
+                        $supportedBands['5 GHz'] = true;
+                    } elseif ($mhz >= 5925 && $mhz < 7125) {
+                        $supportedBands['6 GHz'] = true;
+                    }
+                }
+            }
+
             $radioInfo = [
-                'channel'    => $ch,
-                'txpower'    => null,
-                'frequency'  => null,
-                'band'       => $band,
-                'htmode'     => $radioConfig['htmode'] ?? null,
-                'up'         => $statusRadio['up'] ?? ($luciRadio['up'] ?? false),
-                'disabled'   => ($radioConfig['disabled'] ?? '0') === '1',
-                'phy'        => $iwinfo['phy'] ?? null,
-                'country'    => $iwinfo['country'] ?? null,
-                'hardware'   => $iwinfo['hardware']['name'] ?? null,
-                'hwmodes'    => $iwinfo['hwmodes_text'] ?? null,
-                'htmodes'    => $iwinfo['htmodes'] ?? [],
-                'interfaces' => [],
+                'channel'        => $ch,
+                'txpower'        => null,
+                'frequency'      => null,
+                'band'           => $band,
+                'supportedBands' => array_keys($supportedBands) ?: [$band],
+                'htmode'         => $radioConfig['htmode'] ?? null,
+                'up'             => $statusRadio['up'] ?? ($luciRadio['up'] ?? false),
+                'disabled'       => ($radioConfig['disabled'] ?? '0') === '1',
+                'phy'            => $iwinfo['phy'] ?? null,
+                'country'        => $iwinfo['country'] ?? null,
+                'hardware'       => $iwinfo['hardware']['name'] ?? null,
+                'isUsb'          => isset($radioConfig['path']) && str_contains($radioConfig['path'], 'usb'),
+                'hwmodes'        => $iwinfo['hwmodes_text'] ?? null,
+                'htmodes'        => $iwinfo['htmodes'] ?? [],
+                'interfaces'     => [],
             ];
 
             // Enrich with iwinfo runtime data (txpower, frequency) if radio is up

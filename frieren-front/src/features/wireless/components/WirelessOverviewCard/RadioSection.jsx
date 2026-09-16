@@ -48,12 +48,14 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
             <div className={'d-flex align-items-center justify-content-between mb-2'}>
                 <h6 className={'mb-0'}>
                     {radioName.toUpperCase()}
-                    <Badge bg={'secondary'} className={'ms-2'}>{radio.band || 'Unknown'}</Badge>
+                    {(radio.supportedBands?.length ? radio.supportedBands : [radio.band || 'Unknown']).map((band) => (
+                        <Badge key={band} bg={'secondary'} className={'ms-2'}>{band}</Badge>
+                    ))}
                     <StatusBadge status={radio.disabled ? 'disabled' : (radio.up ? 'up' : 'degraded')} className={'ms-1'}>
                         {radio.disabled ? 'Disabled' : (radio.up ? 'Up' : 'Down')}
                     </StatusBadge>
                     <small className={'text-body-secondary ms-2'}>
-                        {radio.hardware ? `${radio.hardware} | ` : ''}
+                        {radio.hardware ? `${radio.hardware}${radio.isUsb ? ' (USB)' : ''} | ` : ''}
                         Channel {radio.channel} | {radio.htmode}
                         {radio.hwmodes ? ` | ${radio.hwmodes}` : ''}
                     </small>

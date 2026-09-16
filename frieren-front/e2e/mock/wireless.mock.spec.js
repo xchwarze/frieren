@@ -14,6 +14,15 @@ test.describe('Mock: Wireless', () => {
         await expect(page.getByText('Associated Stations', { exact: true })).toBeVisible();
     });
 
+    test('shows a badge per supported band and (USB) for a dual-band USB radio', async ({ mockPage: page }) => {
+        await page.goto('/#/wireless');
+
+        await expect(page.getByText('Aukey USBAC1200 (USB)', { exact: false })).toBeVisible();
+        const radio2Heading = page.getByText('RADIO2');
+        await expect(radio2Heading.locator('..').getByText('2.4 GHz')).toBeVisible();
+        await expect(radio2Heading.locator('..').getByText('5 GHz')).toBeVisible();
+    });
+
     test('Radio Configuration shows Cell Density and Distance fields', async ({ mockPage: page }) => {
         await page.goto('/#/wireless');
 

@@ -177,9 +177,14 @@ class WirelessControllerTest extends TestCase
     public function testGetWirelessOverviewMergesUciAndUbusDataForARadioAndItsInterface(): void
     {
         $exec = $this->getFunctionMock('frieren\helper', 'exec');
-        $exec->expects($this->exactly(3))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+        $exec->expects($this->exactly(4))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
             $retval = 0;
-            if (str_contains($command, "'uci' 'get'")) {
+            if (str_contains($command, "'iwinfo' 'freqlist'")) {
+                $output = [json_encode(['results' => [
+                    ['channel' => 1, 'mhz' => 2412, 'restricted' => false],
+                    ['channel' => 6, 'mhz' => 2437, 'restricted' => false],
+                ]])];
+            } elseif (str_contains($command, "'uci' 'get'")) {
                 $output = [json_encode([
                     'values' => [
                         'radio0' => [
@@ -241,12 +246,14 @@ class WirelessControllerTest extends TestCase
                 'txpower' => null,
                 'frequency' => null,
                 'band' => '2.4 GHz',
+                'supportedBands' => ['2.4 GHz'],
                 'htmode' => 'HT20',
                 'up' => true,
                 'disabled' => false,
                 'phy' => null,
                 'country' => 'US',
                 'hardware' => 'MediaTek MT7615E',
+                'isUsb' => false,
                 'hwmodes' => 'b/g/n',
                 'htmodes' => ['HT20', 'HT40'],
                 'interfaces' => [
@@ -277,7 +284,7 @@ class WirelessControllerTest extends TestCase
     public function testGetWirelessOverviewToleratesAMissingPhyKeyWithoutWarning(): void
     {
         $exec = $this->getFunctionMock('frieren\helper', 'exec');
-        $exec->expects($this->exactly(3))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+        $exec->expects($this->exactly(4))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
             $retval = 0;
             if (str_contains($command, "'uci' 'get'")) {
                 $output = [json_encode([
@@ -306,7 +313,7 @@ class WirelessControllerTest extends TestCase
     public function testGetWirelessOverviewUsesTheConfiguredSixGigahertzBand(): void
     {
         $exec = $this->getFunctionMock('frieren\helper', 'exec');
-        $exec->expects($this->exactly(3))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+        $exec->expects($this->exactly(4))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
             $retval = 0;
             if (str_contains($command, "'uci' 'get'")) {
                 $output = [json_encode([
@@ -336,6 +343,55 @@ class WirelessControllerTest extends TestCase
 
         $this->assertNull($result['error']);
         $this->assertSame('6 GHz', $result['data']['radio3']['band']);
+    }
+
+    /**
+     * A dual-band-capable USB adapter (e.g. an mt76-based AC1200 dongle) reports both
+     * 2.4GHz and 5GHz entries in its own freqlist, even while only one is active. hwmodes
+     * text alone can't be trusted for this (letters like 'n'/'ax' are ambiguous), so this
+     * must come from the real frequency list, and the USB path must be detected from the
+     * UCI 'path' option instead of assumed from a single hardcoded bus.
+     */
+    public function testGetWirelessOverviewReportsAllBandsAndUsbForADualBandUsbRadio(): void
+    {
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->exactly(4))->willReturnCallback(function ($command, &$output = null, &$retval = null) {
+            $retval = 0;
+            if (str_contains($command, "'iwinfo' 'freqlist'")) {
+                $output = [json_encode(['results' => [
+                    ['channel' => 1, 'mhz' => 2412, 'restricted' => false],
+                    ['channel' => 36, 'mhz' => 5180, 'restricted' => false],
+                ]])];
+            } elseif (str_contains($command, "'uci' 'get'")) {
+                $output = [json_encode([
+                    'values' => [
+                        'radio2' => [
+                            '.type' => 'wifi-device',
+                            '.name' => 'radio2',
+                            'band' => '5g',
+                            'channel' => '36',
+                            'htmode' => 'VHT80',
+                            'path' => 'platform/1e1c0000.xhci/usb2/2-1/2-1:1.0',
+                        ],
+                    ],
+                ])];
+            } elseif (str_contains($command, "'network.wireless' 'status'")) {
+                $output = [json_encode(['radio2' => ['up' => true, 'interfaces' => []]])];
+            } elseif (str_contains($command, "'luci-rpc' 'getWirelessDevices'")) {
+                $output = [json_encode(['radio2' => [
+                    'up' => true,
+                    'iwinfo' => ['hardware' => ['name' => 'Aukey USBAC1200'], 'hwmodes_text' => 'ac/b/g/n'],
+                ]])];
+            } else {
+                $output = [];
+            }
+        });
+
+        $result = $this->dispatch(WirelessController::class, 'wireless', ['action' => 'getWirelessOverview']);
+
+        $this->assertNull($result['error']);
+        $this->assertSame(['2.4 GHz', '5 GHz'], $result['data']['radio2']['supportedBands']);
+        $this->assertTrue($result['data']['radio2']['isUsb']);
     }
 
     // -----------------------------------------------------------------

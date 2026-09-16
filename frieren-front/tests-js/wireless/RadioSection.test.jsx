@@ -84,6 +84,27 @@ describe('RadioSection', () => {
         expect(within(guestRow).getByText('Disabled')).toBeInTheDocument();
     });
 
+    it('shows a badge per supported band for a dual-band radio, falling back to band when absent', () => {
+        renderSection({ radio: { ...baseRadio, supportedBands: ['2.4 GHz', '5 GHz'] } });
+
+        expect(screen.getByText('2.4 GHz')).toBeInTheDocument();
+        expect(screen.getByText('5 GHz')).toBeInTheDocument();
+        expect(screen.queryByText('5GHz')).not.toBeInTheDocument();
+    });
+
+    it('appends (USB) to the hardware name for a USB-attached radio', () => {
+        renderSection({ radio: { ...baseRadio, hardware: 'Aukey USBAC1200', isUsb: true } });
+
+        expect(screen.getByText(/Aukey USBAC1200 \(USB\)/)).toBeInTheDocument();
+    });
+
+    it('does not append (USB) for a built-in radio', () => {
+        renderSection({ radio: { ...baseRadio, hardware: 'MediaTek MT7615E', isUsb: false } });
+
+        expect(screen.getByText(/MediaTek MT7615E/)).toBeInTheDocument();
+        expect(screen.queryByText(/MediaTek MT7615E \(USB\)/)).not.toBeInTheDocument();
+    });
+
     it('labels an enabled-but-down radio as Down, distinct from an explicitly disabled radio', () => {
         renderSection({ radio: { ...baseRadio, up: false } });
         expect(screen.getByText('Down')).toBeInTheDocument();
