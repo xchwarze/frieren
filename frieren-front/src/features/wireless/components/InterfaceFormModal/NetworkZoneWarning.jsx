@@ -27,8 +27,7 @@ const NetworkZoneWarning = () => {
     return (
         <Alert variant={'warning'}>
             Network is set to <strong>{network}</strong>. For a client connection this
-            usually belongs on <strong>wan</strong>/<strong>wan6</strong>/<strong>wwan</strong>
-            {' '}instead -- double-check before saving.
+            usually belongs on <strong>wan</strong> instead -- double-check before saving.
         </Alert>
     );
 };
