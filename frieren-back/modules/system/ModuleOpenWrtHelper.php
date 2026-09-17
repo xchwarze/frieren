@@ -119,8 +119,12 @@ class ModuleOpenWrtHelper
         $logs = [];
         foreach ($output as $line) {
             if (preg_match('/^(.{24}) (\S+) (\S+): (.+)$/', $line, $matches)) {
+                // logread emits its own ctime-style, English-only string with no timezone --
+                // send an epoch instead so the frontend renders it in the viewer's own
+                // locale/timezone rather than echoing the device's raw clock format.
+                $epoch = strtotime($matches[1]);
                 $logs[] = [
-                    'timestamp' => $matches[1],
+                    'timestamp' => $epoch !== false ? $epoch : null,
                     'tag'       => $matches[2],
                     'process'   => $matches[3],
                     'message'   => $matches[4],

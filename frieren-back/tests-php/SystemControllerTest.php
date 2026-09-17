@@ -140,8 +140,8 @@ class SystemControllerTest extends TestCase
 
         $this->assertNull($result['error']);
         $this->assertSame([
-            ['timestamp' => 'Wed Jun 10 18:15:10 2026', 'tag' => 'daemon.warn', 'process' => 'odhcpd[1682]', 'message' => 'lease expired'],
-            ['timestamp' => 'Wed Jun 10 18:15:09 2026', 'tag' => 'daemon.info', 'process' => 'dnsmasq[1200]', 'message' => 'query answered'],
+            ['timestamp' => strtotime('Wed Jun 10 18:15:10 2026'), 'tag' => 'daemon.warn', 'process' => 'odhcpd[1682]', 'message' => 'lease expired'],
+            ['timestamp' => strtotime('Wed Jun 10 18:15:09 2026'), 'tag' => 'daemon.info', 'process' => 'dnsmasq[1200]', 'message' => 'query answered'],
         ], $result['data']);
     }
 

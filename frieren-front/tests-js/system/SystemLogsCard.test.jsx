@@ -12,12 +12,14 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import SystemLogsCard from '@src/features/system/components/SystemLogsCard/index.jsx';
 import useGetSystemLogs from '@src/features/system/hooks/useGetSystemLogs.js';
+import { formatEpochDateTime } from '@src/helpers/dateHelper.js';
 
 vi.mock('@src/features/system/hooks/useGetSystemLogs.js', () => ({ default: vi.fn() }));
 
+const FIRST_LOG_EPOCH = 1757930400; // 2026-09-15 10:00:00 UTC
 const logs = [
-    { timestamp: '2026-09-15 10:00:00', tag: 'daemon.info', process: 'sshd', message: 'session opened' },
-    { timestamp: '2026-09-15 10:01:00', tag: 'daemon.err', process: 'uhttpd', message: 'connection reset' },
+    { timestamp: FIRST_LOG_EPOCH, tag: 'daemon.info', process: 'sshd', message: 'session opened' },
+    { timestamp: FIRST_LOG_EPOCH + 60, tag: 'daemon.err', process: 'uhttpd', message: 'connection reset' },
 ];
 
 const mount = (overrides) => {
@@ -47,6 +49,12 @@ describe('SystemLogsCard', () => {
         expect(screen.getByText('sshd')).toBeInTheDocument();
         expect(screen.getByText('uhttpd')).toBeInTheDocument();
         expect(screen.queryByText('No logs found.')).not.toBeInTheDocument();
+    });
+
+    it('renders the epoch timestamp as a local date/time via the shared date helper', () => {
+        mount({ isSuccess: true, data: logs });
+
+        expect(screen.getByText(formatEpochDateTime(FIRST_LOG_EPOCH))).toBeInTheDocument();
     });
 
     it('matches a search term against tag, process, or message, case-insensitively, once debounced', async () => {

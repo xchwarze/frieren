@@ -13,6 +13,7 @@ import SkeletonTable from '@src/components/SkeletonBar/SkeletonTable';
 import SearchInput from '@src/components/SearchInput';
 import useGetSystemLogs from '@src/features/system/hooks/useGetSystemLogs.js';
 import useDebouncedValue from '@src/hooks/useDebouncedValue.js';
+import { formatEpochDateTime } from '@src/helpers/dateHelper.js';
 
 /**
  * Generates a card displaying system logs. Only the last 1000 events are shown for performance reasons.
@@ -72,7 +73,7 @@ const SystemLogsCard = () => {
                         <tbody>
                         {(filteredLogs ?? []).map(({ timestamp, tag, process, message }) => (
                             <tr key={`${timestamp}-${tag}-${process}-${message}`}>
-                                <td>{timestamp}</td>
+                                <td>{formatEpochDateTime(timestamp)}</td>
                                 <td>{tag}</td>
                                 <td>{process}</td>
                                 <td>{message}</td>
