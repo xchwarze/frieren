@@ -23,6 +23,12 @@ test.describe('Mock: Wireless', () => {
         await expect(radio2Heading.locator('..').getByText('5 GHz')).toBeVisible();
     });
 
+    test('shows the pinned BSSID for a sta interface in the interfaces table', async ({ mockPage: page }) => {
+        await page.goto('/#/wireless');
+
+        await expect(page.getByText('02:00:00:00:00:01')).toBeVisible();
+    });
+
     test('Radio Configuration shows Cell Density and Distance fields', async ({ mockPage: page }) => {
         await page.goto('/#/wireless');
 

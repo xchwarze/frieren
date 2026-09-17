@@ -199,6 +199,7 @@ class ModuleOpenWrtHelper
                     'section'    => $section,
                     'mode'       => $ifaceConfig['mode'] ?? '',
                     'ssid'       => $ifaceConfig['ssid'] ?? '',
+                    'bssid'      => $ifaceConfig['bssid'] ?? '',
                     'encryption' => $ifaceConfig['encryption'] ?? '',
                     'network'    => $ifaceConfig['network'] ?? '',
                     'hidden'     => ($ifaceConfig['hidden'] ?? '0') === '1',
