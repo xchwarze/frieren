@@ -12,11 +12,11 @@
   "dashboard": {
     "getSystemStats": {
       "cpu_cores": 4,
-      "cpu_usage": "6%",
-      "memory_used": "27.54%",
+      "cpu_usage": "2%",
+      "memory_used": "27.73%",
       "swap_used": "0%",
-      "uptime": "1d 07:17 hrs",
-      "localtime": "2026-09-17 05:35:04"
+      "uptime": "1d 18:38 hrs",
+      "localtime": "2026-09-17 16:55:49"
     },
     "getSystemResume": {
       "kernel": "6.6.144",
@@ -94,7 +94,7 @@
         "filesystem": "tmpfs",
         "type": "tmpfs",
         "size": "121.6M",
-        "used": "7.3M",
+        "used": "7.4M",
         "available": "114.3M",
         "usePercent": "6%",
         "mountedOn": "/tmp"
@@ -111,22 +111,22 @@
     ],
     "getSystemLogs": [
       {
-        "timestamp": 1789623288,
+        "timestamp": 1789664128,
         "tag": "authpriv.info",
-        "process": "dropbear[25644]",
-        "message": "Exit (root) from <192.0.2.1:58147>: Disconnect received"
+        "process": "dropbear[27796]",
+        "message": "Exit (root) from <192.0.2.1:58830>: Disconnect received"
       },
       {
-        "timestamp": 1789623287,
+        "timestamp": 1789664127,
         "tag": "authpriv.notice",
-        "process": "dropbear[25644]",
-        "message": "Password auth succeeded for 'root' from 192.0.2.1:58147"
+        "process": "dropbear[27796]",
+        "message": "Password auth succeeded for 'root' from 192.0.2.1:58830"
       },
       {
-        "timestamp": 1789623287,
+        "timestamp": 1789664126,
         "tag": "authpriv.info",
-        "process": "dropbear[25644]",
-        "message": "Child connection from 192.0.2.1:58147"
+        "process": "dropbear[27796]",
+        "message": "Child connection from 192.0.2.1:58830"
       }
     ],
     "getSystemLogs:search": [],
@@ -289,7 +289,7 @@
         "repository": "https://github.com/xchwarze/frieren-modules/tree/master/evilportal",
         "documentation": "https://github.com/xchwarze/frieren-modules/tree/master/evilportal#readme",
         "system": false,
-        "size": "412.0K"
+        "size": "419.5K"
       },
       {
         "name": "firewall",
@@ -438,7 +438,7 @@
           "netmask": "255.255.255.0",
           "gateway": null,
           "dns": [],
-          "uptime": 96093,
+          "uptime": 136936,
           "device": "br-evil",
           "mtu": null,
           "macaddr": null,
@@ -452,7 +452,7 @@
           "netmask": "255.255.255.0",
           "gateway": null,
           "dns": [],
-          "uptime": 112608,
+          "uptime": 153451,
           "device": "br-lan",
           "mtu": null,
           "macaddr": null,
@@ -487,13 +487,13 @@
           "hostname": "client-1",
           "ip": "192.0.2.2",
           "mac": "02:00:00:00:00:01",
-          "expires": 1789664750
+          "expires": 1789707189
         },
         {
           "hostname": "client-2",
           "ip": "192.0.2.1",
           "mac": "02:00:00:00:00:02",
-          "expires": 1789653201
+          "expires": 1789692946
         }
       ]
     },
@@ -523,10 +523,10 @@
       ]
     },
     "runPing": {
-      "output": "PING 127.0.0.1 (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: seq=0 ttl=64 time=0.595 ms\n64 bytes from 127.0.0.1: seq=1 ttl=64 time=0.453 ms\n64 bytes from 127.0.0.1: seq=2 ttl=64 time=0.458 ms"
+      "output": "PING 127.0.0.1 (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: seq=0 ttl=64 time=0.785 ms\n64 bytes from 127.0.0.1: seq=1 ttl=64 time=0.449 ms\n64 bytes from 127.0.0.1: seq=2 ttl=64 time=0.431 ms"
     },
     "runTraceroute": {
-      "output": "traceroute to 127.0.0.1 (127.0.0.1), 15 hops max, 46 byte packets\n 1  localhost (127.0.0.1)  0.074 ms"
+      "output": "traceroute to 127.0.0.1 (127.0.0.1), 15 hops max, 46 byte packets\n 1  localhost (127.0.0.1)  0.065 ms"
     },
     "runNslookup": {
       "output": "Server:\t\t127.0.0.1\nAddress:\t127.0.0.1:53\n\nName:\tlocalhost.lan"
@@ -562,7 +562,7 @@
             "mode": "sta",
             "ssid": "ExampleNet",
             "bssid": "02:00:00:00:00:0a",
-            "encryption": "psk2",
+            "encryption": "WPA2-PSK (CCMP)",
             "network": "wwan",
             "hidden": false,
             "up": false,
@@ -575,7 +575,7 @@
             "mode": "ap",
             "ssid": "ExampleNet-2",
             "bssid": "",
-            "encryption": "psk2+ccmp",
+            "encryption": "WPA2-PSK (CCMP)",
             "network": "evil",
             "hidden": false,
             "up": true,
@@ -612,7 +612,7 @@
             "mode": "monitor",
             "ssid": "frieren",
             "bssid": "",
-            "encryption": "none",
+            "encryption": "Open",
             "network": "UNSET",
             "hidden": false,
             "up": true,
@@ -650,7 +650,7 @@
             "mode": "sta",
             "ssid": "ExampleNet-4",
             "bssid": "02:00:00:00:00:03",
-            "encryption": "psk2+ccmp",
+            "encryption": "WPA2-PSK (CCMP)",
             "network": "wwan",
             "hidden": false,
             "up": true,
@@ -734,25 +734,25 @@
         "bssid": "02:00:00:00:00:0a",
         "ssid": "ExampleNet",
         "channel": 8,
-        "signal": -30,
+        "signal": -28,
         "quality": 70,
         "security": "WPA2-PSK / CCMP"
       },
       {
         "bssid": "02:00:00:00:00:0b",
-        "ssid": "Telecentro-37fc",
+        "ssid": "TeleCentro Wifi",
         "channel": 8,
-        "signal": -69,
-        "quality": 41,
-        "security": "WPA3-SAE / CCMP"
+        "signal": -72,
+        "quality": 38,
+        "security": "Open"
       },
       {
         "bssid": "02:00:00:00:00:0c",
-        "ssid": "TeleCentro Wifi",
+        "ssid": "Telecentro-37fc",
         "channel": 8,
-        "signal": -70,
-        "quality": 40,
-        "security": "Open"
+        "signal": -71,
+        "quality": 39,
+        "security": "WPA3-SAE / CCMP"
       }
     ]
   }

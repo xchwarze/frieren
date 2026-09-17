@@ -265,7 +265,7 @@ class WirelessControllerTest extends TestCase
                         'mode' => 'sta',
                         'ssid' => 'ExampleNet',
                         'bssid' => 'AA:BB:CC:DD:EE:FF',
-                        'encryption' => 'psk2+ccmp',
+                        'encryption' => 'WPA2-PSK (CCMP)',
                         'network' => 'wwan',
                         'hidden' => false,
                         'up' => true,

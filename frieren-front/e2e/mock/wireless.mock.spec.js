@@ -14,6 +14,13 @@ test.describe('Mock: Wireless', () => {
         await expect(page.getByText('Associated Stations', { exact: true })).toBeVisible();
     });
 
+    test('shows a human-readable encryption label instead of the raw UCI value', async ({ mockPage: page }) => {
+        await page.goto('/#/wireless');
+
+        await expect(page.getByText('WPA2-PSK (CCMP)').first()).toBeVisible();
+        await expect(page.getByText('psk2+ccmp')).toHaveCount(0);
+    });
+
     test('shows a badge per supported band and (USB) for a dual-band USB radio', async ({ mockPage: page }) => {
         await page.goto('/#/wireless');
 
