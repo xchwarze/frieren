@@ -622,7 +622,16 @@ class ModuleOpenWrtHelper
         OpenWrtHelper::uciSet("wireless.{$section}.disabled", $disabled ? 1 : 0, false, false);
 
         if ($mode === 'monitor') {
-            OpenWrtHelper::uciSet("wireless.{$section}.network", '', false, false);
+            // Monitor mode uses none of these -- delete rather than blank them out.
+            // uciSet(..., '') would write the literal string 'UNSET' (this project's
+            // documented empty-value sentinel, see UciConfigHelper::uciGet()), not
+            // remove the option; a stale ssid/encryption from a prior ap/sta config
+            // (or the stock default_radioN section) would otherwise linger untouched.
+            OpenWrtHelper::uciDelete("wireless.{$section}.network", false);
+            OpenWrtHelper::uciDelete("wireless.{$section}.ssid", false);
+            OpenWrtHelper::uciDelete("wireless.{$section}.encryption", false);
+            OpenWrtHelper::uciDelete("wireless.{$section}.key", false);
+            OpenWrtHelper::uciDelete("wireless.{$section}.hidden", false);
         } else {
             OpenWrtHelper::uciSet("wireless.{$section}.ssid", $ssid, false, false);
             OpenWrtHelper::uciSet("wireless.{$section}.encryption", $encryption, false, false);

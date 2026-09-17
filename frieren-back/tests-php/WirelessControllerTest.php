@@ -1078,6 +1078,53 @@ class WirelessControllerTest extends TestCase
         $this->assertContains($expectedDelete, $capturedCommands);
     }
 
+    /**
+     * Regression test: switching a section to monitor mode used to write network='' via
+     * uciSet(), which this project's own uciSet() turns into the *literal string* 'UNSET'
+     * (its empty-value sentinel) instead of removing the option -- and ssid/encryption/key
+     * were never touched at all, leaving whatever a prior ap/sta config (or the stock
+     * default_radioN section) had lying around. Editing to monitor must delete all five,
+     * not set any of them.
+     */
+    public function testSetInterfaceConfigDeletesStaleFieldsWhenSwitchingToMonitorMode(): void
+    {
+        $capturedCommands = [];
+        $exec = $this->getFunctionMock('frieren\helper', 'exec');
+        $exec->expects($this->any())->willReturnCallback(function ($command, &$output = null, &$retval = null) use (&$capturedCommands) {
+            $capturedCommands[] = $command;
+            $retval = 0;
+            $output = [];
+            if (str_contains($command, "uci -q get 'wireless.default_radio1'")) {
+                return 'wifi-iface';
+            }
+
+            return '';
+        });
+
+        $this->dispatch(WirelessController::class, 'wireless', [
+            'action' => 'setInterfaceConfig',
+            'section' => 'default_radio1',
+            'ssid' => 'OpenWrt',
+            'encryption' => 'none',
+            'key' => '',
+            'mode' => 'monitor',
+            'network' => 'UNSET',
+            'hidden' => 0,
+            'disabled' => 0,
+        ]);
+
+        foreach (['network', 'ssid', 'encryption', 'key', 'hidden'] as $field) {
+            $this->assertContains(
+                'uci -q delete ' . escapeshellarg("wireless.default_radio1.{$field}"),
+                $capturedCommands
+            );
+            $this->assertFalse(
+                (bool)array_filter($capturedCommands, fn($cmd) => str_starts_with($cmd, "uci set " . escapeshellarg("wireless.default_radio1.{$field}") . '=')),
+                "Expected no 'uci set' for {$field} when switching to monitor mode"
+            );
+        }
+    }
+
     public function testSetInterfaceConfigThrowsWhenTheSectionDoesNotExist(): void
     {
         $exec = $this->getFunctionMock('frieren\helper', 'exec');
