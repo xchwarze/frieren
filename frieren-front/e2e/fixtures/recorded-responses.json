@@ -12,11 +12,11 @@
   "dashboard": {
     "getSystemStats": {
       "cpu_cores": 4,
-      "cpu_usage": "4.1%",
-      "memory_used": "25.15%",
+      "cpu_usage": "6%",
+      "memory_used": "27.54%",
       "swap_used": "0%",
-      "uptime": "03:46 hrs",
-      "localtime": "2026-09-16 02:04:06"
+      "uptime": "1d 07:17 hrs",
+      "localtime": "2026-09-17 05:35:04"
     },
     "getSystemResume": {
       "kernel": "6.6.144",
@@ -35,7 +35,28 @@
       }
     },
     "getNews": {
-      "error": "No internet connection available."
+      "news": [
+        {
+          "date": "2026-08-20",
+          "title": "Aura Full Released",
+          "description": "Aura Full, my WiFi reconnaissance and wardriving engine for frieren, is now available at <a href=\"https://frieren.exocetlabs.com/\" target=\"_blank\" rel=\"noopener noreferrer\">frieren.exocetlabs.com</a>. Multi-radio scanning across 2.4/5/6 GHz, simultaneous multi-adapter operation, handshake/PMKID capture, Hashcat export, deauth/beacon flood, GPS wardriving with WiGLE CSV, presence monitoring, and web panel + CLI. Supports 5 architectures (MIPS, MIPS BE, ARM, ARM64), 2 devices per license."
+        },
+        {
+          "date": "2026-07-13",
+          "title": "Frieren 1.4.3 Released",
+          "description": "Performance-focused release: a big cut in per-request subprocess spawns and a non-blocking session make the panel noticeably snappier, plus a runtime terminal enable/disable toggle and fixes to the UCI config parser and DHCP static-lease deletion. More info: <a href=\"https://github.com/xchwarze/frieren/releases/tag/1.4.3\" target=\"_blank\" rel=\"noopener noreferrer\">Release notes</a>"
+        },
+        {
+          "date": "2026-07-07",
+          "title": "Frieren 1.4.2 Released",
+          "description": "Patch release: module manifests grow to schema v2 with a front-end minimum-version gate that blocks modules needing a newer panel, optional tab count badges, wireless interface-role fixes on edit, UI-layout compliance fixes, and expanded docs. <strong>Important: update your installed modules to their latest versions before installing new ones.</strong> More info: <a href=\"https://github.com/xchwarze/frieren/releases/tag/1.4.2\" target=\"_blank\" rel=\"noopener noreferrer\">Release notes</a>"
+        }
+      ],
+      "lastVersion": {
+        "version": "1.4.3",
+        "comment": "Performance pass: fewer subprocess spawns and a non-blocking session for a snappier panel, a runtime terminal enable/disable toggle, and UCI parser + DHCP lease-deletion fixes.",
+        "updateUrl": "https://github.com/xchwarze/frieren-release/raw/refs/heads/master/packages/openwrt/latest/frieren_1.4.3-r1_all.ipk"
+      }
     }
   },
   "system": {
@@ -90,44 +111,25 @@
     ],
     "getSystemLogs": [
       {
-        "timestamp": "Wed Sep 16 01:58:32 2026",
+        "timestamp": 1789623288,
         "tag": "authpriv.info",
-        "process": "dropbear[12808]",
-        "message": "Exit (root) from <192.0.2.1:34874>: Disconnect received"
+        "process": "dropbear[25644]",
+        "message": "Exit (root) from <192.0.2.1:58147>: Disconnect received"
       },
       {
-        "timestamp": "Wed Sep 16 01:58:30 2026",
+        "timestamp": 1789623287,
         "tag": "authpriv.notice",
-        "process": "dropbear[12808]",
-        "message": "Password auth succeeded for 'root' from 192.0.2.1:34874"
+        "process": "dropbear[25644]",
+        "message": "Password auth succeeded for 'root' from 192.0.2.1:58147"
       },
       {
-        "timestamp": "Wed Sep 16 01:58:29 2026",
+        "timestamp": 1789623287,
         "tag": "authpriv.info",
-        "process": "dropbear[12808]",
-        "message": "Child connection from 192.0.2.1:34874"
+        "process": "dropbear[25644]",
+        "message": "Child connection from 192.0.2.1:58147"
       }
     ],
-    "getSystemLogs:search": [
-      {
-        "timestamp": "Tue Sep 15 22:47:30 2026",
-        "tag": "user.info",
-        "process": "kernel",
-        "message": "[ 1816.481045] kmodloader: done loading kernel modules from /etc/modules.d/*"
-      },
-      {
-        "timestamp": "Tue Sep 15 22:47:29 2026",
-        "tag": "user.info",
-        "process": "kernel",
-        "message": "[ 1815.168341] kmodloader: loading kernel modules from /etc/modules.d/*"
-      },
-      {
-        "timestamp": "Fri Jul 24 07:21:57 2026",
-        "tag": "user.info",
-        "process": "kernel",
-        "message": "[   13.526451] kmodloader: done loading kernel modules from /etc/modules.d/*"
-      }
-    ],
+    "getSystemLogs:search": [],
     "getServices": {
       "services": [
         {
@@ -158,7 +160,7 @@
           "name": "aura",
           "title": "Aura",
           "version": "1.0.0",
-          "icon": "key"
+          "icon": "icon.png"
         },
         {
           "name": "evilportal",
@@ -169,7 +171,7 @@
         {
           "name": "firewall",
           "title": "Firewall",
-          "version": "1.0.0",
+          "version": "1.1.0",
           "icon": "shield"
         },
         {
@@ -232,7 +234,7 @@
           "name": "aura",
           "title": "Aura",
           "version": "1.0.0",
-          "icon": "key"
+          "icon": "icon.png"
         },
         {
           "name": "evilportal",
@@ -243,7 +245,7 @@
         {
           "name": "firewall",
           "title": "Firewall",
-          "version": "1.0.0",
+          "version": "1.1.0",
           "icon": "shield"
         },
         {
@@ -264,7 +266,7 @@
       {
         "name": "aura",
         "title": "Aura",
-        "icon": "key",
+        "icon": "icon.png",
         "sidebar": false,
         "forceSidebar": true,
         "description": "AURA engine setup and lifecycle panel",
@@ -273,7 +275,7 @@
         "repository": "https://github.com/xchwarze/frieren-modules/tree/master/aura",
         "documentation": "https://github.com/xchwarze/frieren-modules/tree/master/aura#readme",
         "system": false,
-        "size": "464.0K"
+        "size": "464.5K"
       },
       {
         "name": "evilportal",
@@ -287,7 +289,7 @@
         "repository": "https://github.com/xchwarze/frieren-modules/tree/master/evilportal",
         "documentation": "https://github.com/xchwarze/frieren-modules/tree/master/evilportal#readme",
         "system": false,
-        "size": "392.0K"
+        "size": "412.0K"
       },
       {
         "name": "firewall",
@@ -295,18 +297,67 @@
         "icon": "shield",
         "sidebar": true,
         "forceSidebar": false,
-        "description": "Hardens the gadget by separating the admin and captured trust planes with fw4 zones, plus a raw /etc/config/firewall editor",
+        "description": "frieren firewall isolation and configuration",
         "author": "DSR!",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "repository": "https://github.com/xchwarze/frieren-modules/tree/master/firewall",
         "documentation": "https://github.com/xchwarze/frieren-modules/tree/master/firewall#readme",
         "system": false,
-        "size": "73.0K"
+        "size": "74.5K"
       }
     ],
-    "getAvailableModules": {
-      "error": "No internet connection available."
-    },
+    "getAvailableModules": [
+      {
+        "name": "wpaonlinecrack",
+        "title": "WPA Crack",
+        "version": "1.1.3",
+        "description": "Automates wpa hash cracking through online services",
+        "author": "DSR!",
+        "keywords": [
+          "hash",
+          "wpa"
+        ],
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/wpaonlinecrack",
+        "documentation": "https://github.com/xchwarze/frieren-modules/tree/master/wpaonlinecrack#readme",
+        "minPanelVersion": "1.0.0",
+        "size": 17111,
+        "sizeHuman": "16.71 KiB",
+        "checksum": "82dd897437f674cee16106ba787878fe9fa64753171c3f83a14611387d6fdd87"
+      },
+      {
+        "name": "wigle",
+        "title": "WiGLE",
+        "version": "1.0.1",
+        "description": "WiFi network lookup via WiGLE.net database",
+        "author": "DSR!",
+        "keywords": [
+          "wifi",
+          "recon"
+        ],
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/wigle",
+        "documentation": "https://github.com/xchwarze/frieren-modules/tree/master/wigle#readme",
+        "minPanelVersion": "1.0.0",
+        "size": 13108,
+        "sizeHuman": "12.80 KiB",
+        "checksum": "a79648707393ea412274f99f1cd6347e57d05979ba79b8a10d65fde35545ea53"
+      },
+      {
+        "name": "usbstorage",
+        "title": "SD/USB Storage",
+        "version": "1.0.4",
+        "description": "Add SD/USB Storage Support",
+        "author": "DSR!",
+        "keywords": [
+          "storage"
+        ],
+        "repository": "https://github.com/xchwarze/frieren-modules/tree/master/usbstorage",
+        "documentation": "https://github.com/xchwarze/frieren-modules/tree/master/usbstorage#readme",
+        "minPanelVersion": "1.0.0",
+        "size": 13444,
+        "sizeHuman": "13.13 KiB",
+        "checksum": "f5c301586602542bf53c4dae03fb92def8fbccc4f9f1e4af71cf44a5f5fcbfb2"
+      }
+    ],
     "checkDestination": {
       "alreadyInstalled": false,
       "isInternalAvailable": true,
@@ -363,11 +414,11 @@
       "hostname": "frieren",
       "timezone": "GMT+0",
       "theme": "auto",
-      "terminalAutologin": false,
-      "terminalTheme": "nord",
-      "fontSize": 14,
+      "terminalAutologin": true,
+      "terminalTheme": "gruvbox",
+      "fontSize": 15,
       "cursorStyle": "bar",
-      "cursorBlink": false,
+      "cursorBlink": true,
       "terminalEnabled": true
     }
   },
@@ -383,11 +434,11 @@
           "name": "evil",
           "proto": "static",
           "up": true,
-          "ipaddr": "192.0.2.95",
+          "ipaddr": "192.0.2.91",
           "netmask": "255.255.255.0",
           "gateway": null,
           "dns": [],
-          "uptime": 1392,
+          "uptime": 96093,
           "device": "br-evil",
           "mtu": null,
           "macaddr": null,
@@ -397,11 +448,11 @@
           "name": "lan",
           "proto": "static",
           "up": true,
-          "ipaddr": "192.0.2.9",
+          "ipaddr": "192.0.2.5",
           "netmask": "255.255.255.0",
           "gateway": null,
           "dns": [],
-          "uptime": 13550,
+          "uptime": 112608,
           "device": "br-lan",
           "mtu": null,
           "macaddr": null,
@@ -431,7 +482,20 @@
       ]
     },
     "getDhcpLeases": {
-      "leases": []
+      "leases": [
+        {
+          "hostname": "client-1",
+          "ip": "192.0.2.2",
+          "mac": "02:00:00:00:00:01",
+          "expires": 1789664750
+        },
+        {
+          "hostname": "client-2",
+          "ip": "192.0.2.1",
+          "mac": "02:00:00:00:00:02",
+          "expires": 1789653201
+        }
+      ]
     },
     "getStaticLeases": {
       "leases": []
@@ -439,30 +503,30 @@
     "getArpTable": {
       "neighbors": [
         {
+          "ip": "192.0.2.92",
+          "mac": "02:00:00:00:00:04",
+          "device": "phy2-sta0",
+          "state": "STALE"
+        },
+        {
+          "ip": "192.0.2.4",
+          "mac": "02:00:00:00:00:05",
+          "device": "phy2-sta0",
+          "state": "REACHABLE"
+        },
+        {
           "ip": "192.0.2.1",
-          "mac": "02:00:00:00:00:05",
-          "device": "br-lan",
-          "state": "REACHABLE"
-        },
-        {
-          "ip": "fd78:ff82:d61b:0:7403:32e3:47d7:ffd8",
-          "mac": "02:00:00:00:00:05",
-          "device": "br-lan",
-          "state": "REACHABLE"
-        },
-        {
-          "ip": "fe80::9043:f2f1:b40e:31f1",
-          "mac": "02:00:00:00:00:05",
+          "mac": "02:00:00:00:00:02",
           "device": "br-lan",
           "state": "REACHABLE"
         }
       ]
     },
     "runPing": {
-      "output": "PING 127.0.0.1 (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: seq=0 ttl=64 time=0.594 ms\n64 bytes from 127.0.0.1: seq=1 ttl=64 time=0.448 ms\n64 bytes from 127.0.0.1: seq=2 ttl=64 time=0.439 ms"
+      "output": "PING 127.0.0.1 (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: seq=0 ttl=64 time=0.595 ms\n64 bytes from 127.0.0.1: seq=1 ttl=64 time=0.453 ms\n64 bytes from 127.0.0.1: seq=2 ttl=64 time=0.458 ms"
     },
     "runTraceroute": {
-      "output": "traceroute to 127.0.0.1 (127.0.0.1), 15 hops max, 46 byte packets\n 1  localhost (127.0.0.1)  0.065 ms"
+      "output": "traceroute to 127.0.0.1 (127.0.0.1), 15 hops max, 46 byte packets\n 1  localhost (127.0.0.1)  0.074 ms"
     },
     "runNslookup": {
       "output": "Server:\t\t127.0.0.1\nAddress:\t127.0.0.1:53\n\nName:\tlocalhost.lan"
@@ -497,7 +561,7 @@
             "section": "wifinet1",
             "mode": "sta",
             "ssid": "ExampleNet",
-            "bssid": "02:00:00:00:00:03",
+            "bssid": "02:00:00:00:00:0a",
             "encryption": "psk2",
             "network": "wwan",
             "hidden": false,
@@ -559,7 +623,7 @@
       "radio2": {
         "channel": "36",
         "txpower": 20,
-        "frequency": 2447,
+        "frequency": 5240,
         "band": "5 GHz",
         "supportedBands": [
           "2.4 GHz",
@@ -582,12 +646,12 @@
           {
             "radio": "radio2",
             "ifname": "phy2-sta0",
-            "section": "wifinet3",
+            "section": "wifinet4",
             "mode": "sta",
-            "ssid": "ExampleNet",
-            "bssid": "02:00:00:00:00:01",
+            "ssid": "ExampleNet-4",
+            "bssid": "02:00:00:00:00:03",
             "encryption": "psk2+ccmp",
-            "network": "wan",
+            "network": "wwan",
             "hidden": false,
             "up": true,
             "disabled": false
@@ -596,7 +660,7 @@
       }
     },
     "getRawWirelessConfig": {
-      "content": "\nconfig wifi-device 'radio0'\n\toption type 'mac80211'\n\toption path '1e140000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0'\n\toption band '2g'\n\toption channel '8'\n\toption htmode 'HT20'\n\toption cell_density '0'\n\nconfig wifi-device 'radio1'\n\toption type 'mac80211'\n\toption path '1e140000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0+1'\n\toption band '5g'\n\toption channel '36'\n\toption htmode 'VHT80'\n\toption disabled '0'\n\toption txpower '20'\n\toption country 'US'\n\toption cell_density '0'\n\toption distance '0'\n\nconfig wifi-iface 'default_radio1'\n\toption device 'radio1'\n\toption network 'UNSET'\n\toption mode 'monitor'\n\toption ssid 'frieren'\n\toption encryption 'none'\n\toption disabled '0'\n\nconfig wifi-iface 'wifinet1'\n\toption device 'radio0'\n\toption mode 'sta'\n\toption network 'wwan'\n\toption ssid 'ExampleNet'\n\toption bssid '02:00:00:00:00:01'\n\toption encryption 'psk2'\n\toption key 'ExamplePassphrase'\n\toption disabled '1'\n\nconfig wifi-device 'radio2'\n\toption type 'mac80211'\n\toption path 'platform/1e1c0000.xhci/usb2/2-1/2-1:1.0'\n\toption band '5g'\n\toption channel '36'\n\toption htmode 'VHT80'\n\toption disabled '0'\n\toption txpower '20'\n\toption country 'US'\n\toption cell_density '0'\n\toption distance '0'\n\nconfig wifi-iface 'wifinet2'\n\toption device 'radio0'\n\toption mode 'ap'\n\toption disabled '0'\n\toption network 'evil'\n\toption ssid 'ExampleNet-2'\n\toption encryption 'psk2+ccmp'\n\toption hidden '0'\n\toption key 'ExamplePassphrase'\n\toption ieee80211w '0'\n\nconfig wifi-iface 'wifinet3'\n\toption device 'radio2'\n\toption mode 'sta'\n\toption disabled '0'\n\toption network 'wan'\n\toption ssid 'ExampleNet'\n\toption encryption 'psk2+ccmp'\n\toption hidden '0'\n\toption key 'ExamplePassphrase'\n\n"
+      "content": "\nconfig wifi-device 'radio0'\n\toption type 'mac80211'\n\toption path '1e140000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0'\n\toption band '2g'\n\toption channel '8'\n\toption htmode 'HT20'\n\toption cell_density '0'\n\nconfig wifi-device 'radio1'\n\toption type 'mac80211'\n\toption path '1e140000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0+1'\n\toption band '5g'\n\toption channel '36'\n\toption htmode 'VHT80'\n\toption disabled '0'\n\toption txpower '20'\n\toption country 'US'\n\toption cell_density '0'\n\toption distance '0'\n\nconfig wifi-iface 'default_radio1'\n\toption device 'radio1'\n\toption network 'UNSET'\n\toption mode 'monitor'\n\toption ssid 'frieren'\n\toption encryption 'none'\n\toption disabled '0'\n\nconfig wifi-iface 'wifinet1'\n\toption device 'radio0'\n\toption mode 'sta'\n\toption network 'wwan'\n\toption ssid 'ExampleNet'\n\toption bssid '02:00:00:00:00:0a'\n\toption encryption 'psk2'\n\toption key 'ExamplePassphrase'\n\toption disabled '1'\n\nconfig wifi-device 'radio2'\n\toption type 'mac80211'\n\toption path 'platform/1e1c0000.xhci/usb2/2-1/2-1:1.0'\n\toption band '5g'\n\toption channel '36'\n\toption htmode 'VHT80'\n\toption disabled '0'\n\toption txpower '20'\n\toption country 'US'\n\toption cell_density '0'\n\toption distance '0'\n\nconfig wifi-iface 'wifinet2'\n\toption device 'radio0'\n\toption mode 'ap'\n\toption disabled '0'\n\toption network 'evil'\n\toption ssid 'ExampleNet-2'\n\toption encryption 'psk2+ccmp'\n\toption hidden '0'\n\toption key 'ExamplePassphrase'\n\toption ieee80211w '0'\n\nconfig wifi-iface 'wifinet4'\n\toption device 'radio2'\n\toption mode 'sta'\n\toption disabled '0'\n\toption network 'wwan'\n\toption ssid 'ExampleNet-4'\n\toption encryption 'psk2+ccmp'\n\toption hidden '0'\n\toption key 'ExamplePassphrase'\n\toption bssid '02:00:00:00:00:03'\n\n"
     },
     "getRadioConfig": {
       "current": {
@@ -667,27 +731,27 @@
     },
     "scanForNetworks": [
       {
-        "bssid": "02:00:00:00:00:01",
+        "bssid": "02:00:00:00:00:0a",
         "ssid": "ExampleNet",
         "channel": 8,
-        "signal": -24,
+        "signal": -30,
         "quality": 70,
         "security": "WPA2-PSK / CCMP"
       },
       {
-        "bssid": "02:00:00:00:00:06",
+        "bssid": "02:00:00:00:00:0b",
         "ssid": "Telecentro-37fc",
-        "channel": 8,
-        "signal": -68,
-        "quality": 42,
-        "security": "WPA3-SAE / CCMP"
-      },
-      {
-        "bssid": "02:00:00:00:00:07",
-        "ssid": "TeleCentro Wifi",
         "channel": 8,
         "signal": -69,
         "quality": 41,
+        "security": "WPA3-SAE / CCMP"
+      },
+      {
+        "bssid": "02:00:00:00:00:0c",
+        "ssid": "TeleCentro Wifi",
+        "channel": 8,
+        "signal": -70,
+        "quality": 40,
         "security": "Open"
       }
     ]
