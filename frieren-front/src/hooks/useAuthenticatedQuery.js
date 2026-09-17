@@ -13,6 +13,7 @@ import useHandleError from '@src/hooks/useHandleError.js';
  * Utilizes React Query's useQuery for state management and fetching logic.
  *
  * @param {Function} queryFn - The query function to be executed, expected to return a promise.
+ * @param {boolean} [showGenericToast=true] - Whether non-session errors use the generic toast.
  * @param {{
  *   queryKey?: unknown[],
  *   enabled?: boolean,
@@ -62,7 +63,7 @@ import useHandleError from '@src/hooks/useHandleError.js';
  *   status: 'pending' | 'error' | 'success',
  * }} The result object from the useQuery hook, containing state and control properties.
  */
-const useAuthenticatedQuery = ({ queryFn, ...rest }) => {
+const useAuthenticatedQuery = ({ queryFn, showGenericToast = true, ...rest }) => {
     const handleError = useHandleError();
 
     return useQuery({
@@ -70,7 +71,7 @@ const useAuthenticatedQuery = ({ queryFn, ...rest }) => {
             try {
                 return await queryFn();
             } catch (error) {
-                handleError(error);
+                handleError(error, { showGenericToast });
 
                 throw error;
             }
