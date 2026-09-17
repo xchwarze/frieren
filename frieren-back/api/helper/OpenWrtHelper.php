@@ -181,6 +181,11 @@ class OpenWrtHelper implements HelperInterface
     /**
      * Sets a value in the UCI configuration.
      *
+     * An empty string or null writes the literal string 'UNSET' (see
+     * UciConfigHelper::uciSet()), not a real unset. Only safe for config nothing outside
+     * this app reads. For any option OpenWrt's own tooling also reads (network/wireless/
+     * dhcp/firewall/etc.), use uciDelete() instead -- that raw string gets read literally.
+     *
      * @param string $settingString The UCI setting string.
      * @param mixed $value The value to set.
      * @param bool $isList If true, the value will be added to a list; otherwise, it will set the value.

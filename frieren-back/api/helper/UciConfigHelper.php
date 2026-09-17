@@ -200,6 +200,16 @@ class UciConfigHelper
     /**
      * Sets a value in the UCI configuration.
      *
+     * An empty string or null writes the literal string 'UNSET' (this framework's own
+     * empty-value sentinel, decoded back to null by uciGet() below) instead of removing
+     * the option. That round-trip is only safe for config nothing outside this app reads
+     * (e.g. frieren's own `frieren` config). For any option OpenWrt's own tooling also
+     * reads -- network/netifd, wireless/hostapd+wpa_supplicant+mac80211, dhcp, firewall,
+     * etc. -- that tooling reads the raw file and sees a literal "UNSET" string, not
+     * "unset". Use uciDelete() instead. (Bitten twice already: network's
+     * writeProtoOptions() gateway option, and wireless's setInterfaceConfig() switching
+     * a section to monitor mode.)
+     *
      * @param string $settingString The UCI setting string.
      * @param mixed $value The value to set.
      * @param bool $isList If true, the value will be added to a list; otherwise, it will set the value.

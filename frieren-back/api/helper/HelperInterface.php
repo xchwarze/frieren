@@ -55,6 +55,10 @@ interface HelperInterface
     /**
      * Sets a value in the UCI configuration.
      *
+     * An empty string/null writes the literal 'UNSET' sentinel, not a real unset --
+     * see OpenWrtHelper::uciSet(). Use uciDelete() for any option OpenWrt's own
+     * tooling also reads.
+     *
      * @param string $settingString The UCI setting string.
      * @param mixed $value The value to set.
      * @param bool $isList If true, the value will be added to a list; otherwise, it will set the value.
