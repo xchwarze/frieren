@@ -54,7 +54,9 @@ const WirelessOverviewCard = () => {
             initialValues: {
                 ssid: network.ssid || '',
                 mode: 'sta',
-                network: '',
+                // 'wwan' is the dedicated, device-less uplink network this router ships for a
+                // wifi client to claim -- 'wan'/'wan6' already belong to the ethernet port.
+                network: 'wwan',
                 encryption: mapScanSecurityToEncryption(network.security),
                 key: '',
                 hidden: false,

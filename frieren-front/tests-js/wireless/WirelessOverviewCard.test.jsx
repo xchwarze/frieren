@@ -7,8 +7,9 @@
  * mocked to a thin marker that exposes just the props under test, so a wrong radio/section
  * threaded through this component is the only thing that can make these fail.
  *
- * The first test is the original regression case: the network binding for a scan-to-connect is
- * selected from the device's configured network list by the form, not guessed here.
+ * The first test covers the scan-to-connect network default: `wwan` is the dedicated,
+ * device-less network this router's config reserves for a wifi client uplink (`wan`/`wan6`
+ * already belong to the ethernet port), so it's the one sane default to pre-select here.
  */
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
@@ -88,13 +89,13 @@ describe('WirelessOverviewCard', () => {
         useGetWirelessOverview.mockReturnValue(overviewOf({ radio0: { interfaces: [] } }));
     });
 
-    it('does not guess a device-specific network when connecting from a scan', () => {
+    it('defaults the network to wwan when connecting from a scan', () => {
         render(<WirelessOverviewCard />);
 
         fireEvent.click(screen.getByRole('button', { name: 'Open scan' }));
         fireEvent.click(screen.getByRole('button', { name: 'Connect scan result' }));
 
-        expect(screen.getByTestId('scan-network')).toHaveTextContent('');
+        expect(screen.getByTestId('scan-network')).toHaveTextContent('wwan');
     });
 
     it('renders one RadioSection per radio key returned by the overview', () => {

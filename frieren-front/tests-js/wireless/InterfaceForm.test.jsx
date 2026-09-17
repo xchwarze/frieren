@@ -196,6 +196,19 @@ describe('InterfaceForm', () => {
         expect(screen.queryByText(/usually belongs on/)).not.toBeInTheDocument();
     });
 
+    it('warns for a sta interface on plain wan too -- it belongs to the ethernet port, not wifi', () => {
+        render(
+            <InterfaceForm
+                radio={'radio0'}
+                onHide={vi.fn()}
+                defaultValues={{ ...apDefaults, mode: 'sta', network: 'wan' }}
+                onInterfaceSaved={vi.fn()}
+            />
+        );
+
+        expect(screen.getByText(/usually belongs on/)).toBeInTheDocument();
+    });
+
     it('does not warn for a sta interface on wwan', () => {
         render(
             <InterfaceForm
