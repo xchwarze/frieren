@@ -107,7 +107,7 @@ const RadioSection = ({ radioName, radio, onScan, onEdit, onAdd, onConfigure, ch
                                     <td>{iface.ssid || '-'}</td>
                                     <td>{iface.mode}</td>
                                     <td><code>{iface.bssid || '-'}</code></td>
-                                    <td>{iface.encryption || 'None'}</td>
+                                    <td>{iface.encryption || '-'}</td>
                                     <td>
                                         <StatusBadge status={iface.disabled ? 'disabled' : (iface.up ? 'up' : 'degraded')}>
                                             {iface.disabled

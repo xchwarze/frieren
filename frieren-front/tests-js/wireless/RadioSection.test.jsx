@@ -75,12 +75,11 @@ describe('RadioSection', () => {
         expect(within(rowFor('MyNet')).getByText('Up')).toBeInTheDocument();
     });
 
-    it('falls back to placeholders for a disabled interface missing bssid/encryption', () => {
+    it('falls back to a dash for a disabled interface missing bssid/encryption', () => {
         renderSection();
 
         const guestRow = rowFor('Guest');
-        expect(within(guestRow).getByText('-')).toBeInTheDocument();
-        expect(within(guestRow).getByText('None')).toBeInTheDocument();
+        expect(within(guestRow).getAllByText('-')).toHaveLength(2);
         expect(within(guestRow).getByText('Disabled')).toBeInTheDocument();
     });
 
