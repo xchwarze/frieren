@@ -20,6 +20,7 @@ import Button from '@src/components/Button';
  * @param {String} title - The title of the panel card.
  * @param {String} [icon] - Optional leading icon name (feather) shown before the title.
  * @param {String} [subtitle] - Optional descriptive subtitle.
+ * @param {ReactNode} [headerActions] - Optional actions rendered beside the refresh button.
  * @param {Function} [refetch] - Refetch handler for the refresh button.
  * @param {Boolean} [showRefresh] - Whether to show the refresh button. Defaults to whether
  *   `refetch` was passed (`!!refetch`), so a card with no refetch handler renders no button
@@ -33,53 +34,64 @@ import Button from '@src/components/Button';
  * @return {ReactNode} The rendered panel card component.
  */
 const PanelCard = ({
-                       title,
-                       icon,
-                       subtitle,
-                       refetch,
-                       showRefresh = !!refetch,
-                       isFetching,
-                       fill = false,
-                       className = '',
-                       children,
-                       ...rest
-                   }) => (
-    <Card className={`panel-card ${className}`.trim()} {...rest}>
-        <Card.Body className={fill ? 'd-flex flex-column' : undefined}>
-            <div className={'mb-4'}>
-                <Card.Title className={'panel-card-title'}>
-                    <span className={'d-inline-flex align-items-center gap-2'}>
-                        {icon && <Icon name={icon} />}
-                        {title}
-                    </span>
-                    {showRefresh && (
-                        <Button
-                            variant={'outline-secondary'}
-                            disabled={isFetching}
-                            onClick={refetch}
-                            className={'btn-icon'}
-                            icon={`refresh-cw ${isFetching ? 'icon-spin' : ''}`}
-                            title={'Refresh'}
-                        />
+                        title,
+                        icon,
+                        subtitle,
+                        headerActions,
+                        refetch,
+                        showRefresh = !!refetch,
+                        isFetching,
+                        fill = false,
+                        className = '',
+                        children,
+                        ...rest
+                   }) => {
+    const refreshButton = showRefresh && (
+        <Button
+            variant={'outline-secondary'}
+            disabled={isFetching}
+            onClick={refetch}
+            className={'btn-icon'}
+            icon={`refresh-cw ${isFetching ? 'icon-spin' : ''}`}
+            title={'Refresh'}
+        />
+    );
+
+    return (
+        <Card className={`panel-card ${className}`.trim()} {...rest}>
+            <Card.Body className={fill ? 'd-flex flex-column' : undefined}>
+                <div className={'mb-4'}>
+                    <Card.Title className={'panel-card-title'}>
+                        <span className={'d-inline-flex align-items-center gap-2'}>
+                            {icon && <Icon name={icon} />}
+                            {title}
+                        </span>
+                        {headerActions ? (
+                            <div className={'d-flex align-items-center gap-2'}>
+                                {headerActions}
+                                {refreshButton}
+                            </div>
+                        ) : refreshButton}
+                    </Card.Title>
+
+                    {subtitle && (
+                        <Card.Subtitle className={'text-body-secondary'}>
+                            {subtitle}
+                        </Card.Subtitle>
                     )}
-                </Card.Title>
+                </div>
 
-                {subtitle && (
-                    <Card.Subtitle className={'text-body-secondary'}>
-                        {subtitle}
-                    </Card.Subtitle>
-                )}
-            </div>
-
-            {children}
-        </Card.Body>
-    </Card>
-);
+                {children}
+            </Card.Body>
+        </Card>
+    );
+};
 
 PanelCard.propTypes = {
     title: PropTypes.string.isRequired,
     icon: PropTypes.string,
     subtitle: PropTypes.node,
+    headerActions: PropTypes.node,
     showRefresh: PropTypes.bool,
     refetch: PropTypes.func,
     isFetching: PropTypes.bool,

@@ -56,6 +56,32 @@ describe('PanelCard', () => {
         expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument();
     });
 
+    it('renders optional header actions beside refresh', () => {
+        render(
+            <PanelCard
+                title={'Watchlist'}
+                refetch={vi.fn()}
+                headerActions={<button>Add entry</button>}
+            >
+                Body
+            </PanelCard>,
+        );
+
+        const addButton = screen.getByRole('button', { name: 'Add entry' });
+        const refreshButton = screen.getByTitle('Refresh');
+
+        expect(addButton).toBeInTheDocument();
+        expect(refreshButton).toBeInTheDocument();
+        expect(addButton.parentElement).toHaveClass('d-flex', 'align-items-center', 'gap-2');
+        expect(addButton.parentElement).toContainElement(refreshButton);
+    });
+
+    it('preserves the legacy title structure without header actions', () => {
+        const { container } = render(<PanelCard title={'Legacy'}>Body</PanelCard>);
+
+        expect(container.querySelector('.panel-card-title > span')).toHaveTextContent('Legacy');
+    });
+
     it('calls refetch when the refresh button is clicked', async () => {
         const refetch = vi.fn();
         render(<PanelCard title={'X'} refetch={refetch}>content</PanelCard>);
