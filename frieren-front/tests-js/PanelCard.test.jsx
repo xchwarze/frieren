@@ -82,6 +82,44 @@ describe('PanelCard', () => {
         expect(container.querySelector('.panel-card-title > span')).toHaveTextContent('Legacy');
     });
 
+    /**
+     * sentinel-operator-ux-redesign AC-028 (REQ-008): at 320 CSS px a card with several header
+     * actions used to grow wider than its container, so the actions lay outside the viewport.
+     * jsdom computes no layout, so these pin the structural contract that makes wrapping possible
+     * (a wrapping title row and a wrapping action group); the real-browser 320x800 transcript is
+     * what proves the pixels.
+     */
+    it('lets the title row wrap so header actions drop below the title on narrow screens', () => {
+        const { container } = render(
+            <PanelCard title={'Watchlist'} headerActions={<button>Add entry</button>}>Body</PanelCard>,
+        );
+
+        expect(container.querySelector('.panel-card-title')).toHaveClass('flex-wrap', 'gap-2');
+    });
+
+    it('lets the header action group wrap so a wide action set cannot widen the card', () => {
+        render(
+            <PanelCard
+                title={'Watchlist'}
+                refetch={vi.fn()}
+                headerActions={<button>Add entry</button>}
+            >
+                Body
+            </PanelCard>,
+        );
+
+        expect(screen.getByRole('button', { name: 'Add entry' }).parentElement).toHaveClass('flex-wrap');
+    });
+
+    it('keeps the legacy title row a single non-wrapping row without header actions', () => {
+        const { container } = render(<PanelCard title={'Legacy'} refetch={vi.fn()}>Body</PanelCard>);
+
+        const titleRow = container.querySelector('.panel-card-title');
+        expect(titleRow).not.toHaveClass('flex-wrap');
+        expect(titleRow).not.toHaveClass('gap-2');
+        expect(screen.getByTitle('Refresh').parentElement).toBe(titleRow);
+    });
+
     it('calls refetch when the refresh button is clicked', async () => {
         const refetch = vi.fn();
         render(<PanelCard title={'X'} refetch={refetch}>content</PanelCard>);

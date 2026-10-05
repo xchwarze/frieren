@@ -10,6 +10,12 @@ import PropTypes from 'prop-types';
 import Icon from '@src/components/Icon';
 import Button from '@src/components/Button';
 
+// Only the header-actions variant may wrap: a wide action set then drops below the title instead
+// of widening the card past its container on narrow screens. Without actions the title row stays
+// the legacy single non-wrapping row, so existing cards render exactly as before.
+const TITLE_ROW_CLASS = 'panel-card-title';
+const TITLE_ROW_WITH_ACTIONS_CLASS = `${TITLE_ROW_CLASS} flex-wrap gap-2`;
+
 /**
  * Panel card with a title, optional subtitle, and optional refresh button.
  *
@@ -20,7 +26,8 @@ import Button from '@src/components/Button';
  * @param {String} title - The title of the panel card.
  * @param {String} [icon] - Optional leading icon name (feather) shown before the title.
  * @param {String} [subtitle] - Optional descriptive subtitle.
- * @param {ReactNode} [headerActions] - Optional actions rendered beside the refresh button.
+ * @param {ReactNode} [headerActions] - Optional actions rendered beside the refresh button. The
+ *   group wraps (and drops below the title) when the card is too narrow to hold them in one row.
  * @param {Function} [refetch] - Refetch handler for the refresh button.
  * @param {Boolean} [showRefresh] - Whether to show the refresh button. Defaults to whether
  *   `refetch` was passed (`!!refetch`), so a card with no refetch handler renders no button
@@ -61,13 +68,13 @@ const PanelCard = ({
         <Card className={`panel-card ${className}`.trim()} {...rest}>
             <Card.Body className={fill ? 'd-flex flex-column' : undefined}>
                 <div className={'mb-4'}>
-                    <Card.Title className={'panel-card-title'}>
+                    <Card.Title className={headerActions ? TITLE_ROW_WITH_ACTIONS_CLASS : TITLE_ROW_CLASS}>
                         <span className={'d-inline-flex align-items-center gap-2'}>
                             {icon && <Icon name={icon} />}
                             {title}
                         </span>
                         {headerActions ? (
-                            <div className={'d-flex align-items-center gap-2'}>
+                            <div className={'d-flex flex-wrap align-items-center gap-2'}>
                                 {headerActions}
                                 {refreshButton}
                             </div>
