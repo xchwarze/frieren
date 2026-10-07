@@ -31,6 +31,24 @@ test.describe('Mock: Dashboard', () => {
         expect(count).toBeGreaterThan(0);
     });
 
+    test('paginates news at 10 entries per page', async ({ page }) => {
+        const news = Array.from({ length: 12 }, (_, index) => ({
+            date: '2026-01-01',
+            title: `News item ${index + 1}`,
+            description: 'Description',
+        }));
+        await mockApiWithOverrides(page, { dashboard: { getNews: { news } } });
+        await page.goto('/#/dashboard');
+
+        const newsRows = page.locator('table').last().locator('tbody tr');
+        await expect(newsRows).toHaveCount(10);
+        await expect(page.getByText('1-10 of 12 items')).toBeVisible();
+
+        await page.getByRole('button', { name: '2', exact: true }).click();
+        await expect(newsRows).toHaveCount(2);
+        await expect(page.getByText('11-12 of 12 items')).toBeVisible();
+    });
+
     test('no update alert when version is current', async ({ page }) => {
         await mockApi(page);
         await page.goto('/#/dashboard');

@@ -6,7 +6,7 @@
  * Pure logic, no rendering. Fixed system time via vi.setSystemTime so the relative-vs-absolute
  * boundary (60s / 3600s) is deterministic regardless of when the suite actually runs.
  */
-import { timeSinceEpoch } from '@src/helpers/dateHelper.js';
+import { formatCalendarDate, timeSinceEpoch } from '@src/helpers/dateHelper.js';
 
 const NOW = new Date('2026-01-01T12:00:00Z');
 
@@ -45,5 +45,23 @@ describe('timeSinceEpoch', () => {
     it('handles a future timestamp the same way (relative, then absolute)', () => {
         const soon = NOW.getTime() / 1000 + 30;
         expect(timeSinceEpoch(soon)).toMatch(/second/);
+    });
+});
+
+describe('formatCalendarDate', () => {
+    it('returns an empty string when the date is absent', () => {
+        expect(formatCalendarDate(undefined)).toBe('');
+        expect(formatCalendarDate('')).toBe('');
+    });
+
+    it('formats a calendar date as a local day, without a time part', () => {
+        const result = formatCalendarDate('2026-06-04');
+        expect(result).toMatch(/2026/);
+        expect(result).toMatch(/\b4\b/);
+        expect(result).not.toMatch(/:/);
+    });
+
+    it('returns the input unchanged when it is not a valid date', () => {
+        expect(formatCalendarDate('soon')).toBe('soon');
     });
 });

@@ -9,6 +9,7 @@
 // the last hour reads naturally ("5 minutes ago"); past that, the absolute local
 // date/time in whatever format the operator's locale prefers.
 const ABSOLUTE_TIME_FMT = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+const DATE_ONLY_FMT = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 const RELATIVE_TIME_FMT = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
 
 /**
@@ -50,4 +51,24 @@ export const formatEpochDateTime = (epoch) => {
     }
 
     return ABSOLUTE_TIME_FMT.format(new Date(epoch * 1000));
+};
+
+/**
+ * Formats a calendar date string (e.g. "2026-06-04") in the viewer's own locale. Parsed
+ * as a local date so the day never shifts with the viewer's timezone offset.
+ *
+ * @param {string} dateString - ISO calendar date (YYYY-MM-DD).
+ * @return {string} The localized date; the input unchanged when unparseable, empty when absent.
+ */
+export const formatCalendarDate = (dateString) => {
+    if (!dateString) {
+        return '';
+    }
+
+    const date = new Date(`${dateString}T00:00:00`);
+    if (Number.isNaN(date.getTime())) {
+        return dateString;
+    }
+
+    return DATE_ONLY_FMT.format(date);
 };

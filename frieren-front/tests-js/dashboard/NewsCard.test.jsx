@@ -7,6 +7,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import NewsCard from '@src/features/dashboard/components/NewsCard/index.jsx';
 import useNews from '@src/features/dashboard/hooks/useNews.js';
+import { formatCalendarDate } from '@src/helpers/dateHelper.js';
 
 vi.mock('@src/features/dashboard/hooks/useNews.js', () => ({ default: vi.fn() }));
 
@@ -38,8 +39,35 @@ describe('NewsCard', () => {
         render(<NewsCard />);
 
         const row = screen.getByText('Release').closest('tr');
-        expect(within(row).getByText('2026-01-01')).toBeInTheDocument();
+        expect(within(row).getByText(formatCalendarDate('2026-01-01'))).toBeInTheDocument();
         expect(within(row).getByText('notes')).toBeInTheDocument();
+    });
+
+    it('paginates the news list at 10 items per page', () => {
+        const news = Array.from({ length: 12 }, (_, index) => ({
+            date: '2026-01-01',
+            title: `Item ${index + 1}`,
+            description: 'desc',
+        }));
+        useNews.mockReturnValue({
+            isLoading: false,
+            isSuccess: true,
+            isFetching: false,
+            refetch: vi.fn(),
+            data: { news },
+        });
+
+        render(<NewsCard />);
+
+        expect(screen.getByText('Item 10')).toBeInTheDocument();
+        expect(screen.queryByText('Item 11')).not.toBeInTheDocument();
+        expect(screen.getByText('1-10 of 12 items')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('2'));
+
+        expect(screen.getByText('Item 11')).toBeInTheDocument();
+        expect(screen.queryByText('Item 1')).not.toBeInTheDocument();
+        expect(screen.getByText('11-12 of 12 items')).toBeInTheDocument();
     });
 
     it('shows an empty-state row when the backend reports no news', () => {
