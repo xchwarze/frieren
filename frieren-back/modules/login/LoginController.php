@@ -19,6 +19,9 @@ class LoginController extends \frieren\core\Controller
     {
         if (isset($this->request['username']) && isset($this->request['password'])) {
             if (self::setupCoreHelper()::verifyPassword($this->request['username'], $this->request['password'])) {
+                // Regenerate the session ID on privilege change to prevent session
+                // fixation attacks (keep the CSRF token data by not deleting the old session).
+                session_regenerate_id(false);
                 $_SESSION['user_logged'] = true;
                 session_write_close();
 
