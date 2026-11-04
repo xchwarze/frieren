@@ -31,11 +31,20 @@ Vite env files live in `config/` (not project root). Mode mapping in `vite.confi
 
 ## Dev Proxy
 
-Dev server proxies `/api/*` to `http://localhost:8000/api-proxy.php`. Run the proxy with:
+Dev server proxies `/api/*` to `http://localhost:8000`, which runs `api-proxy.php` as a router script so
+every path is dispatched through it regardless of the request URL. Run it with:
 ```bash
-cd ../tools && php -S localhost:8000
+cd ../tools && php -S localhost:8000 api-proxy.php
 ```
-Proxy forwards to device at `192.168.7.1:5000`.
+(The router script argument is required — without it, PHP's built-in server 404s on anything that
+isn't literally `/api-proxy.php`, since it otherwise just maps the request path to a file on disk.)
+Proxy forwards to device at `192.168.7.1:5000`, and additionally forwards the incoming `Content-Type`
+and `X-XSRF-TOKEN` headers — both required by the backend's CSRF defense (`ApiCore.php`) but dropped by
+default since curl doesn't inherit them from the original request.
+
+`/modules/*` (third-party module UMD bundles) is proxied separately, straight to the device via
+`VITE_DEV_DEVICE_TARGET` (`config/.env.dev`) — these are static files nginx serves directly, not JSON
+API calls, so they don't need `api-proxy.php`'s header/cookie handling.
 
 ## Architecture
 

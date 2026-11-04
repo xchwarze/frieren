@@ -26,6 +26,7 @@ class RequestForwarder
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POSTFIELDS => file_get_contents('php://input'),
             CURLOPT_COOKIE => $cookieHeader,
+            CURLOPT_HTTPHEADER => $this->buildForwardedRequestHeaders(),
             CURLOPT_HEADERFUNCTION => [$this, 'captureAndForwardHeaders']
         ]);
 
@@ -37,6 +38,47 @@ class RequestForwarder
         $this->sendResponseHeaders();
 
         echo $response;
+    }
+
+    /**
+     * Builds the request headers to forward to the device.
+     *
+     * The backend requires Content-Type: application/json (its CSRF defense
+     * rejects anything else), and echoes the XSRF-TOKEN cookie back via the
+     * X-XSRF-TOKEN header (double-submit). Neither survives by default since
+     * curl doesn't inherit the incoming request's headers.
+     *
+     * @return string[] Header lines to pass via CURLOPT_HTTPHEADER.
+     */
+    private function buildForwardedRequestHeaders()
+    {
+        $headers = [];
+
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        if ($contentType !== '') {
+            $headers[] = "Content-Type: $contentType";
+        }
+
+        $xsrfToken = $this->getRequestHeader('X-XSRF-TOKEN');
+        if ($xsrfToken !== null) {
+            $headers[] = "X-XSRF-TOKEN: $xsrfToken";
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Reads an incoming request header by name (case-insensitive), independent
+     * of getallheaders() availability under the PHP built-in server.
+     *
+     * @param string $name Header name, e.g. "X-XSRF-TOKEN".
+     * @return string|null The header value, or null if not present.
+     */
+    private function getRequestHeader($name)
+    {
+        $serverKey = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+
+        return $_SERVER[$serverKey] ?? null;
     }
 
     /**

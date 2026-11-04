@@ -81,6 +81,18 @@ export default defineConfig(({ mode }) => {
         },
       }
     };
+
+    // Third-party module UMD bundles (/modules/{name}/module.umd.js) are static
+    // files nginx serves straight off the device filesystem -- no CSRF/session
+    // dance like the JSON API, so this goes directly to the device rather than
+    // through api-proxy.php (which only knows how to relay POST /api/index.php).
+    if (env.VITE_DEV_DEVICE_TARGET) {
+      config.server.proxy['/modules'] = {
+        target: env.VITE_DEV_DEVICE_TARGET,
+        changeOrigin: true,
+        secure: false,
+      };
+    }
   }
 
   if (env.VITE_COMPRESSION_ENABLE === 'true') {
