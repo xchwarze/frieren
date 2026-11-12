@@ -61,7 +61,7 @@ jobs:
 
   frontend-mock-e2e:
     name: Frontend mock e2e (Playwright, no live device)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frieren-front
