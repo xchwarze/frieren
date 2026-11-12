@@ -11,7 +11,7 @@ frieren/
 ├── frieren-front/         # React SPA frontend (Vite)
 ├── frieren-module-template/ # Scaffolding for third-party modules
 ├── frieren-terminal/      # Modified ttyd frontend (xterm.js)
-└── tools/                 # Deploy, API test, SSH helpers + PHP minifier
+└── tools/                 # Development tools
 ```
 
 ## Components
