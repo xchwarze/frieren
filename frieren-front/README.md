@@ -32,17 +32,19 @@ To start the development server, run:
 
 ```bash
 cd frieren/frieren-front
-cp config/.env.dev .env
 yarn dev
 ```
+
+`yarn dev` automatically loads `config/.env.dev`. Vite forwards `/api/*` directly to the device at `VITE_DEV_PROXY_TARGET` (default: `http://192.168.7.1:5000`), including JSON headers and session cookies. Update that value for your device and keep its backend running and reachable. No local PHP server or manual `.env` copy is needed.
 
 For building the project for production, use:
 
 ```bash
 cd frieren/frieren-front
-cp config/.env.prod .env
 yarn build
 ```
+
+Production builds automatically load `config/.env.prod`; `yarn build --mode release` loads `config/.env.release`.
 
 Check out the other scripts in `package.json` for linting, previewing the build, and more.
 

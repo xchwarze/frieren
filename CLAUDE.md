@@ -11,7 +11,7 @@ frieren/
 ├── frieren-front/         # React SPA frontend (Vite)
 ├── frieren-module-template/ # Scaffolding for third-party modules
 ├── frieren-terminal/      # Modified ttyd frontend (xterm.js)
-└── tools/                 # Dev proxy + PHP minifier
+└── tools/                 # Deploy, API test, SSH helpers + PHP minifier
 ```
 
 ## Components
@@ -33,7 +33,6 @@ Scaffolding for creating third-party modules. Includes example controller, helpe
 Modified ttyd web terminal frontend. Webpack + TypeScript + xterm.js. Builds inlined HTML (`html.h`) for the ttyd C binary.
 
 ### Tools (`tools/`)
-- **`api-proxy.php`** — Dev proxy for frontend: forwards `/api/*` requests from Vite dev server to hardware device at `192.168.7.1:5000`. Handles PHPSESSID/XSRF-TOKEN cookie forwarding. Run with `php -S localhost:8000`.
 - **`api-test.sh`** — CLI helper for testing backend APIs via curl. Manages login session (cookies/XSRF). Usage: `./api-test.sh login` then `./api-test.sh req '{"module":"...","action":"..."}'`. Supports `-s SLEEP` for polling, `-o FILE` for saving response.
 - **`deploy.sh`** — Deploys backend or frontend to device via SCP. Usage: `./deploy.sh back|front [host] [password]`. Backend deploys `api/` core + `modules/` to `/usr/share/frieren`. Frontend builds prod, compresses assets, and deploys `dist/`.
 - **`ssh-cmd.sh`** — Run a command on device via SSH. Usage: `./ssh-cmd.sh "command" [host] [password]`. Uses SSH_ASKPASS for non-interactive password auth.
@@ -57,12 +56,11 @@ ResponseHandler (JSON)                              OpenWrt system commands
 
 ## Development
 
+Vite proxies `/api/*` directly to the hardware backend configured by `VITE_DEV_PROXY_TARGET` in `frieren-front/config/.env.dev` (default: `http://192.168.7.1:5000`), preserving request headers and session cookies. Keep the backend running on the device; no local PHP server is required. Vite loads the mode-specific files from `config/` automatically, so no manual `.env` copy is needed.
+
 ```bash
 # Frontend dev (from frieren-front/)
 yarn dev
-
-# Backend proxy (from tools/)
-php -S localhost:8000
 
 # Production build (from frieren-front/)
 yarn build

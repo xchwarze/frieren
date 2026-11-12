@@ -31,11 +31,11 @@ Vite env files live in `config/` (not project root). Mode mapping in `vite.confi
 
 ## Dev Proxy
 
-Dev server proxies `/api/*` to `http://localhost:8000/api-proxy.php`. Run the proxy with:
-```bash
-cd ../tools && php -S localhost:8000
-```
-Proxy forwards to device at `192.168.7.1:5000`.
+`yarn dev` starts Vite, which proxies `/api/*` directly to the hardware backend configured by `VITE_DEV_PROXY_TARGET` in `config/.env.dev` (default: `http://192.168.7.1:5000`). Vite preserves the request path, JSON `Content-Type`, `X-XSRF-TOKEN`, and session cookies.
+
+Keep the backend running on the device and update `VITE_DEV_PROXY_TARGET` if its address differs. No local PHP server is required.
+
+Only API requests are currently proxied. Third-party module assets under `/modules/*` require a separate static-asset proxy rule.
 
 ## Architecture
 
@@ -185,6 +185,7 @@ Bootstrap `data-bs-theme` attribute. Values: `'dark'`, `'light'`, or auto (syste
 | Variable | Description | Default |
 |---|---|---|
 | `VITE_RELATIVE_API_PATH` | API endpoint path | `api/index.php` |
+| `VITE_DEV_PROXY_TARGET` | Dev server API proxy target | `http://192.168.7.1:5000` in `config/.env.dev` |
 | `VITE_FULL_API_ENDPOINT` | Full API URL (overrides relative) | — |
 | `VITE_WEB_MODULES_FOLDER` | External modules folder | `modules` |
 | `VITE_COMPRESSION_ENABLE` | Gzip build output | `true` |
@@ -199,7 +200,7 @@ Bootstrap `data-bs-theme` attribute. Values: `'dark'`, `'light'`, or auto (syste
 - Output: `assets/[name].js`, `assets/[name].[ext]` (no hashes)
 - Optional gzip compression plugin
 - Optional bundle analyzer plugin
-- Dev proxy: `/api/*` → `localhost:8000/api-proxy.php`
+- Dev proxy: `/api/*` is forwarded directly to `VITE_DEV_PROXY_TARGET` (`http://192.168.7.1:5000` in `config/.env.dev`)
 
 ## Backend API Reference
 
